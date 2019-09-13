@@ -20,6 +20,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
 
     touch server.service
     echo $SERVICE_CONTENT > server.service
+    cat server.service
 
     # Create local repository and push to server
     git init
