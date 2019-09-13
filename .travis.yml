@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - lts/*
+addons:
+  ssh_known_hosts:
+    - 206.189.63.151
+after_success:
+  - bash _scripts/deploy.sh
