@@ -1,6 +1,6 @@
 #!/bin/bash
 # set for debugging
-set -x
+# set -x
 
 if [ $TRAVIS_BRANCH = "master" ]; then
 
@@ -19,9 +19,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     SERVICE_CONTENT="${SERVICE_CONTENT}Group:$SERVER_GROUP"
 
     touch server.service
-    echo "$SERVICE_CONTENT"
     echo "$SERVICE_CONTENT" > server.service
-    cat server.service
 
     # Create local repository and push to server
     git init
