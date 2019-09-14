@@ -28,7 +28,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     git init
 
     git remote add deploy "$SERVER_USER@$SERVER_IP}:$SERVER_PATH}"
-    git config.username = "Travis CI"
+    git config user.name = "Travis CI"
 
     git add .
     git commit -m "Deploy Commit: $TRAVIS_COMMIT"
