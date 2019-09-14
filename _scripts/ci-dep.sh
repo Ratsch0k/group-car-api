@@ -15,13 +15,17 @@ if [ $TRAVIS_BRANCH = "master" ]; then
 
     # Create service file
     SERVICE_CONTENT=$"[Unit]\n"
-    SERVICE_CONTENT=$"${SERVICE_CONTENT}Description=Api server for group-car. Handles api requests, not used as static resource distribution\n\n"
+    SERVICE_CONTENT=$"${SERVICE_CONTENT}Description=Api server for group-car. Handles api requests, not used as static resource distribution\n"
+    SERVICE_CONTENT=$"${SERVICE_CONTENT}After=network.target\n\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}[Service]\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}Type=forking\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}ExecStart=$SERVER_PATH/server/server.js\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}WorkingDirectory=$SERVER_PATH/server\n"
-    SERVICE_CONTENT=$"${SERVICE_CONTENT}User=$SERVER_USER\n"
-    SERVICE_CONTENT=$"${SERVICE_CONTENT}Group=$SERVER_GROUP\n\n"
+    SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=PATH=/usr/bin:/usr/local/bin\n"
+    SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=NODE_ENV=production\n"
+    SERVICE_CONTENT=$"${SERVICE_CONTENT}Restart=always\n"
+    SERVICE_CONTENT=$"${SERVICE_CONTENT}User=nobody\n"
+    SERVICE_CONTENT=$"${SERVICE_CONTENT}Group=nogroup\n\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}[Install]\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}WantedBy=multi-user.target"
 
