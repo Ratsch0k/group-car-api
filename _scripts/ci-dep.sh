@@ -29,7 +29,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
 
     # Create new folder to use as repository, copy data and remove unnecessary files
     mkdir _rep
-    cp -R *.* routes node_modules _rep
+    cp -R *.* routes _scripts _rep
     cd _rep
 
     # Create new repository and push to server
@@ -41,6 +41,8 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     git commit -m "Deploy Commit: $TRAVIS_COMMIT"
     git push --force deploy master
 
+    # Execute remote install script on server
+    ssh $SERVER_USER@$SERVER_IP _scripts/remote_install.sh
 else
     echo "Not on master branch, not deploying"
 fi
