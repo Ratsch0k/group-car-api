@@ -24,10 +24,8 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     touch server.service
     echo "$SERVICE_CONTENT" > server.service
 
-    # Create local repository and push to server
-    git init
-
-    git remote add deploy "$SERVER_USER@$SERVER_IP}:$SERVER_PATH}"
+    # Add server as new remote and push to server
+    git remote add deploy "$SERVER_USER@$SERVER_IP:$SERVER_PATH"
     git config user.name = "Travis CI"
 
     git add .
