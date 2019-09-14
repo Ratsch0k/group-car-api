@@ -44,7 +44,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     git push --force deploy master
 
     # Execute remote install script on server
-    ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/server/_scripts/remote_install.sh
+    ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/server/_scripts/remote_install.sh $SERVER_PATH/server
 else
     echo "Not on master branch, not deploying"
 fi
