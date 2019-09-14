@@ -22,7 +22,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     SERVICE_CONTENT=$"${SERVICE_CONTENT}Group:$SERVER_GROUP"
 
     touch server.service
-    echo "$SERVICE_CONTENT" > server.service
+    echo -e "$SERVICE_CONTENT" > server.service
 
     # Create new folder to use as repository, copy data and remove unnecessary files
     mkdir _rep
