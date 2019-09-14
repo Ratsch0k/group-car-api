@@ -28,9 +28,6 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     mkdir _rep
     cp -R *.* routes _rep
     cd _rep
-    rm .git
-    rm .gitignore
-    rm _scripts
 
     # Create new repository and push to server
     git init
