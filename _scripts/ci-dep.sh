@@ -1,6 +1,6 @@
 #!/bin/bash
 # set for debugging
-set -x
+# set -x
 
 # crash if any error occurs
 set -e
@@ -26,7 +26,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
 
     # Create new folder to use as repository, copy data and remove unnecessary files
     mkdir _rep
-    cp -R *.* routes _rep
+    cp -R *.* routes node_modules _rep
     cd _rep
 
     # Create new repository and push to server

@@ -5,4 +5,4 @@ addons:
   ssh_known_hosts:
     - 206.189.63.151
 after_success:
-  - bash _scripts/ci-deploy.sh
+  - bash _scripts/ci-dep.sh
