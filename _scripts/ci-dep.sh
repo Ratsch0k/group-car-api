@@ -22,7 +22,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     SERVICE_CONTENT=$"${SERVICE_CONTENT}ExecStart=$SERVER_PATH/server/server.js\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}WorkingDirectory=$SERVER_PATH/server\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=PATH=/usr/bin:/usr/local/bin\n"
-    SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=NODE_ENV=production\n"
+    SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=DEBUG=group-api:*\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}Restart=always\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}User=nobody\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}Group=nogroup\n\n"
@@ -37,6 +37,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     cp -R *.* routes _scripts _rep
     cd _rep
     chmod +x _scripts/remote_install.sh
+    chmod +x server.js
 
     # Create new repository and push to server
     git init
