@@ -1,11 +1,14 @@
 #!/bin/bash
 # set for debugging
-# set -x
+set -x
+
+# crash if any error occurs
+set -e
 
 if [ $TRAVIS_BRANCH = "master" ]; then
 
     # encrypt key
-    # missing line, encrypts key
+    openssl aes-256-cbc -K $encrypted_c28e77baa059_key -iv $encrypted_c28e77baa059_iv -in deploy-key.enc -out deploy-key -d
     rm deploy-key.enc
     chmod 600 deploy-key
     mv deploy-key ~/.ssh/id_rsa
