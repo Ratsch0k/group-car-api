@@ -17,6 +17,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     SERVICE_CONTENT=$"[Unit]\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}Description=Api server for group-car. Handles api requests, not used as static resource distribution\n\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}[Service]\n"
+    SERVICE_CONTENT=$"${SERVICE_CONTENT}Type=forking\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}ExecStart=$SERVER_PATH/server/server.js\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}WorkingDirectory=$SERVER_PATH/server\n"
     SERVICE_CONTENT=$"${SERVICE_CONTENT}User=$SERVER_USER\n"
@@ -31,6 +32,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     mkdir _rep
     cp -R *.* routes _scripts _rep
     cd _rep
+    chmod +x _scripts/remote_install.sh
 
     # Create new repository and push to server
     git init
@@ -42,7 +44,7 @@ if [ $TRAVIS_BRANCH = "master" ]; then
     git push --force deploy master
 
     # Execute remote install script on server
-    ssh $SERVER_USER@$SERVER_IP _scripts/remote_install.sh
+    ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/server/_scripts/remote_install.sh
 else
     echo "Not on master branch, not deploying"
 fi
