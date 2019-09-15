@@ -1,4 +1,6 @@
-# Group Car Api
+[![Build Status](https://travis-ci.com/Ratsch0k/group-car-api.svg?token=VoTpURfdRAcYtA5D82Re&branch=master)](https://travis-ci.com/Ratsch0k/group-car-api)
+
+# Group Car Api 
 ## Backend api for the webapp Group Car
 
 --------
