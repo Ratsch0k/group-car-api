@@ -3,3 +3,6 @@ _scripts
 
 # Ignore node modules
 node_modules
+
+# Ignore everything in the public folder
+public
