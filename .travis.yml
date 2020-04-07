@@ -25,7 +25,7 @@ jobs:
     - stage: "Compare version and tag"
       script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
     - stage: "Deploy"
-      script: sudo _scripts/ci-dep.sh
+      script: sudo ./_scripts/ci-dep.sh
 
 stages:
   - "Static Analysis"
