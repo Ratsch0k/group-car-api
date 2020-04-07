@@ -7,5 +7,25 @@ node_js:
 addons:
   ssh_known_hosts:
     - 206.189.63.151
-after_success:
-  - bash _scripts/ci-dep.sh
+
+cache:
+  directories:
+    - node_modules
+
+jobs: 
+  include:
+    - stage: "Static Analysis"
+      name: "Eslint"
+      script: npm run eslint
+    - script: npm audit
+      name: "Audit"
+# Tests don't exist yet
+#    - stage: "Test"
+#      script: npm test
+    - stage: "Deploy"
+      script: _scripts/ci-dep.sh
+
+stages:
+  - "Static Analysis"
+  - name: "Deploy"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
