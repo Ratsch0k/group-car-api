@@ -31,8 +31,8 @@ jobs:
         - sudo bash _scripts/ci-dep.sh
 
 stages:
-  - "Static Analysis"
-  - name: "Compare version and tag"
-    if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
-  - name: "Deploy"
-    if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
+  #- "Static Analysis"
+  #- name: "Compare version and tag"
+  #  if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
+  - "Deploy"
+    #if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
