@@ -29,6 +29,7 @@ jobs:
       script: 
         - echo "$USER"
         - cat ~/.ssh/config
+        - cat ~/.ssh/known_hosts
         - ls -la ~/.ssh/
         - sudo bash _scripts/ci-dep.sh
 
