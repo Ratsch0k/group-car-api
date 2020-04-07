@@ -25,7 +25,7 @@ jobs:
     - stage: "Compare version and tag"
       script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
     - stage: "Deploy"
-      before_script: 'echo -e "Host 206.189.63.151\n\tBatchMode=yes\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config' # Disables strict host key checking (no authenticity warning)
+      before_script: 'echo -e "Host 206.189.63.151\n\tBatchMode yes\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config' # Disables strict host key checking (no authenticity warning)
       script: 
         - cat ~/.ssh/config
         - sudo bash _scripts/ci-dep.sh
