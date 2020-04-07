@@ -4,6 +4,7 @@ dist: bionic
 language: node_js
 node_js:
   - lts/*
+
 addons:
   ssh_known_hosts:
     - 206.189.63.151
@@ -25,7 +26,9 @@ jobs:
 #    - stage: "Compare version and tag"
 #      script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
     - stage: "Deploy"
-      before_script: 'echo -e "Host 206.189.63.151\n\tUserKnownHostsFile /dev/null\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config' # Disables strict host key checking (no authenticity warning)
+      before_script: 
+        - 'echo -e "Host 206.189.63.151\n\tUserKnownHostsFile /dev/null\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config' # Disables strict host key checking (no authenticity warning)
+        - 'echo -e "my-group-car.de,206.189.63.151 ssh-rsa\nAAAAB3NzaC1yc2EAAAADAQABAAABAQC736REkChWZCIw3JxIZox/en2/IEoq+Yu4agOMxcgpxp0ZM+zm8KqHuZg2h1SMia7TvaNdl/IsLyD/+vSYp/VnJZ/SQxU4GnRhbLHPMameLbwo04HD9ujhgOOtQEmnWHxdm+iDopEDlbrlg8H3/lpePGkaDp6UCZi14TrdkPFwEaGj9ZKDxiMlBtY8oh9azRlMUQClQ+KCwRJhe8/8wcP6RXZ+/aMI3ZTVV4Bd1YX0whSeaIsq5p0Bu05zeVfiBA3Z9L2QGUtsPRcoUnTvmyUxZrn9GR0CcVtLK5/phk7lxXycXB9XzqBCfjxvaChYg38A7yWsnYnfD8VGdsvEMPnL" >> ~/.ssh/known_hosts'
       script: 
         - echo "$USER"
         - cat ~/.ssh/config
