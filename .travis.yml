@@ -1,8 +1,37 @@
+os: linux
+dist: bionic
+
 language: node_js
 node_js:
   - lts/*
+
 addons:
   ssh_known_hosts:
     - 206.189.63.151
-after_success:
-  - bash _scripts/ci-dep.sh
+
+cache:
+  directories:
+    - node_modules
+
+jobs: 
+  include:
+#   - stage: "Static Analysis"
+#   name: "Eslint"
+#   script: npm run eslint
+#    - script: npm audit
+#      name: "Audit"
+# Tests don't exist yet
+#    - stage: "Test"
+#      script: npm test
+#    - stage: "Compare version and tag"
+#      script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
+    - stage: "Deploy"
+      script: 
+        - sudo bash _scripts/ci-dep.sh
+
+stages:
+  #- "Static Analysis"
+  #- name: "Compare version and tag"
+  #  if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
+  - "Deploy"
+    #if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
