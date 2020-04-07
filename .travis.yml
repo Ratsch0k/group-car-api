@@ -27,7 +27,7 @@ jobs:
 #      script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
     - stage: "Deploy"
       script: 
-        - sudo bash _scripts/ci-dep.sh
+        - bash _scripts/ci-dep.sh
 
 stages:
   #- "Static Analysis"
