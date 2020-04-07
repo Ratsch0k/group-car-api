@@ -32,5 +32,5 @@ stages:
   - "Static Analysis"
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
-  - "Deploy"
+  - name: "Deploy"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
