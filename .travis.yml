@@ -5,7 +5,7 @@ language: node_js
 node_js:
   - lts/*
 addons:
-  known_hosts:
+  ssh_known_hosts:
     - 206.189.63.151
 
 cache:
