@@ -28,6 +28,7 @@ jobs:
       before_script: 'echo -e "Host 206.189.63.151\n\tBatchMode yes\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config' # Disables strict host key checking (no authenticity warning)
       script: 
         - cat ~/.ssh/config
+        - ls -la ~/.ssh/
         - sudo bash _scripts/ci-dep.sh
 
 stages:
