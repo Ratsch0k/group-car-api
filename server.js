@@ -5,7 +5,7 @@
  */
 
 const app = require('./app');
-const debug = require('debug')('group-api:server');
+const debug = require('debug')('my-group-car:http');
 const http = require('http');
 
 /**

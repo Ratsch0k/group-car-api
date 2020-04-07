@@ -1,9 +1,11 @@
 {
-  "name": "group-car-api",
+  "name": "my-group-car-api",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "node server.js",
+    "debug": "set DEBUG=my-group-car:* & node server.js",
+    "debugAll": "set DEBUG=* & node server.js",
     "eslint": "./node_modules/.bin/eslint . --ext .js"
   },
   "dependencies": {
