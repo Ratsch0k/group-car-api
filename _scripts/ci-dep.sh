@@ -42,4 +42,4 @@ rm -r node_modules
 scp -r $PWD/* $SERVER_USER@$SERVER_IP:$SERVER_PATH
 
 # Execute remote install script on server
-ssh -t $SERVER_USER@$SERVER_IP $SERVER_PATH/_scripts/remote_install.sh $SERVER_PATH
+ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/_scripts/remote_install.sh $SERVER_PATH
