@@ -13,11 +13,11 @@ mv deploy-key ~/.ssh/id_rsa
 
 # Create service file
 SERVICE_CONTENT=$"[Unit]\n"
-SERVICE_CONTENT=$"${SERVICE_CONTENT}Description=Api server for group-car. Handles api requests, not used as static resource distribution\n"
+SERVICE_CONTENT=$"${SERVICE_CONTENT}Description=Api server for group-car. Handles api requests and serves frontend\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}After=network.target\n\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}[Service]\n"
-SERVICE_CONTENT=$"${SERVICE_CONTENT}ExecStart=$SERVER_PATH/server/server.js\n"
-SERVICE_CONTENT=$"${SERVICE_CONTENT}WorkingDirectory=$SERVER_PATH/server\n"
+SERVICE_CONTENT=$"${SERVICE_CONTENT}ExecStart=$SERVER_PATH/server.js\n"
+SERVICE_CONTENT=$"${SERVICE_CONTENT}WorkingDirectory=$SERVER_PATH\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=PATH=/usr/bin:/usr/local/bin\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=DEBUG=group-api:*\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Restart=always\n"
@@ -30,6 +30,7 @@ touch server.service
 echo -e "$SERVICE_CONTENT" > server.service
 
 # Create new folder to use as repository, copy data and remove unnecessary files
+cp -R _scripts build
 cd build
 mkdir _rep
 cp -R *.* routes _scripts _rep
@@ -47,4 +48,4 @@ git commit -m "Deploy Commit: $TRAVIS_COMMIT"
 git push --force deploy master
 
 # Execute remote install script on server
-ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/server/_scripts/remote_install.sh $SERVER_PATH/server
+ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/_scripts/remote_install.sh $SERVER_PATH
