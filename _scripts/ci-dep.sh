@@ -2,6 +2,9 @@
 # crash if any error occurs
 set -ev
 
+# Build code
+npm run tsc
+
 # encrypt key
 openssl aes-256-cbc -K $encrypted_c28e77baa059_key -iv $encrypted_c28e77baa059_iv -in deploy-key.enc -out deploy-key -d
 rm deploy-key.enc
@@ -27,6 +30,7 @@ touch server.service
 echo -e "$SERVICE_CONTENT" > server.service
 
 # Create new folder to use as repository, copy data and remove unnecessary files
+cd build
 mkdir _rep
 cp -R *.* routes _scripts _rep
 cd _rep

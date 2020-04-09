@@ -20,6 +20,8 @@ jobs:
       script: npm run eslint
     - script: npm audit
       name: "Audit"
+    - stage: "Build"
+      script: npm run tsc
 # Tests don't exist yet
 #    - stage: "Test"
 #      script: npm test
@@ -30,6 +32,7 @@ jobs:
 
 stages:
   - "Static Analysis"
+  - "Build"
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
   - name: "Deploy"

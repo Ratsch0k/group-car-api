@@ -6,3 +6,6 @@ node_modules
 
 # Ignore everything in the public folder
 public
+
+#Ignore build js files
+build

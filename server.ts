@@ -5,15 +5,14 @@
  */
 
 const app = require('./app');
-const debug = require('debug')('my-group-car:http');
+const debug = require('debug')('group-car:http');
 const http = require('http');
-const config = require('./config.json');
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || config.port);
+const port = normalizePort(process.env.npm_package_config_port || '8080');
 app.set('port', port);
 
 /**
@@ -35,7 +34,7 @@ server.on('listening', onListening);
  * @param {string} val  a string which represent a port
  * @return {number | string | boolean} the normalized port
  */
-function normalizePort(val) {
+function normalizePort(val: string) {
   const port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -55,7 +54,7 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  * @param {error} error the thrown error
  */
-function onError(error) {
+function onError(error: any) {
   if (error.syscall !== 'listen') {
     throw error;
   }
