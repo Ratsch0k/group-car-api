@@ -34,7 +34,7 @@ chmod +x _scripts/remote_install.sh
 chmod +x build/server.js
 
 # Copy files to server to the correct path
-scp -r . $SERVER_IP:$SERVER_PATH
+scp -r . $SERVER_USER@$SERVER_IP:$SERVER_PATH
 
 # Execute remote install script on server
 ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/_scripts/remote_install.sh $SERVER_PATH
