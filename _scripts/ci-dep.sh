@@ -33,8 +33,7 @@ echo -e "$SERVICE_CONTENT" > group-car.service
 
 # Create new folder to use as repository, copy data and remove unnecessary files
 chmod +x _scripts/remote_install.sh
-chmod +x build/server.js
-chmod +x start.sh
+chmod +x build/group-car.js
 
 # Delete node_modules for faster file transfer
 rm -r node_modules
