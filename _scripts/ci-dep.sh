@@ -17,7 +17,7 @@ SERVICE_CONTENT=$"${SERVICE_CONTENT}Description=Api server for group-car. Handle
 SERVICE_CONTENT=$"${SERVICE_CONTENT}After=network.target\n\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}[Service]\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}ExecStart=$SERVER_PATH/start.sh\n"
-SERVICE_CONTENT=$"${SERVICE_CONTENT}WorkingDirectory=$SERVER_PATH/build\n"
+SERVICE_CONTENT=$"${SERVICE_CONTENT}WorkingDirectory=$SERVER_PATH\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=PATH=/usr/bin:/usr/local/bin\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=DEBUG=group-api:*\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Restart=always\n"
@@ -32,12 +32,13 @@ echo -e "$SERVICE_CONTENT" > server.service
 # Create new folder to use as repository, copy data and remove unnecessary files
 chmod +x _scripts/remote_install.sh
 chmod +x build/server.js
+chomd +x start.sh
 
 # Delete node_modules for faster file transfer
 rm -r node_modules
 
 # Copy files to server to the correct path
-scp -pr $PWD/* $SERVER_USER@$SERVER_IP:$SERVER_PATH
+scp -r $PWD/* $SERVER_USER@$SERVER_IP:$SERVER_PATH
 
 # Execute remote install script on server
 ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/_scripts/remote_install.sh $SERVER_PATH
