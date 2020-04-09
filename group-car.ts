@@ -5,8 +5,8 @@
  */
 
 const app = require('./app');
-const debug: debug.Debug & { debug: debug.Debug; default: debug.Debug } =
-  require('debug')('group-car:http');
+import debug = require('debug');
+debug('group-car:http');
 const http = require('http');
 
 /**
