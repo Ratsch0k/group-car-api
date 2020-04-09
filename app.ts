@@ -22,10 +22,8 @@ app.use('/api/login', loginRouter);
 
 app.use(
     express.static(
-      process.env.DEBUG ?
-      path.join(__dirname, 'public') :
-      process.env.npm_package_config_public ||
-      process.env.PUBLIC ||
-      path.join(__dirname, 'public')));
+        process.env.npm_package_config_public ||
+        process.env.PUBLIC ||
+        path.join(__dirname, 'public')));
 
 module.exports = app;
