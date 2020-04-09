@@ -30,20 +30,11 @@ touch server.service
 echo -e "$SERVICE_CONTENT" > server.service
 
 # Create new folder to use as repository, copy data and remove unnecessary files
-mkdir _rep
-rsync -av . _rep --exclude .git 
-cd _rep
 chmod +x _scripts/remote_install.sh
 chmod +x build/server.js
 
-# Create new repository and push to server
-git init
-git remote add deploy "$SERVER_USER@$SERVER_IP:$SERVER_PATH"
-git config user.name = "Travis CI"
-
-git add .
-git commit -m "Deploy Commit: $TRAVIS_COMMIT"
-git push --force deploy master
+# Copy files to server to the correct path
+scp -r . $SERVER_IP:$SERVER_PATH
 
 # Execute remote install script on server
 ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/_scripts/remote_install.sh $SERVER_PATH
