@@ -16,8 +16,8 @@ SERVICE_CONTENT=$"[Unit]\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Description=Api server for group-car. Handles api requests and serves frontend\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}After=network.target\n\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}[Service]\n"
-SERVICE_CONTENT=$"${SERVICE_CONTENT}ExecStart=$SERVER_PATH/server.js\n"
-SERVICE_CONTENT=$"${SERVICE_CONTENT}WorkingDirectory=$SERVER_PATH\n"
+SERVICE_CONTENT=$"${SERVICE_CONTENT}ExecStart=$SERVER_PATH/start.sh\n"
+SERVICE_CONTENT=$"${SERVICE_CONTENT}WorkingDirectory=$SERVER_PATH/build\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=PATH=/usr/bin:/usr/local/bin\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=DEBUG=group-api:*\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Restart=always\n"
@@ -30,10 +30,8 @@ touch server.service
 echo -e "$SERVICE_CONTENT" > server.service
 
 # Create new folder to use as repository, copy data and remove unnecessary files
-cp -R _scripts build
-cd build
 mkdir _rep
-cp -R *.* routes _scripts _rep
+rsync -av . /_rep --exclude .git
 cd _rep
 chmod +x _scripts/remote_install.sh
 chmod +x server.js
