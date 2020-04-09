@@ -31,7 +31,7 @@ echo -e "$SERVICE_CONTENT" > server.service
 
 # Create new folder to use as repository, copy data and remove unnecessary files
 mkdir _rep
-rsync -av . /_rep --exclude .git 
+rsync -av . _rep --exclude .git 
 cd _rep
 chmod +x _scripts/remote_install.sh
 chmod +x server.js
