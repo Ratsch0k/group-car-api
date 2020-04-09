@@ -7,12 +7,12 @@
     "public": "../html/"
   },
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpileOnly server.ts",
-    "debug": "set DEBUG=group-car:* & ts-node-dev --respawn --transpileOnly server.ts",
-    "debugAll": "set DEBUG=* & ts-node-dev --respawn --transpileOnly server.ts",
+    "dev": "ts-node-dev --respawn --transpileOnly group-car.ts",
+    "debug": "set DEBUG=group-car:* & ts-node-dev --respawn --transpileOnly group-car.ts",
+    "debugAll": "set DEBUG=* & ts-node-dev --respawn --transpileOnly group-car.ts",
     "eslint": "./node_modules/.bin/eslint . --ext .js,.ts",
     "tsc": "tsc",
-    "prod": "tsc & node ./build/server.js"
+    "prod": "tsc & node ./build/group-car.js"
   },
   "dependencies": {
     "@types/debug": "^4.1.5",
