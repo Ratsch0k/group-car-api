@@ -32,7 +32,7 @@ echo -e "$SERVICE_CONTENT" > server.service
 # Create new folder to use as repository, copy data and remove unnecessary files
 chmod +x _scripts/remote_install.sh
 chmod +x build/server.js
-chomd +x start.sh
+chmod +x start.sh
 
 # Delete node_modules for faster file transfer
 rm -r node_modules
