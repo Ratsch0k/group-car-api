@@ -15,25 +15,25 @@ cache:
 
 jobs: 
   include:
-#    - stage: "Static Analysis"
-#      name: "Eslint"
-#      script: npm run eslint
-#    - script: npm audit
-#      name: "Audit"
-#    - stage: "Build"
-#      script: npm run tsc
+    - stage: "Static Analysis"
+      name: "Eslint"
+      script: npm run eslint
+    - script: npm audit
+      name: "Audit"
+    - stage: "Build"
+      script: npm run tsc
 # Tests don't exist yet
 #    - stage: "Test"
 #      script: npm test
-#    - stage: "Compare version and tag"
-#      script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
+    - stage: "Compare version and tag"
+      script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
     - stage: "Deploy"
       script: bash _scripts/ci-dep.sh
 
 stages:
-#  - "Static Analysis"
-#  - "Build"
-#  - name: "Compare version and tag"
-#    if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
+  - "Static Analysis"
+  - "Build"
+  - name: "Compare version and tag"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
   - name: "Deploy"
-#    if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
