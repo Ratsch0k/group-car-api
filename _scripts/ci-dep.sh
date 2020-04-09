@@ -33,8 +33,11 @@ echo -e "$SERVICE_CONTENT" > server.service
 chmod +x _scripts/remote_install.sh
 chmod +x build/server.js
 
+# Delete node_modules for faster file transfer
+rm -r node_modules
+
 # Copy files to server to the correct path
-scp -r $PWD $SERVER_USER@$SERVER_IP:$SERVER_PATH
+scp -pr $PWD/* $SERVER_USER@$SERVER_IP:$SERVER_PATH
 
 # Execute remote install script on server
 ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/_scripts/remote_install.sh $SERVER_PATH
