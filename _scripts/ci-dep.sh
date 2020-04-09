@@ -34,7 +34,7 @@ mkdir _rep
 rsync -av . _rep --exclude .git 
 cd _rep
 chmod +x _scripts/remote_install.sh
-chmod +x server.js
+chmod +x build/server.js
 
 # Create new repository and push to server
 git init
