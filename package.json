@@ -4,7 +4,7 @@
   "private": true,
   "config": {
     "port": "8080",
-    "public": "../html/"
+    "public": "../group-car/build/"
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpileOnly group-car.ts",

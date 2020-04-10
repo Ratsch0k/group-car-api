@@ -20,10 +20,23 @@ app.use(cookieParser());
 app.use('/api/test', testRouter);
 app.use('/api/login', loginRouter);
 
+/**
+ * Configure static serving and spa serving
+ */
 app.use(
     express.static(
-        process.env.npm_package_config_public ||
-        process.env.PUBLIC ||
-        path.join(__dirname, 'public')));
+        path.join(
+            path.resolve(process.env.npm_package_config_public) ||
+            path.resolve(process.env.PUBLIC) ||
+            __dirname)));
+
+app.get('/*', (req, res) => {
+  res.sendFile(
+      path.join(
+          path.resolve(process.env.npm_package_config_public) ||
+          path.resolve(process.env.PUBLIC) ||
+          __dirname,
+          'index.html'));
+});
 
 module.exports = app;
