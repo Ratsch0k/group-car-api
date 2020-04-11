@@ -36,6 +36,7 @@ jobs:
 stages:
   - "Static Analysis"
   - "Build"
+  - "Test"
   - "Generate typedoc"
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
