@@ -21,22 +21,26 @@ app.use('/api/test', testRouter);
 app.use('/api/login', loginRouter);
 
 /**
- * Configure static serving and spa serving
+ * Configure static serving and spa serving.
+ * Check how the public path is supplied. If no environment is provided
+ * do not serve static content.
+ * Priority has directly provided environment variable "HTML_STATIC"
  */
-app.use(
-    express.static(
-        path.join(
-            path.resolve(process.env.npm_package_config_public) ||
-            path.resolve(process.env.PUBLIC) ||
-            __dirname)));
+if (process.env.npm_package_config_public || process.env.HTML_STATIC) {
+  app.use(
+      express.static(
+          path.join(
+              path.resolve(process.env.HTML_STATIC ||
+                process.env.npm_package_config_public))));
 
-app.get('/*', (req, res) => {
-  res.sendFile(
-      path.join(
-          path.resolve(process.env.npm_package_config_public) ||
-          path.resolve(process.env.PUBLIC) ||
-          __dirname,
-          'index.html'));
-});
+  app.get('/*', (req, res) => {
+    res.sendFile(
+        path.join(
+            path.resolve(process.env.HTML_STATIC ||
+                process.env.npm_package_config_public),
+            'index.html'));
+  });
+}
+
 
 module.exports = app;
