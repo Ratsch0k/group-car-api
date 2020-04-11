@@ -9,12 +9,12 @@ const router: express.Router = express.Router();
  * @param res Http response
  */
 const loginRouter: express.RequestHandler = (req, res) => {
-  if (!req.body.user || !req.body.password) {
+  if (!req.body.username || !req.body.password) {
     debug.log('Request is missing required credentials');
     res.status(400).send();
   }
 
-  debug.log('%o requested login', req.body.user);
+  debug.log('%o requested login', req.body.username);
   res.status(501).send();
 };
 

@@ -7,7 +7,7 @@
 const app = require('./app');
 import debug = require('debug');
 debug('group-car:http');
-const http = require('http');
+import http from 'http';
 
 /**
  * Get port from environment and store in Express.
@@ -86,8 +86,12 @@ function onError(error: any) {
  */
 function onListening() {
   const addr = server.address();
-  const bind = typeof addr === 'string' ?
-        'pipe ' + addr :
-        'port ' + addr.port;
-  debug('Listening on ' + bind);
+  if (addr !== null) {
+    const bind = typeof addr === 'string' ?
+    'pipe ' + addr :
+    'port ' + addr.port;
+    debug('Listening on ' + bind);
+  }
 }
+
+module.exports = server;

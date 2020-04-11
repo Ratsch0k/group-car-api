@@ -26,6 +26,8 @@ jobs:
     - stage: "Test"
       name: "Unit Tests"
       script: npm run unitTest
+    - script: npm run integrationTest
+      name: "Integration Tests"
     - stage: "Generate typedoc"
       script: npm run typedoc
     - stage: "Compare version and tag"
