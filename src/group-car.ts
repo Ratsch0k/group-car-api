@@ -7,7 +7,7 @@
 const app = require('./app');
 import debug = require('debug');
 debug('group-car:http');
-import http from 'http';
+import http = require('http');
 
 /**
  * Get port from environment and store in Express.

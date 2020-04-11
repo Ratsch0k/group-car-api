@@ -1,5 +1,5 @@
-import http = require('http');
 import request = require('supertest');
+import http = require('http'); // eslint-disable-line no-unused-vars
 
 describe('LoginRouter', () => {
   let server: http.Server;
