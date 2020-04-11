@@ -20,5 +20,6 @@ module.exports = {
   ],
   'rules': {
     "new-cap": "off",
+    "valid-jsdoc": "off"
   },
 };

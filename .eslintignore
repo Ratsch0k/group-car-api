@@ -4,8 +4,8 @@ _scripts
 # Ignore node modules
 node_modules
 
-# Ignore everything in the public folder
-public
+# Ignore everything in the static folder
+static
 
 #Ignore build js files
 build

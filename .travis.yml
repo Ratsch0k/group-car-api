@@ -12,6 +12,7 @@ addons:
 cache:
   directories:
     - node_modules
+    - static/doc/typedoc # Cache generated typescript documentation
 
 jobs: 
   include:
@@ -25,6 +26,8 @@ jobs:
 # Tests don't exist yet
 #    - stage: "Test"
 #      script: npm test
+    - stage: "Generate typedoc"
+      script: npm run typedoc
     - stage: "Compare version and tag"
       script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
     - stage: "Deploy"
@@ -33,6 +36,7 @@ jobs:
 stages:
   - "Static Analysis"
   - "Build"
+  - "Generate typedoc"
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
   - name: "Deploy"

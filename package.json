@@ -7,12 +7,13 @@
     "public": "../group-car/build/"
   },
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpileOnly group-car.ts",
-    "debug": "set DEBUG=group-car:* & ts-node-dev --respawn --transpileOnly group-car.ts",
-    "debugAll": "set DEBUG=* & ts-node-dev --respawn --transpileOnly group-car.ts",
+    "dev": "ts-node-dev --respawn --transpileOnly src/group-car.ts",
+    "debug": "set DEBUG=group-car:* & ts-node-dev --respawn --transpileOnly src/group-car.ts",
+    "debugAll": "set DEBUG=* & ts-node-dev --respawn --transpileOnly src/group-car.ts",
     "eslint": "./node_modules/.bin/eslint . --ext .js,.ts",
     "tsc": "tsc",
-    "prod": "tsc & node ./build/group-car.js"
+    "prod": "tsc & node ./build/group-car.js",
+    "typedoc": "typedoc"
   },
   "dependencies": {
     "@types/debug": "^4.1.5",
@@ -28,6 +29,7 @@
     "@typescript-eslint/parser": "^2.27.0",
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
-    "ts-node-dev": "^1.0.0-pre.44"
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typedoc": "^0.17.4"
   }
 }

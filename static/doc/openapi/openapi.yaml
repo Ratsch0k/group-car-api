@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: Group car api
+  version: 0.1.0
+
+# Paths
+paths:
+  /api/status:
+    get:
+      summary: Test path
+      description: A test path to check if the server is reachable
+      responses:
+        200:
+          description: The standard response. The server is reachable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusObject'
+
+# Components
+components:
+  schemas:
+    StatusObject:
+      type: object
+      properties:
+        server:
+          $ref: '#/components/schemas/StatusType'
+        database:
+          $ref: '#/components/schemas/StatusType'
+    StatusType:
+      type: string
+      enum:
+      - 'up'
+      - 'down'
+
+# External docs
+externalDocs:
+  description: Code documentation is here
+  url: /doc/typedoc
