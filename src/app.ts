@@ -6,9 +6,8 @@ import logger = require('morgan');
 /**
  * Import router
  */
-const statusRouter = require('src/routes/statusRouter');
-const loginRouter = require('src/routes/loginRouter');
-
+const statusRouter = require('routes/statusRouter');
+const loginRouter = require('routes/loginRouter');
 
 const app: express.Application = express();
 

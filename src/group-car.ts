@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const app = require('./app');
+const app = require('app');
 import debug = require('debug');
 debug('group-car:http');
 import http = require('http');
