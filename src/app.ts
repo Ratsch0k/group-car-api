@@ -1,13 +1,13 @@
 import express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
+import path = require('path');
+import cookieParser = require('cookie-parser');
+import logger = require('morgan');
 
 /**
  * Import router
  */
-const statusRouter = require('./routes/status');
-const loginRouter = require('./routes/login');
+const statusRouter = require('src/routes/statusRouter');
+const loginRouter = require('src/routes/loginRouter');
 
 
 const app: express.Application = express();
@@ -36,13 +36,15 @@ if (process.env.npm_package_config_public || process.env.HTML_STATIC) {
       express.static(
           path.join(
               path.resolve(process.env.HTML_STATIC ||
-                process.env.npm_package_config_public))));
+                process.env.npm_package_config_public ||
+                'static'))));
 
   app.get('/*', (req, res) => {
     res.sendFile(
         path.join(
             path.resolve(process.env.HTML_STATIC ||
-                process.env.npm_package_config_public),
+                process.env.npm_package_config_public ||
+                'static'),
             'index.html'));
   });
 }

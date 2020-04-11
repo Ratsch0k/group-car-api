@@ -2,11 +2,11 @@ import express = require('express');
 const router: express.Router = express.Router();
 
 /**
- * Status handler
+ * Status router
  * @param req Http request
  * @param res Http response
  */
-const statusHandler: express.RequestHandler = (req, res) => {
+const statusRouter: express.RequestHandler = (req, res) => {
   res.send({
     server: 'up',
     database: 'down',
@@ -14,8 +14,8 @@ const statusHandler: express.RequestHandler = (req, res) => {
 };
 
 /**
- * Add the statusHandler to the get route
+ * Add the {@link statusRouter} to the get route
  */
-router.get('/', statusHandler);
+router.get('/', statusRouter);
 
 module.exports = router;

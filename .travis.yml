@@ -23,9 +23,9 @@ jobs:
       name: "Audit"
     - stage: "Build"
       script: npm run tsc
-# Tests don't exist yet
-#    - stage: "Test"
-#      script: npm test
+    - stage: "Test"
+      name: "Unit Tests"
+      script: npm run unitTest
     - stage: "Generate typedoc"
       script: npm run typedoc
     - stage: "Compare version and tag"

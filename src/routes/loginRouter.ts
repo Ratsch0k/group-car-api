@@ -4,21 +4,23 @@ debug('group-car:login');
 const router: express.Router = express.Router();
 
 /**
- * Login handler
+ * Login router
  * @param req Http request
  * @param res Http response
  */
-const loginHandler: express.RequestHandler = (req, res) => {
+const loginRouter: express.RequestHandler = (req, res) => {
   if (!req.body.user || !req.body.password) {
+    debug.log('Request is missing required credentials');
     res.status(400).send();
   }
 
   debug.log('%o requested login', req.body.user);
+  res.status(501).send();
 };
 
 /**
- * Add the loginHandler to the router
+ * Add the {@link loginRouter} to the router
  */
-router.put('/', loginHandler);
+router.put('/', loginRouter);
 
 module.exports = router;
