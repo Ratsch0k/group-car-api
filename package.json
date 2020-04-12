@@ -17,7 +17,7 @@
     "test": "set DEBUG=group-car:* && mocha -r ts-node/register -r tsconfig-paths/register test/**/*.spec.ts",
     "unitTest": "set DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register test/unit/**/*.spec.ts",
     "integrationTest": " set DEBUG=group-car:* && mocha -r ts-node/register -r tsconfig-paths/register test/integration/**/*.spec.ts",
-    "migrate": "sequelize db:migrate"
+    "migrate": "sequelize-cli db:migrate"
   },
   "dependencies": {
     "@types/bluebird": "^3.5.30",
