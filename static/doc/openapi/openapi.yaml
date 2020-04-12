@@ -16,10 +16,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusObject'
-
+  /api/users:
+    get:
+      summary: Get all users
+      description: Get a list of all users
+      responses:
+        200:
+          description: The list of all users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
 # Components
 components:
   schemas:
+    # Status schemas
     StatusObject:
       type: object
       properties:
@@ -32,6 +43,28 @@ components:
       enum:
       - 'up'
       - 'down'
+    # User schemas
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        isBetaUser:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UserList:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
 
 # External docs
 externalDocs:

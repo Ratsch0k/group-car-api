@@ -23,4 +23,4 @@ const loginRouter: express.RequestHandler = (req, res) => {
  */
 router.put('/', loginRouter);
 
-module.exports = router;
+export default router;

@@ -2,12 +2,16 @@ import express = require('express');
 import path = require('path');
 import cookieParser = require('cookie-parser');
 import logger = require('morgan');
+import debug from 'debug';
+const log = debug('group-car:app:log');
+log('Environment: %s', process.env.NODE_ENV);
 
 /**
  * Import router
  */
-const statusRouter = require('routes/statusRouter');
-const loginRouter = require('routes/loginRouter');
+import statusRouter from 'routes/statusRouter';
+import loginRouter from 'routes/loginRouter';
+import userRouter from 'routes/userRouter';
 
 const app: express.Application = express();
 
@@ -18,6 +22,7 @@ app.use(cookieParser());
 
 app.use('/api/test', statusRouter);
 app.use('/api/login', loginRouter);
+app.use('/api/user', userRouter);
 
 /**
  * Configure serving of documentation
@@ -49,4 +54,4 @@ if (process.env.npm_package_config_public || process.env.HTML_STATIC) {
 }
 
 
-module.exports = app;
+export default app;

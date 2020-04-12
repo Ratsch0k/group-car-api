@@ -1,16 +1,27 @@
-import express = require('express');
-const router: express.Router = express.Router();
+import express, { Router, RequestHandler } from 'express';
+const router: Router = express.Router();
+import database from 'db';
+
+export type state = 'up' | 'down';
+export interface Status {
+  server: state;
+  database: state;
+}
 
 /**
  * Status router
  * @param req Http request
  * @param res Http response
  */
-const statusRouter: express.RequestHandler = (req, res) => {
-  res.send({
-    server: 'up',
-    database: 'down',
-  });
+const statusRouter: RequestHandler = (req, res) => {
+  database.isAvailable().then((avail: boolean) => {
+    const status: Status = {
+      server: 'up',
+      database: avail ? 'up' : 'down', 
+    }
+
+    res.send(status);
+  })
 };
 
 /**
@@ -18,4 +29,4 @@ const statusRouter: express.RequestHandler = (req, res) => {
  */
 router.get('/', statusRouter);
 
-module.exports = router;
+export default router;

@@ -4,10 +4,13 @@
  * Module dependencies.
  */
 
-const app = require('app');
-import debug = require('debug');
-debug('group-car:http');
+import app from 'app';
+import debug from 'debug';
 import http = require('http');
+import db from './db';
+
+const log = debug('group-car:http:log');
+const error = debug('group-car:http:error');
 
 /**
  * Get port from environment and store in Express.
@@ -90,8 +93,16 @@ function onListening() {
     const bind = typeof addr === 'string' ?
     'pipe ' + addr :
     'port ' + addr.port;
-    debug('Listening on ' + bind);
+    log('Listening on ' + bind);
   }
+
+  db.isAvailable().then((avail: boolean) => {
+    if(avail) {
+      log('Database is available')
+    } else {
+      error('Database is not available');
+    }
+  })
 }
 
 module.exports = server;

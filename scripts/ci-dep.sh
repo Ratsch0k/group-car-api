@@ -22,6 +22,7 @@ SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=PATH=/usr/bin:/usr/local/bin\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=DEBUG=group-car:*\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=HTML_STATIC=../html/\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=PORT=8080\n"
+SERVICE_CONTENT=$"${SERVICE_CONTENT}Environment=NODE_ENV=production\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Restart=always\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}User=$SERVER_USER\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Group=$SERVER_GROUP\n\n"
@@ -32,7 +33,7 @@ touch server.service
 echo -e "$SERVICE_CONTENT" > group-car.service
 
 # Create new folder to use as repository, copy data and remove unnecessary files
-chmod +x _scripts/remote_install.sh
+chmod +x scripts/remote_install.sh
 chmod +x build/group-car.js
 
 # Delete node_modules for faster file transfer

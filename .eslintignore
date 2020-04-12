@@ -9,3 +9,6 @@ static
 
 #Ignore build js files
 build
+
+# Ignore database specific files
+db
