@@ -46,4 +46,4 @@ ssh $SERVER_USER@$SERVER_IP rm -R $SERVER_PATH/*
 scp -r $PWD/* $SERVER_USER@$SERVER_IP:$SERVER_PATH
 
 # Execute remote install script on server
-ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/_scripts/remote_install.sh $SERVER_PATH
+ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/scripts/remote_install.sh $SERVER_PATH
