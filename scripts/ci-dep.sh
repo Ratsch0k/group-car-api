@@ -39,8 +39,8 @@ chmod +x build/group-car.js
 # Delete node_modules for faster file transfer
 rm -r node_modules
 
-# Delete files on server
-ssh $SERVER_USER@$SERVER_IP rm -R $SERVER_PATH/*
+# Delete files on server if they exists
+ssh $SERVER_USER@$SERVER_IP [[ $(ls -A $SERVER_PATH) ]] && rm -R $SERVER_PATH/* || echo "No files in path" 
 
 # Copy files to server to the correct path
 scp -pr $PWD/. $SERVER_USER@$SERVER_IP:$SERVER_PATH
