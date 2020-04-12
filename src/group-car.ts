@@ -97,12 +97,12 @@ function onListening() {
   }
 
   db.isAvailable().then((avail: boolean) => {
-    if(avail) {
-      log('Database is available')
+    if (avail) {
+      log('Database is available');
     } else {
       error('Database is not available');
     }
-  })
+  });
 }
 
 module.exports = server;

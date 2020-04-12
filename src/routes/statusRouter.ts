@@ -1,5 +1,5 @@
-import express, { Router, RequestHandler } from 'express';
-const router: Router = express.Router();
+import express from 'express';
+const router: express.Router = express.Router();
 import database from 'db';
 
 export type state = 'up' | 'down';
@@ -13,15 +13,15 @@ export interface Status {
  * @param req Http request
  * @param res Http response
  */
-const statusRouter: RequestHandler = (req, res) => {
+const statusRouter: express.RequestHandler = (req, res) => {
   database.isAvailable().then((avail: boolean) => {
     const status: Status = {
       server: 'up',
-      database: avail ? 'up' : 'down', 
-    }
+      database: avail ? 'up' : 'down',
+    };
 
     res.send(status);
-  })
+  });
 };
 
 /**
