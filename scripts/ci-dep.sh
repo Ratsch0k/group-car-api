@@ -43,7 +43,7 @@ rm -r node_modules
 ssh $SERVER_USER@$SERVER_IP rm -R $SERVER_PATH/*
 
 # Copy files to server to the correct path
-scp -r $PWD/* $SERVER_USER@$SERVER_IP:$SERVER_PATH
+scp -r $PWD/. $SERVER_USER@$SERVER_IP:$SERVER_PATH
 
 # Execute remote install script on server
 ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/scripts/remote_install.sh $SERVER_PATH
