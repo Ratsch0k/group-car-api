@@ -39,11 +39,9 @@ chmod +x build/group-car.js
 # Delete node_modules for faster file transfer
 rm -r node_modules
  
-# Delete files on server if they exists
-ssh $SERVER_USER@$SERVER_IP [[ $(ls -A $SERVER_PATH) ]] && rm -R $SERVER_PATH/* || echo "No files in path" 
- 
 # Copy files to server to the correct path
-scp -pr $(pwd) $SERVER_USER@$SERVER_IP:$SERVER_PATH
+rsync --recursive --times --compress --delete --progress ./ $SERVER_USER@$SERVER_IP:$SERVER_PATH
+
  
 # Execute remote install script on server
 ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/scripts/remote_install.sh $SERVER_PATH
