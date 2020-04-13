@@ -3,30 +3,29 @@ import path = require('path');
 import cookieParser = require('cookie-parser');
 import logger = require('morgan');
 import debug from 'debug';
+import errorHandler from 'errors/errorHandler';
 const log = debug('group-car:app:log');
 log('Environment: %s', process.env.NODE_ENV);
 
 /**
  * Import router
  */
-import statusRouter from 'routes/statusRouter';
-import loginRouter from 'routes/loginRouter';
-import userRouter from 'routes/userRouter';
-import errorHandler from './errors/restError';
-
+import statusRouter from 'routes/api/statusRouter';
+import loginRouter from 'routes/auth/loginRouter';
+import userRouter from 'routes/api/userRouter';
+import signUpRouter from 'routes/auth/signUpRouter';
 const app: express.Application = express();
 
-// Overwrite the res.send function with custom error handling
-express.response.send = errorHandler(express.response.send);
-
+app.set('trust proxy', true);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
 app.use('/api/test', statusRouter);
-app.use('/api/login', loginRouter);
+app.use('/auth/login', loginRouter);
 app.use('/api/user', userRouter);
+app.use('/auth/signup', signUpRouter);
 
 /**
  * Configure serving of documentation
@@ -56,6 +55,9 @@ if (process.env.npm_package_config_public || process.env.HTML_STATIC) {
             'index.html'));
   });
 }
+
+// Register error handler
+app.use(errorHandler);
 
 
 export default app;

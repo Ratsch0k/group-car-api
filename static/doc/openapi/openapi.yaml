@@ -1,7 +1,11 @@
 openapi: 3.0.3
 info:
   title: Group car api
-  version: 0.1.0
+  version: 0.1.10
+  
+tags:
+- name: Authentication
+  description: Requests for authentication
 
 # Paths
 paths:
@@ -29,10 +33,12 @@ paths:
                 $ref: '#/components/schemas/UserList'
   
   # Authentication
-  /api/login:
+  /auth/login:
     put:
       summary: Log in
       description: Logs the user in with the given username and the given password
+      tags:
+      - Authentication
       requestBody:
         description: Login data
         content:
@@ -54,7 +60,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
-                
+  /auth/signup:
+    put:
+      summary: Sign up
+      description: Signs the user up with the given attributes
+      tags:
+      - Authentication
+      requestBody:
+        description: The sign up properties
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpObject'
+      responses:
+        200:
+          description: The user was succesfully signed up
+        400:
+          description: The request is malformed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
 # Components
 components:
   schemas:
@@ -100,6 +126,15 @@ components:
         username:
           type: string
         password: 
+          type: string
+    SignUpObject:
+      type: object
+      properties:
+        email: 
+          type: string
+        username:
+          type: string
+        password:
           type: string
     # Error
     RestError:
