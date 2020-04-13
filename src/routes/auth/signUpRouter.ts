@@ -3,6 +3,7 @@ import debug = require('debug');
 import signUpValidators from 'validators/signUpValidators';
 import signUpController from 'controllers/auth/signUpController';
 import {validationResult} from 'express-validator';
+import InvalidRequestError from 'src/errors/invalidReqestError';
 debug('group-car:login');
 const router: express.Router = express.Router();
 
@@ -13,8 +14,8 @@ const router: express.Router = express.Router();
  */
 const signUpRouter: express.RequestHandler = (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty) {
-    next(errors);
+  if (!errors.isEmpty()) {
+    throw new InvalidRequestError(errors);
   } else {
     next();
   }
@@ -23,6 +24,6 @@ const signUpRouter: express.RequestHandler = (req, res, next) => {
 /**
  * Add the {@link signUpRouter} to the router
  */
-router.put('/', signUpValidators, signUpRouter, signUpController);
+router.put('/', signUpValidators.validator, signUpRouter, signUpController);
 
 export default router;

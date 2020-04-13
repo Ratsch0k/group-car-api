@@ -27,24 +27,25 @@ export class RestError {
   /**
    * The error object which was thrown.
    */
-  public readonly error?: Error;
+  public readonly errorInfo?: any;
 
   /**
    * Creates an instance of this class.
    * @param statusCode Http status code of the error
    * @param message   Message of the error
    * @param timestamp When the error occurred
-   * @param error     The thrown error
+   * @param error     More info about the error,
+   *    can be used on the client for better error visualization
    */
   constructor(statusCode: number,
       message: string,
       timestamp: Date,
-      error?: Error) {
+      errorInfo?: any) {
     this.statusCode = statusCode;
     this.status = STATUS_CODES[statusCode];
     this.message = message;
     this.timestamp = timestamp;
-    this.error = error;
+    this.errorInfo = errorInfo;
   }
 }
 

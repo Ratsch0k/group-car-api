@@ -11,7 +11,7 @@ import InternalError from './internalError';
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   console.error(err.stack);
   if (err instanceof RestError) {
-    res.status(err.statusCode).send(err);
+    res.status(err.statusCode).send(err as RestError);
   } else {
     if (process.env.NODE_ENV === 'production') {
       res.status(500).send(new InternalError());
