@@ -1,5 +1,6 @@
 import express = require('express');
 import debug = require('debug');
+import NotImplementedError from 'src/errors/notImplementedError';
 debug('group-car:login');
 const router: express.Router = express.Router();
 
@@ -15,7 +16,7 @@ const loginRouter: express.RequestHandler = (req, res) => {
   }
 
   debug.log('%o requested login', req.body.username);
-  res.status(501).send();
+  res.send(new NotImplementedError(req.path));
 };
 
 /**

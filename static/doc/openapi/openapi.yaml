@@ -27,10 +27,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserList'
+  
+  # Authentication
+  /api/login:
+    put:
+      summary: Log in
+      description: Logs the user in with the given username and the given password
+      requestBody:
+        description: Login data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginObject'
+      responses:
+        200:
+          description: The login was successful
+        400:
+          description: The login request is malformed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+        501:
+          description: The endpoint is not yet implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+                
 # Components
 components:
   schemas:
-    # Status schemas
+    # Status
     StatusObject:
       type: object
       properties:
@@ -43,7 +71,7 @@ components:
       enum:
       - 'up'
       - 'down'
-    # User schemas
+    # User
     User:
       type: object
       properties:
@@ -65,6 +93,34 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/User'
+    # Authentication
+    LoginObject:
+      type: object
+      properties:
+        username:
+          type: string
+        password: 
+          type: string
+    # Error
+    RestError:
+      type: object
+      required: 
+      - status
+      - statusCode
+      - timestamp
+      - message
+      properties:
+        status:
+          type: string
+        statusCode:
+          type: number
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        error:
+          type: object
 
 # External docs
 externalDocs:

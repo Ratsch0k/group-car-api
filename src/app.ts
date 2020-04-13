@@ -12,8 +12,12 @@ log('Environment: %s', process.env.NODE_ENV);
 import statusRouter from 'routes/statusRouter';
 import loginRouter from 'routes/loginRouter';
 import userRouter from 'routes/userRouter';
+import errorHandler from './errors/restError';
 
 const app: express.Application = express();
+
+// Overwrite the res.send function with custom error handling
+express.response.send = errorHandler(express.response.send);
 
 app.use(logger('dev'));
 app.use(express.json());
