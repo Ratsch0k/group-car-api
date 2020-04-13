@@ -68,8 +68,7 @@ const errorHandler = function(send: Send) {
     }
 
     // eslint-disable-next-line prefer-rest-params
-    send.apply(this, arguments as any);
-    return this;
+    return send.apply(this, arguments as any);
   };
 };
 
