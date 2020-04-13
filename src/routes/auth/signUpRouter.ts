@@ -3,7 +3,7 @@ import debug = require('debug');
 import signUpValidators from 'validators/signUpValidators';
 import signUpController from 'controllers/auth/signUpController';
 import {validationResult} from 'express-validator';
-import InvalidRequestError from 'src/errors/invalidReqestError';
+import InvalidRequestError from 'errors/invalidRequestError';
 debug('group-car:login');
 const router: express.Router = express.Router();
 
