@@ -1,6 +1,6 @@
 {
   "name": "group-car-api",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "config": {
     "port": "8080",
