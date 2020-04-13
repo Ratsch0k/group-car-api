@@ -16,7 +16,7 @@ const loginRouter: express.RequestHandler = (req, res) => {
   }
 
   debug.log('%o requested login', req.body.username);
-  res.send(new NotImplementedError(req.path));
+  throw new NotImplementedError(req.path);
 };
 
 /**
