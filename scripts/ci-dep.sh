@@ -40,7 +40,7 @@ chmod +x build/group-car.js
 rm -r node_modules
  
 # Copy files to server to the correct path
-rsync --recursive --times --compress --delete --progress ./ $SERVER_USER@$SERVER_IP:$SERVER_PATH
+rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER@$SERVER_IP:$SERVER_PATH
 
  
 # Execute remote install script on server
