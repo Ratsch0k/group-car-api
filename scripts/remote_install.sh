@@ -1,5 +1,8 @@
 #!/bin/bash
 set -ev
+
+source ~/.bashrc
+
 cd $1
 
 # Install dependencies

@@ -182,3 +182,6 @@ modules.xml
 
 # Typescript build directory
 build/
+
+# Ignore build typedoc documentation
+static/doc/typedoc/*

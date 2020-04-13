@@ -2,17 +2,48 @@ import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from 'db';
 
 /**
- *  Model class for users
+ * Model class for users.\
+ * Represents a column of the table 'users' in the database
  */
 class User extends Model {
+  /**
+   * Id of the user
+   */
   public id!: number;
+
+  /**
+   * Username (not email).\
+   * Is not allowed to be null or empty
+   */
   public username!: string;
+
+  /**
+   * Email of the user.\
+   * Is not allowed to be null or empty
+   */
   public email!: string;
+
+  /**
+   * Password of the user, is hashed with bcrypt.\
+   * Is not allowed to be null or empty
+   */
   public password!: string;
+
+  /**
+   * Whether or not the user has access to the beta build.\
+   * The default value is false and is never updated by a client request.
+   */
   public isBetaUser!: boolean;
 
   // Timestamps
+  /**
+   * The date and time the user was created
+   */
   public readonly createdAt!: Date;
+
+  /**
+   * The date and time the user was updated
+   */
   public readonly updatedAt!: Date;
 }
 
