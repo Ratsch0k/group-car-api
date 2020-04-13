@@ -6,7 +6,7 @@ cd $1
 npm install
 
 # Migrate database changes
-npm run migrate
+npm run prodMigrate
 
 # Restart service
 sudo systemctl daemon-reload
