@@ -15,6 +15,7 @@ import loginRouter from '@app/authentication/login/login-router';
 import userRouter from '@app/users/user-router';
 import signUpRouter from '@app/authentication/signUp/sign-up-router';
 import database from '@db';
+import config from '@config';
 const app: express.Application = express();
 
 app.set('trust proxy', true);
@@ -25,7 +26,7 @@ app.use(cookieParser());
 
 app.use('/api/test', statusRouter);
 app.use('/auth/login', loginRouter);
-app.use('/api/user', userRouter);
+app.use('/api', userRouter);
 app.use('/auth/signup', signUpRouter);
 
 /**
@@ -34,28 +35,14 @@ app.use('/auth/signup', signUpRouter);
 app.use(express.static('static'));
 
 /**
- * Configure static serving and spa serving.
- * Check how the public path is supplied. If no environment is provided
- * do not serve static content.
- * Priority has directly provided environment variable "HTML_STATIC"
+ * Configure static service
  */
-if (process.env.npm_package_config_public || process.env.HTML_STATIC) {
-  app.use(
-      express.static(
-          path.join(
-              path.resolve(process.env.HTML_STATIC ||
-                process.env.npm_package_config_public ||
-                'static'))));
-
-  app.get('/*', (req, res) => {
-    res.sendFile(
-        path.join(
-            path.resolve(process.env.HTML_STATIC ||
-                process.env.npm_package_config_public ||
-                'static'),
-            'index.html'));
-  });
-}
+app.use(express.static(config.staticPath.path));
+app.get('/*', (req, res) =>
+  res.sendFile(
+      path.join(
+          config.staticPath.path,
+          'index.html')));
 
 // Register error handler
 app.use(errorHandler);
