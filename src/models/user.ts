@@ -7,13 +7,14 @@ import {default as sequelize} from 'db';
  */
 class User extends Model {
   /**
-   * Id of the user
+   * The id of the user.\
+   * Primary key.
    */
   public id!: number;
 
   /**
    * Username (not email).\
-   * Is not allowed to be null or empty
+   * Is unique
    */
   public username!: string;
 
@@ -45,6 +46,11 @@ class User extends Model {
    * The date and time the user was updated
    */
   public readonly updatedAt!: Date;
+
+  /**
+   * The date and time the user was deleted
+   */
+  public readonly deletedAt!: Date;
 }
 
 /**
@@ -61,6 +67,7 @@ User.init(
       username: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
         validate: {
           notEmpty: true,
         },
@@ -96,6 +103,8 @@ User.init(
     {
       sequelize,
       tableName: 'users',
+      timestamps: true,
+      paranoid: true,
     });
 
 export default User;
