@@ -11,6 +11,9 @@
       "program": "${workspaceFolder}/app/group-car.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": ["${workspaceFolder}/build/**/*.js"],
+      "env": {
+        "NODE_ENV": "development",
+      },
       "runtimeArgs": [
         "-r", 
         "tsconfig-paths/register"
