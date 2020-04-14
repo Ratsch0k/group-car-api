@@ -1,4 +1,4 @@
-import {RestError} from './restError';
+import {RestError} from './rest-error';
 
 /**
  * Error which is thrown is an endpoint is not yet implemented.

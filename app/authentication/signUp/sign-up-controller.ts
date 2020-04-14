@@ -1,10 +1,16 @@
 import debug from 'debug';
 import {validationResult} from 'express-validator';
-import InvalidRequestError from '@app/errors/invalidRequestError';
+import InvalidRequestError from '@app/errors/invalid-request-error';
 
 type RequestHandler = import('express').RequestHandler;
 
+/**
+ * Log method for normal debug logging
+ */
 const log = debug('group-car:signup:controller:log');
+/**
+ * Log method for error logging
+ */
 const error = debug('group-car:signup:controller:error');
 
 /**

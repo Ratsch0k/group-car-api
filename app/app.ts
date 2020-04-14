@@ -3,17 +3,17 @@ import path = require('path');
 import cookieParser = require('cookie-parser');
 import logger = require('morgan');
 import debug from 'debug';
-import errorHandler from '@app/errors/errorHandler';
+import errorHandler from '@app/errors/error-handler';
 const log = debug('group-car:app:log');
 log('Environment: %s', process.env.NODE_ENV);
 
 /**
  * Import router
  */
-import statusRouter from '@app/api/statusRouter';
-import loginRouter from '@app/authentication/login/loginRouter';
-import userRouter from '@app/users/userRouter';
-import signUpRouter from '@app/authentication/signUp/signUpRouter';
+import statusRouter from '@app/api/status-router';
+import loginRouter from '@app/authentication/login/login-router';
+import userRouter from '@app/users/user-router';
+import signUpRouter from '@app/authentication/signUp/sign-up-router';
 import database from '@db';
 const app: express.Application = express();
 

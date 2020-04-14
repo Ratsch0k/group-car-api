@@ -1,4 +1,4 @@
-import {RestError} from './restError';
+import {RestError} from './rest-error';
 
 /**
  * Error class for internal errors.
@@ -13,8 +13,15 @@ class InternalError extends RestError {
   /**
    * Creates an instance of this class.
    */
-  constructor(stack?: string) {
-    super(500, 'An internal error occurred', new Date());
+  constructor(message?: string, stack?: string) {
+    let _message: string;
+    if (message === undefined) {
+      _message = 'An internal error occurred';
+    } else {
+      _message = message;
+    }
+
+    super(500, _message, new Date());
 
     this.stack = stack;
   }

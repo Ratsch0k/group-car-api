@@ -1,4 +1,4 @@
-import BadRequestError from './badRequestError';
+import BadRequestError from './bad-request-error';
 type Result = import('express-validator').Result;
 
 /**

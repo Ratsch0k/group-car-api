@@ -1,6 +1,6 @@
 type ErrorRequestHandler = import('express').ErrorRequestHandler;
-import RestError from './restError';
-import InternalError from './internalError';
+import RestError from './rest-error';
+import InternalError from './internal-error';
 
 /**
  * The general error handler for errors.
