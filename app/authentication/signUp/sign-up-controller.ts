@@ -4,6 +4,9 @@ import InvalidRequestError from '@app/errors/invalid-request-error';
 import User from '@app/users/user';
 import UserDto from '@app/users/user-dto';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
+import UsernameAlreadyExistsError from
+  '@app/users/username-already-exists-error';
+import {UniqueConstraintError} from 'sequelize';
 
 type RequestHandler = import('express').RequestHandler;
 
@@ -42,7 +45,12 @@ const signUpController: RequestHandler = (req, res, next) => {
       res.send(ModelToDtoConverter
           .convert<UserDto>(user.get({plain: true}), UserDto));
     }).catch((err) => {
-      next(err);
+      // Handle unique constraints error differently
+      if (err instanceof UniqueConstraintError) {
+        next(new UsernameAlreadyExistsError(req.body.username));
+      } else {
+        next(err);
+      }
     });
   }
 };
