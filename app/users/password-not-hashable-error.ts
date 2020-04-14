@@ -1,4 +1,5 @@
-import InternalError from './internal-error';
+import {InternalError} from '@errors';
+
 
 /**
  * Error thrown if an error occurred while hashing.
@@ -14,7 +15,7 @@ class PasswordNotHashableError extends InternalError {
    * @param user The user of which the password is
    */
   constructor(user: string) {
-    super(`Couldn't has the password for user '${user}'`);
+    super(`Couldn't hash the password for user '${user}'`);
 
     this.user = user;
   }
