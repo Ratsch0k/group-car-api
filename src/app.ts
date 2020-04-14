@@ -14,6 +14,7 @@ import statusRouter from 'routes/api/statusRouter';
 import loginRouter from 'routes/auth/loginRouter';
 import userRouter from 'routes/api/userRouter';
 import signUpRouter from 'routes/auth/signUpRouter';
+import database from './db';
 const app: express.Application = express();
 
 app.set('trust proxy', true);
@@ -58,6 +59,14 @@ if (process.env.npm_package_config_public || process.env.HTML_STATIC) {
 
 // Register error handler
 app.use(errorHandler);
+
+
+// If currently in environment sync the database
+if (process.env.NODE_ENV === 'development') {
+  database.sync({force: true}).then(() => {
+    console.log('Sync database');
+  });
+}
 
 
 export default app;
