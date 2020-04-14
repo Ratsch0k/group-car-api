@@ -26,7 +26,7 @@ app.use(cookieParser());
 
 app.use('/api/test', statusRouter);
 app.use('/auth/login', loginRouter);
-app.use('/api', userRouter);
+app.use('/api/user', userRouter);
 app.use('/auth/signup', signUpRouter);
 
 /**

@@ -23,6 +23,6 @@ const userRouter: express.RequestHandler = (req, res) => {
 /**
  * Add the {@link userRouter} to the get route
  */
-router.get('/users', userRouter);
+router.get('/', userRouter);
 
 export default router;

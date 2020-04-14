@@ -20,7 +20,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusObject'
-  /api/users:
+  /api/user:
     get:
       summary: Get all users
       description: Get a list of all users
