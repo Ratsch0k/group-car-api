@@ -1,5 +1,10 @@
 import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from '@db';
+import { ModelHooks, HookReturn } from 'sequelize/types/lib/hooks';
+import bcrypt from 'bcrypt';
+import config from '@config';
+import InternalError from '@app/errors/internal-error';
+import PasswordNotHashableError from '@app/errors/password-not-hashable-error';
 
 /**
  * Model class for users.\
@@ -54,6 +59,29 @@ class User extends Model {
 }
 
 /**
+ * Sets the password of the user to it's salted hash.
+ * @param user    The user for which to hash the password
+ * @param options Options
+ */
+const hashPasswordOfUser = (user: User, options: any) => {
+  bcrypt.hash(user.password, config.bcrypt.saltRounds).then((hash: string) => {
+    user.password = hash;
+  }).catch(() => {
+    throw new PasswordNotHashableError(user.username);
+  });
+};
+
+/**
+ * Create hooks for user model.\
+ * Will be used when initializing the model.
+ */
+const hooks: Partial<ModelHooks<User>> = {
+  beforeCreate: hashPasswordOfUser,
+  beforeUpdate: hashPasswordOfUser,
+  beforeSave: hashPasswordOfUser,
+};
+
+/**
  * Initialize user model
  */
 User.init(
@@ -103,6 +131,7 @@ User.init(
     {
       sequelize,
       tableName: 'users',
+      hooks,
       timestamps: true,
       paranoid: true,
     });
