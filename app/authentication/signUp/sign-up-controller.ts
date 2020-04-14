@@ -1,6 +1,9 @@
 import debug from 'debug';
 import {validationResult} from 'express-validator';
 import InvalidRequestError from '@app/errors/invalid-request-error';
+import User from '@app/users/user';
+import UserDto from '@app/users/user-dto';
+import ModelToDtoConverter from '@app/util/model-to-dto-converter';
 
 type RequestHandler = import('express').RequestHandler;
 
@@ -20,7 +23,7 @@ const error = debug('group-car:signup:controller:error');
  * @param username  Username
  * @param password  Password
  */
-const signUpController: RequestHandler = (req, res) => {
+const signUpController: RequestHandler = (req, res, next) => {
   log('IP %s requested sign up', req.ip);
 
   // Check for validation errors
@@ -30,6 +33,17 @@ const signUpController: RequestHandler = (req, res) => {
     throw new InvalidRequestError(errors);
   } else {
     log('Sign up for IP %s passed validation', req.ip);
+
+    User.create({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+    }).then((user) => {
+      res.send(ModelToDtoConverter
+          .convert<UserDto>(user.get({plain: true}), UserDto));
+    }).catch((err) => {
+      next(err);
+    });
   }
 };
 
