@@ -1,6 +1,6 @@
 import express from 'express';
 const router: express.Router = express.Router();
-import database from 'db';
+import database from '@db';
 
 export type state = 'up' | 'down';
 export interface Status {

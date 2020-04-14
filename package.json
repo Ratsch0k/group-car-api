@@ -7,16 +7,16 @@
     "public": "../group-car/build/"
   },
   "scripts": {
-    "dev": "ts-node -r tsconfig-paths/register --transpile-only src/group-car.ts",
-    "debug": "cross-env DEBUG=group-car:* ts-node --transpile-only -r tsconfig-paths/register src/group-car.ts",
-    "debugAll": "cross-env DEBUG=* ts-node --transpile-only -r tsconfig-paths/register src/group-car.ts",
+    "dev": "ts-node -r tsconfig-paths/register --transpile-only app/group-car.ts",
+    "debug": "cross-env DEBUG=group-car:* ts-node --transpile-only -r tsconfig-paths/register app/group-car.ts",
+    "debugAll": "cross-env DEBUG=* ts-node --transpile-only -r tsconfig-paths/register app/group-car.ts",
     "eslint": "./node_modules/.bin/eslint . --ext .js,.ts",
     "tsc": "tsc",
     "prod": "tsc & cross-env NODE_ENV=production node -r tsconfig-paths/register ./build/group-car.js",
     "typedoc": "typedoc",
-    "test": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register test/**/*.spec.ts",
-    "unitTest": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register test/unit/**/*.spec.ts",
-    "integrationTest": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register test/integration/**/*.spec.ts",
+    "test": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*.spec.ts",
+    "unitTest": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*unit.spec.ts",
+    "integrationTest": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*integration.spec.ts",
     "devMigrate": "cross-env NODE_ENV=development sequelize-cli db:migrate",
     "prodMigrate": "cross-env NODE_ENV=production sequelize-cli db:migrate"
   },

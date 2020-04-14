@@ -1,6 +1,6 @@
 import mocha = require('mocha');
 import chai = require('chai');
-const loginController = require('src/controllers/auth/loginController');
+const loginController = require('./loginController');
 
 mocha.describe('LoginController', () => {
   mocha.it('should return false', () => {

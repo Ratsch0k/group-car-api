@@ -1,7 +1,7 @@
 import {Sequelize} from 'sequelize';
 type Options = import('sequelize').Options;
 const env = process.env.NODE_ENV || 'development';
-const config = require('config/database')[env];
+const config = require('@app/config/database-config')[env];
 
 /**
  * An extension of the {@link Sequelize} class which also

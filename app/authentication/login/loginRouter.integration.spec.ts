@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../../../src/app';
+import app from '@app/app';
 
 describe('LoginRouter', () => {
   it('response with 400 if no username and password given', () => {

@@ -4,10 +4,10 @@
  * Module dependencies.
  */
 
-import app from 'app';
+import app from './app';
 import debug from 'debug';
 import http = require('http');
-import db from './db';
+import db from '@db';
 
 const log = debug('group-car:http:log');
 const error = debug('group-car:http:error');

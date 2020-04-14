@@ -1,5 +1,5 @@
 import {Model, DataTypes} from 'sequelize';
-import {default as sequelize} from 'db';
+import {default as sequelize} from '@db';
 
 /**
  * Model class for users.\
