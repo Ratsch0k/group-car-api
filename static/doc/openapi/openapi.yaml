@@ -136,6 +136,10 @@ components:
           type: string
         password:
           type: string
+      example:
+        email: demo@mai.com
+        username: demo
+        password: 123456
     # Error
     RestError:
       type: object
