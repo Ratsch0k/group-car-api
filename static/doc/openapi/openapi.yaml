@@ -74,7 +74,7 @@ paths:
               $ref: '#/components/schemas/SignUpObject'
       responses:
         200:
-          description: The user was succesfully signed up
+          description: The user was successfully signed up
         400:
           description: The request is malformed
           content:
@@ -154,7 +154,7 @@ components:
           format: date-time
         message:
           type: string
-        error:
+        errorInfo:
           type: object
 
 # External docs
