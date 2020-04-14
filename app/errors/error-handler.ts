@@ -14,7 +14,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     res.status(err.statusCode).send(new RestError(err.statusCode,
         err.message,
         err.timestamp,
-        err.errorInfo));
+        err.detail));
   } else {
     if (process.env.NODE_ENV === 'production') {
       res.status(500).send(new InternalError());
