@@ -2,7 +2,7 @@ import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from '@db';
 import bcrypt from 'bcrypt';
 import config from '@config';
-import PasswordNotHashableError from '@app/errors/password-not-hashable-error';
+import PasswordNotHashableError from '@app/users/password-not-hashable-error';
 
 type ModelHooks = import('sequelize/types/lib/hooks').ModelHooks;
 
@@ -64,7 +64,7 @@ class User extends Model {
  * @param options Options
  */
 const hashPasswordOfUser = (user: User, options: any) => {
-  return bcrypt.hash(user.password, config.bcrypt.saltRounds)
+  return bcrypt.hash(user.password + '', config.bcrypt.saltRounds)
       .then((hash: string) => {
         user.password = hash;
       }).catch(() => {
