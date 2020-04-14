@@ -3,7 +3,7 @@ import {STATUS_CODES} from 'http';
 /**
  * The model of an error response.
  */
-export class RestError {
+export class RestError extends Error {
   /**
    * The http status code of the error.
    */
@@ -41,6 +41,7 @@ export class RestError {
       message: string,
       timestamp: Date,
       errorInfo?: any) {
+    super();
     this.statusCode = statusCode;
     this.status = STATUS_CODES[statusCode];
     this.message = message;
