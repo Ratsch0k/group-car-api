@@ -1,6 +1,7 @@
 type ErrorRequestHandler = import('express').ErrorRequestHandler;
 import RestError from './rest-error';
 import InternalError from './internal-error';
+import config from '@app/config';
 
 /**
  * The general error handler for errors.
@@ -16,7 +17,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
         err.timestamp,
         err.detail));
   } else {
-    if (process.env.NODE_ENV === 'production') {
+    if (!config.error.withStack) {
       res.status(500).send(new InternalError());
     } else {
       res.status(500).send(new InternalError(err.stack));

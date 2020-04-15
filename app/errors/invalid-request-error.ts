@@ -17,9 +17,11 @@ class InvalidRequestError extends BadRequestError {
       for (let i = 0; i< resultArray.length; i++) {
         message += `${resultArray[i].param} -> ${resultArray[i].msg}, `;
       }
+
+      // Remove the last ', '
+      message = message.substring(0, message.length - 2);
     }
-    // Remove the last ', '
-    message = message.substring(0, message.length - 2);
+
     super(message, validationResult);
   }
 }

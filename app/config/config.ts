@@ -18,10 +18,15 @@ export interface StaticPathConfig {
   path: string;
 }
 
+export interface ErrorConfig {
+  withStack: boolean;
+}
+
 export interface Config {
   database: DBConfig;
   bcrypt: BcryptConfig;
   staticPath: StaticPathConfig;
+  error: ErrorConfig;
 }
 
 /**
@@ -29,21 +34,25 @@ export interface Config {
  */
 const database: DBConfig = require('./database-config')[environment];
 
-let bcrypt: BcryptConfig;
+/**
+ * Initialize BcryptConfig with default value.
+ */
+const bcrypt: BcryptConfig = {
+  saltRounds: 8,
+};
+/**
+ * Initialize ErrorConfig with default value
+ */
+const error: ErrorConfig = {
+  withStack: true,
+};
 
-// Depending on node environment configure differently
+// Depending on node environment changes configs
 if (environment === 'production') {
-  bcrypt = {
-    saltRounds: 10,
-  };
+  bcrypt.saltRounds = 10;
+  error.withStack = false;
 } else if (environment === 'test') {
-  bcrypt = {
-    saltRounds: 4,
-  };
-} else {
-  bcrypt = {
-    saltRounds: 8,
-  };
+  bcrypt.saltRounds = 4;
 }
 
 /**
@@ -75,6 +84,7 @@ const config: Config = {
   database,
   bcrypt,
   staticPath: staticPathConfig,
+  error,
 };
 
 export default config;
