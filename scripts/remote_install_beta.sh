@@ -7,7 +7,7 @@ cd $1
 npm install
 
 # Migrate database changes
-npm run betaMigrate
+npm run prodMigrate
 
 # Restart service
 sudo systemctl daemon-reload
