@@ -11,9 +11,9 @@ log('Environment: %s', process.env.NODE_ENV);
  * Import router
  */
 import statusRouter from '@app/api/status-router';
-import loginRouter from '@app/authentication/login/login-router';
+import loginRouter from '@app/auth/login/login-router';
 import userRouter from '@app/users/user-router';
-import signUpRouter from '@app/authentication/signUp/sign-up-router';
+import signUpRouter from '@app/auth/signUp/sign-up-router';
 import database from '@db';
 import config from '@config';
 const app: express.Application = express();
