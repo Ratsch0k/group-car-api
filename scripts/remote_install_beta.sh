@@ -11,4 +11,4 @@ npm run betaMigrate
 
 # Restart service
 sudo systemctl daemon-reload
-sudo systemctl restart group-car
+sudo systemctl restart beta.my-group-car.de
