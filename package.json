@@ -18,6 +18,7 @@
     "unitTest": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*unit.spec.ts",
     "integrationTest": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*integration.spec.ts",
     "devMigrate": "cross-env NODE_ENV=development sequelize-cli db:migrate",
+    "betaMigrate": "cross-env NODE_ENV=beta sequelize-cli db:migrate",
     "prodMigrate": "cross-env NODE_ENV=production sequelize-cli db:migrate"
   },
   "dependencies": {
