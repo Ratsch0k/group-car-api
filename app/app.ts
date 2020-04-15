@@ -2,11 +2,7 @@ import express = require('express');
 import path = require('path');
 import cookieParser = require('cookie-parser');
 import logger = require('morgan');
-import debug from 'debug';
 import errorHandler from '@app/errors/error-handler';
-const log = debug('group-car:app:log');
-log('Environment: %s', process.env.NODE_ENV);
-
 /**
  * Import router
  */
