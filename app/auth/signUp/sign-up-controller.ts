@@ -1,6 +1,4 @@
 import debug from 'debug';
-import {validationResult} from 'express-validator';
-import InvalidRequestError from '@app/errors/invalid-request-error';
 import User from '@app/users/user';
 import UserDto from '@app/users/user-dto';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
@@ -13,11 +11,11 @@ type RequestHandler = import('express').RequestHandler;
 /**
  * Log method for normal debug logging
  */
-const log = debug('group-car:signup:controller:log');
+const log = debug('group-car:sign-up:controller:log');
 /**
  * Log method for error logging
  */
-const error = debug('group-car:signup:controller:error');
+const error = debug('group-car:sign-up:controller:error');
 
 /**
  * Signs the user up.\
@@ -27,32 +25,26 @@ const error = debug('group-car:signup:controller:error');
  * @param password  Password
  */
 const signUpController: RequestHandler = (req, res, next) => {
-  log('IP %s requested sign up', req.ip);
-
-  // Check for validation errors
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error('Sign up for IP %s failed validation', req.ip);
-    throw new InvalidRequestError(errors);
-  } else {
-    log('Sign up for IP %s passed validation', req.ip);
-
-    User.create({
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-    }).then((user) => {
-      res.send(ModelToDtoConverter
-          .convert<UserDto>(user.get({plain: true}), UserDto));
-    }).catch((err) => {
-      // Handle unique constraints error differently
-      if (err instanceof UniqueConstraintError) {
-        next(new UsernameAlreadyExistsError(req.body.username));
-      } else {
-        next(err);
-      }
-    });
-  }
+  log('Create new user for %o', req.body);
+  User.create({
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+  }).then((user) => {
+    log('User %o successfully created', req.body);
+    res.send(ModelToDtoConverter
+        .convert<UserDto>(user.get({plain: true}), UserDto));
+  }).catch((err) => {
+    // Handle unique constraints error differently
+    if (err instanceof UniqueConstraintError) {
+      error('Couldn\'t create user %o, because username already exists',
+          req.body);
+      next(new UsernameAlreadyExistsError(req.body.username));
+    } else {
+      error('Couldn\'t create user %o', req.body);
+      next(err);
+    }
+  });
 };
 
 export default signUpController;

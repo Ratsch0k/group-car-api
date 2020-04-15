@@ -20,7 +20,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     if (!config.error.withStack) {
       res.status(500).send(new InternalError());
     } else {
-      res.status(500).send(new InternalError(err.stack));
+      res.status(500).send(new InternalError(undefined, err.stack));
     }
   }
 };

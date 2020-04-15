@@ -60,7 +60,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
-  /auth/signup:
+  /auth/sign-up:
     put:
       summary: Sign up
       description: Signs the user up with the given attributes
