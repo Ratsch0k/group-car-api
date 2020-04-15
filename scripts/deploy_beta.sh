@@ -29,7 +29,7 @@ SERVICE_CONTENT=$"${SERVICE_CONTENT}User=$SERVER_SERVICE_USER_BETA\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}[Install]\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}WantedBy=multi-user.target"
  
-touch server.service
+touch beta.my-group-car.de.service
 echo -e "$SERVICE_CONTENT" > beta.my-group-car.de.service
  
 # Create new folder to use as repository, copy data and remove unnecessary files
