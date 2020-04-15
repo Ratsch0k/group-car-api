@@ -1,4 +1,6 @@
 import path from 'path';
+import debug from 'debug';
+const log = debug('group-car:config');
 
 type DBConfig = import('sequelize/types').Config;
 /**
@@ -6,6 +8,7 @@ type DBConfig = import('sequelize/types').Config;
  * If none provided assume development.
  */
 const environment = process.env.NODE_ENV || 'development';
+log('Environment: %s', environment);
 
 export interface BcryptConfig {
   saltRounds: number;
