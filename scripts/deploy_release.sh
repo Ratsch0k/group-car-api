@@ -30,7 +30,7 @@ SERVICE_CONTENT=$"${SERVICE_CONTENT}[Install]\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}WantedBy=multi-user.target"
  
 touch server.service
-echo -e "$SERVICE_CONTENT" > group-car.service
+echo -e "$SERVICE_CONTENT" > my-group-car.de.service
  
 # Create new folder to use as repository, copy data and remove unnecessary files
 chmod +x scripts/remote_install_release.sh
