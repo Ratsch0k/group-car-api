@@ -1,6 +1,6 @@
 import * as express from 'express';
-import signUpValidators from '@app/authentication/signUp/sign-up-validators';
-import signUpController from '@app/authentication/signUp/sign-up-controller';
+import signUpValidators from '@app/auth/signUp/sign-up-validators';
+import signUpController from '@app/auth/signUp/sign-up-controller';
 
 const router: express.Router = express.Router();
 

@@ -41,6 +41,7 @@
     "pg": "^8.0.2",
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.6",
+    "sinon": "^9.0.2",
     "supports-color": "^7.1.0",
     "typescript": "^3.8.3"
   },
