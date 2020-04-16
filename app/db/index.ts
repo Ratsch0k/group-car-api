@@ -1,7 +1,6 @@
 import {Sequelize} from 'sequelize';
 type Options = import('sequelize').Options;
-const env = process.env.NODE_ENV || 'development';
-const config = require('@app/config/database-config')[env];
+import config from '@config';
 
 /**
  * An extension of the {@link Sequelize} class which also
@@ -38,9 +37,9 @@ export class Database extends Sequelize {
   }
 }
 
-const database = new Database(config.database,
-    config.username,
-    config.password,
-    config);
+const database = new Database(config.database.database,
+    config.database.username,
+    config.database.password || '',
+    config.database as unknown as Options);
 
 export default database;

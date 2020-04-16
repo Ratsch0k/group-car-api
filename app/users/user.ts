@@ -63,7 +63,7 @@ class User extends Model {
  * @param user    The user for which to hash the password
  * @param options Options
  */
-const hashPasswordOfUser = (user: User, options: any) => {
+export const hashPasswordOfUser = (user: User) => {
   return bcrypt.hash(user.password + '', config.bcrypt.saltRounds)
       .then((hash: string) => {
         user.password = hash;
