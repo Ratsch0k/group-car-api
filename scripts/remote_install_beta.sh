@@ -11,6 +11,10 @@ echo $2
 cat $2
 source $2
 export DB_USERNAME DB_HOSTNAME DB_PASSWORD DB_NAME
+echo $DB_USERNAME
+echo $DB_HOSTNAME
+echo $DB_PASSWORD
+echo $DB_NAME
 
 # Migrate database changes
 npm run prodMigrate
