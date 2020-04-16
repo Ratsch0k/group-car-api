@@ -20,9 +20,9 @@ const error = debug('group-car:sign-up:controller:error');
 /**
  * Signs the user up.\
  * Creates a new user with the given properties.
- * @param email     Email of the user
- * @param username  Username
- * @param password  Password
+ * @param req   Http request, information about user in `req.body`
+ * @param res   Http response
+ * @param next  The next request handler
  */
 const signUpController: RequestHandler = (req, res, next) => {
   log('Create new user for %o', req.body);

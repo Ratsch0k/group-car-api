@@ -6,6 +6,11 @@ type Result = import('express-validator').Result;
  */
 class InvalidRequestError extends BadRequestError {
   /**
+   * The result of the validation.
+   */
+  public validationResult: Result;
+
+  /**
    * Creates an instance of this class.
    * @param validationResult The result of the validation
    */
@@ -14,7 +19,7 @@ class InvalidRequestError extends BadRequestError {
     if (!validationResult.isEmpty()) {
       message += 'The following fields are invalid: ';
       const resultArray: any[] = validationResult.array();
-      for (let i = 0; i< resultArray.length; i++) {
+      for (let i = 0; i < resultArray.length; i++) {
         message += `${resultArray[i].param} -> ${resultArray[i].msg}, `;
       }
 
@@ -23,6 +28,8 @@ class InvalidRequestError extends BadRequestError {
     }
 
     super(message, validationResult);
+
+    this.validationResult = validationResult;
   }
 }
 

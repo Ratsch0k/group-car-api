@@ -15,7 +15,7 @@ const router: express.Router = express.Router();
  * @param res   Http response
  * @param next  Next handler
  */
-const signUpRouter: express.RequestHandler = (req, res, next) => {
+export const signUpRouter: express.RequestHandler = (req, res, next) => {
   log('IP %s requested sign up', req.ip);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

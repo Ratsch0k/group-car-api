@@ -7,7 +7,7 @@ class UsernameAlreadyExistsError extends BadRequestError {
   /**
    * The username which already exists.
    */
-  private readonly username: string;
+  public readonly username: string;
 
   /**
    * Creates an instance of this class.
