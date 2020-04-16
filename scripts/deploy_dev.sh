@@ -44,4 +44,4 @@ rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER@$SERVER_IP
 
  
 # Execute remote install script on server
-ssh $SERVER_USER@$SERVER_IP $SERVER_PATH_DEV/scripts/remote_install_dev.sh $SERVER_PATH_DEV
+ssh $SERVER_USER@$SERVER_IP $SERVER_PATH_DEV/scripts/remote_install_dev.sh $SERVER_PATH_DEV $SERVER_ENV_FILE_PATH_DEV

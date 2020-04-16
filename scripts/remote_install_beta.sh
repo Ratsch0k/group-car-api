@@ -7,9 +7,9 @@ cd $1
 npm install
 
 # Get secrets from environment file
-echo $SERVER_ENV_FILE_PATH_BETA
-cat $SERVER_ENV_FILE_PATH_BETA
-source $SERVER_ENV_FILE_PATH_BETA
+echo $2
+cat $2
+source $2
 export DB_USERNAME DB_HOSTNAME DB_PASSWORD DB_NAME
 
 # Migrate database changes

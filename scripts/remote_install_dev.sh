@@ -7,7 +7,7 @@ cd $1
 npm install
 
 # Get secrets from environment file
-source "$SERVER_ENV_FILE_PATH_DEV"
+source $2
 export DB_USERNAME DB_HOSTNAME DB_PASSWORD DB_NAME
 
 # Migrate database changes
