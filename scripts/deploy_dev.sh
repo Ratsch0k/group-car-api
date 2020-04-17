@@ -30,17 +30,17 @@ SERVICE_CONTENT=$"${SERVICE_CONTENT}[Install]\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}WantedBy=multi-user.target"
  
 touch server.service
-echo -e "$SERVICE_CONTENT" > group-car.service
+echo -e "$SERVICE_CONTENT" > dev.my-group-car.de.service
  
 # Create new folder to use as repository, copy data and remove unnecessary files
-chmod +x scripts/remote_install.sh
+chmod +x scripts/remote_install_dev.sh
 chmod +x build/group-car.js
  
 # Delete node_modules for faster file transfer
 rm -r node_modules
  
 # Copy files to server to the correct path
-rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER_@$SERVER_IP:$SERVER_PATH_DEV
+rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER@$SERVER_IP:$SERVER_PATH_DEV
 
  
 # Execute remote install script on server

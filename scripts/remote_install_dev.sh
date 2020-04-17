@@ -11,4 +11,4 @@ npm run devMigrate
 
 # Restart service
 sudo systemctl daemon-reload
-sudo systemctl restart group-car
+sudo systemctl restart dev.my-group-car.de
