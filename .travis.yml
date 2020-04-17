@@ -35,8 +35,8 @@ jobs:
       - NODE_ENV=test
       before_script:
         # Install postgres, create test user and test database for integration tests
-      - psql -c "CREATE USER groupCarApiTest" WITH PASSWORD 'groupCarApiTest';" -U postgres
-      - psql -c "CREATE DATABASE groupCarTest" WITH OWNER=groupCarApiTest;" -U postgres
+      - psql -c "CREATE USER groupCarApiTest WITH PASSWORD 'groupCarApiTest';" -U postgres
+      - psql -c "CREATE DATABASE groupCarTest WITH OWNER=groupCarApiTest;" -U postgres
       name: "Integration Tests"
     - stage: "Generate typedoc"
       script: npm run typedoc
