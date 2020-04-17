@@ -31,6 +31,9 @@ jobs:
     - script: 
       - npx sequelize-cli db:create
       - npm run integrationTest
+      before_script:
+      - apt-get install postgresql-11
+      - 
       name: "Integration Tests"
     - stage: "Generate typedoc"
       script: npm run typedoc
