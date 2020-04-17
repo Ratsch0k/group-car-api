@@ -7,9 +7,9 @@ module.exports = {
     dialect: 'postgres',
   },
   test: {
-    username: 'group-car-api-test',
-    password: 'group-car-api-test',
-    database: 'group-car-test',
+    username: 'groupCarApiTest',
+    password: 'groupCarApiTest',
+    database: 'groupCarTest',
     host: '127.0.0.1',
     dialect: 'postgres',
   },
