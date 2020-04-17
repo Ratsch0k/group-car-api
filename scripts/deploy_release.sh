@@ -29,7 +29,7 @@ SERVICE_CONTENT=$"${SERVICE_CONTENT}User=$SERVER_SERVICE_USER\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}[Install]\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}WantedBy=multi-user.target"
  
-touch server.service
+touch my-group-car.de.service
 echo -e "$SERVICE_CONTENT" > my-group-car.de.service
  
 # Create new folder to use as repository, copy data and remove unnecessary files
@@ -44,4 +44,4 @@ rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER@$SERVER_IP
 
  
 # Execute remote install script on server
-ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/scripts/remote_install_release.sh $SERVER_PATH
+ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/scripts/remote_install_release.sh $SERVER_PATH $SERVER_ENV_FILE_PATH
