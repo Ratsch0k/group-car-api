@@ -33,7 +33,7 @@ jobs:
       - NODE_ENV=test
       before_script:
         # Install postgres, create test user and test database for integration tests
-      - apt-get install postgresql-11
+      - sudo apt-get install postgresql-11
       - psql -c "CREATE USER "group-car-api-test" WITH PASSWORD 'group-car-api-test';"
       - psql -c "CREATE DATABASE "group-car-test" WITH OWNER="group-car-api-test";"
       name: "Integration Tests"
