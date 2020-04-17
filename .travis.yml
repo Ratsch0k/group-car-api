@@ -24,9 +24,13 @@ jobs:
     - stage: "Build"
       script: npm run tsc
     - stage: "Test"
+      env:
+      - NOE_ENV=test
       name: "Unit Tests"
       script: npm run unitTest
-    - script: npm run integrationTest
+    - script: 
+      - npx sequelize-cli db:create
+      - npm run integrationTest
       name: "Integration Tests"
     - stage: "Generate typedoc"
       script: npm run typedoc
