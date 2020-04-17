@@ -24,13 +24,13 @@ jobs:
     - stage: "Build"
       script: npm run tsc
     - stage: "Test"
-      env:
-      - NOE_ENV=test
       name: "Unit Tests"
       script: npm run unitTest
     - script: 
       - npx sequelize-cli db:create
       - npm run integrationTest
+      env:
+      - NODE_ENV=test
       before_script:
         # Install postgres, create test user and test database for integration tests
       - apt-get install postgresql-11
