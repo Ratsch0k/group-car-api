@@ -37,9 +37,23 @@ export class Database extends Sequelize {
   }
 }
 
-const database = new Database(config.database.database,
-    config.database.username,
-    config.database.password || '',
-    config.database as unknown as Options);
+const database = new Database(config.database.sequelize.database,
+    config.database.sequelize.username,
+    config.database.sequelize.password || '',
+    config.database.sequelize as unknown as Options);
+
+    // If currently in environment sync the database
+let syncPromise: Promise<void>;
+if (config.database.withFlush) {
+  syncPromise = database.sync({force: true}).then(() => {
+    console.log('Sync database');
+  });
+} else {
+  syncPromise = Promise.resolve();
+}
+
+export {
+  syncPromise,
+}
 
 export default database;

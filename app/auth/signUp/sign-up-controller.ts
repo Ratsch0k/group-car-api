@@ -25,23 +25,23 @@ const error = debug('group-car:sign-up:controller:error');
  * @param next  The next request handler
  */
 const signUpController: RequestHandler = (req, res, next) => {
-  log('Create new user for %o', req.body);
+  log('Create new user for "%s"', req.body.username);
   User.create({
     username: req.body.username,
     email: req.body.email,
     password: req.body.password,
   }).then((user) => {
-    log('User %o successfully created', req.body);
+    log('User "%s" successfully created', req.body.username);
     res.send(ModelToDtoConverter
         .convert<UserDto>(user.get({plain: true}), UserDto));
   }).catch((err) => {
     // Handle unique constraints error differently
     if (err instanceof UniqueConstraintError) {
-      error('Couldn\'t create user %o, because username already exists',
-          req.body);
+      error('Couldn\'t create user "%s", because username already exists',
+          req.body.username);
       next(new UsernameAlreadyExistsError(req.body.username));
     } else {
-      error('Couldn\'t create user %o', req.body);
+      error('Couldn\'t create user "%s"', req.body.username);
       next(err);
     }
   });

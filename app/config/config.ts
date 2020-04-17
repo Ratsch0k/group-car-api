@@ -2,7 +2,7 @@ import path from 'path';
 import debug from 'debug';
 const log = debug('group-car:config');
 
-type DBConfig = import('sequelize/types').Config;
+type SequelizeConfig = import('sequelize/types').Config;
 /**
  * Get node environment.\
  * If none provided assume development.
@@ -22,6 +22,11 @@ export interface ErrorConfig {
   withStack: boolean;
 }
 
+export interface DBConfig {
+  sequelize: SequelizeConfig;
+  withFlush: boolean;
+}
+
 export interface Config {
   database: DBConfig;
   bcrypt: BcryptConfig;
@@ -32,7 +37,7 @@ export interface Config {
 /**
  * Add database config
  */
-const database: DBConfig = require('./database-config')[environment];
+const sequelize: SequelizeConfig = require('./database-config')[environment];
 
 /**
  * Initialize BcryptConfig with default value.
@@ -47,10 +52,13 @@ const error: ErrorConfig = {
   withStack: true,
 };
 
+let withFlush = true;
+
 // Depending on node environment changes configs
 if (environment === 'production') {
   bcrypt.saltRounds = 10;
   error.withStack = false;
+  withFlush = false;
 } else if (environment === 'test') {
   bcrypt.saltRounds = 4;
 }
@@ -78,6 +86,11 @@ try {
 }
 const staticPathConfig: StaticPathConfig = {
   path: pathToStatic,
+};
+
+const database: DBConfig = {
+  sequelize,
+  withFlush,
 };
 
 const config: Config = {

@@ -10,7 +10,6 @@ import statusRouter from '@app/api/status-router';
 import loginRouter from '@app/auth/login/login-router';
 import userRouter from '@app/users/user-router';
 import signUpRouter from '@app/auth/signUp/sign-up-router';
-import database from '@db';
 import config from '@config';
 const app: express.Application = express();
 
@@ -42,14 +41,5 @@ app.get('/*', (req, res) =>
 
 // Register error handler
 app.use(errorHandler);
-
-
-// If currently in environment sync the database
-if (process.env.NODE_ENV === 'development') {
-  database.sync({force: true}).then(() => {
-    console.log('Sync database');
-  });
-}
-
 
 export default app;
