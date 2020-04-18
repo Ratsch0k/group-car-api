@@ -27,11 +27,16 @@ export interface DBConfig {
   withFlush: boolean;
 }
 
+export interface JWTConfig {
+  secret: string;
+}
+
 export interface Config {
   database: DBConfig;
   bcrypt: BcryptConfig;
   staticPath: StaticPathConfig;
   error: ErrorConfig;
+  jwt: JWTConfig;
 }
 
 /**
@@ -93,11 +98,26 @@ const database: DBConfig = {
   withFlush,
 };
 
+// Get the secret for the jwt
+// If no secret is provided exit with 1. #
+// Server shouldn't start without the secret
+const jwtSecret = process.env.JWT_SECRET;
+if (jwtSecret === undefined) {
+  console.error('Secret for jwt tokens is not provided. Please set the ' +
+      'environment variable "JWT_SECRET" to the secret which should be used\n');
+  process.exit(1);
+}
+
+const jwt: JWTConfig = {
+  secret: jwtSecret,
+};
+
 const config: Config = {
   database,
   bcrypt,
   staticPath: staticPathConfig,
   error,
+  jwt,
 };
 
 export default config;
