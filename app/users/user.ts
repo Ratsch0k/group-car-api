@@ -2,7 +2,7 @@ import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from '@db';
 import bcrypt from 'bcrypt';
 import config from '@config';
-import PasswordNotHashableError from '@app/users/password-not-hashable-error';
+import {PasswordNotHashableError} from '@errors';
 
 type ModelHooks = import('sequelize/types/lib/hooks').ModelHooks;
 

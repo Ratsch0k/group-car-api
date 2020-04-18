@@ -49,13 +49,7 @@ paths:
         200:
           description: The login was successful
         400:
-          description: The login request is malformed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
-        501:
-          description: The endpoint is not yet implemented
+          description: The login request is malformed, or the given credentials are invalid
           content:
             application/json:
               schema:

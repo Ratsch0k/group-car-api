@@ -1,7 +1,11 @@
 import express = require('express');
-import debug = require('debug');
-import NotImplementedError from '@app/errors/not-implemented-error';
-debug('group-car:login');
+import debug from 'debug';
+import loginValidators from './login-validators';
+import loginController from './login-controller';
+import {validationResult} from 'express-validator';
+import {InvalidRequestError} from '@app/errors';
+
+const log = debug('group-car:login:log');
 const router: express.Router = express.Router();
 
 /**
@@ -9,19 +13,19 @@ const router: express.Router = express.Router();
  * @param req Http request
  * @param res Http response
  */
-const loginRouter: express.RequestHandler = (req, res) => {
-  if (!req.body.username || !req.body.password) {
-    debug.log('Request is missing required credentials');
-    res.status(400).send();
+export const loginRouter: express.RequestHandler = (req, res, next) => {
+  log('IP %s requested login for user "%s"', req.ip, req.body.username);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new InvalidRequestError(errors);
+  } else {
+    next();
   }
-
-  debug.log('%o requested login', req.body.username);
-  throw new NotImplementedError(req.baseUrl + req.path);
 };
 
 /**
  * Add the {@link loginRouter} to the router
  */
-router.put('/', loginRouter);
+router.put('/', loginValidators.validator, loginRouter, loginController);
 
 export default router;

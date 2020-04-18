@@ -1,6 +1,5 @@
 import {InternalError} from '@errors';
 
-
 /**
  * Error thrown if an error occurred while hashing.
  */

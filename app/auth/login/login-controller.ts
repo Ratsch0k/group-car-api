@@ -1,11 +1,45 @@
+import User from '@app/users/user';
+import ModelToDtoConverter from '@app/util/model-to-dto-converter';
+import UserDto from '@app/users/user-dto';
+import bcrypt from 'bcrypt';
+import debug from 'debug';
+import InvalidLoginError from '@app/errors/login/invalid-login-error';
+
+type RequestHandler = import('express').RequestHandler;
+
+const log = debug('group-car:login:controller:log');
+const error = debug('group-car:login:controller:error');
+
 /**
  * Login controller
  * @param username Username of the login request
  * @param password Password of the login request
  * @return Whether or not the login was successful
  */
-const loginController = (username: string, password: string): boolean => {
-  return false;
+const loginController: RequestHandler = (req, res, next ) => {
+  User.findOne({
+    where: {
+      username: req.body.username,
+    },
+  }).then((user: User | null) => {
+    if (user === null) {
+      error('User "%s" doesn\'t exist', req.body.username);
+      throw new InvalidLoginError();
+    } else {
+      log('Found user "%s"', req.body.username);
+      // Compare password
+      return bcrypt.compare(req.body.password, user.password).then((result) => {
+        // Check if sent password is equal to stored user password
+        if (result) {
+          res.send(ModelToDtoConverter.convertSequelizeModel(user, UserDto));
+        } else {
+          throw new InvalidLoginError();
+        }
+      });
+    }
+  }).catch((err) => {
+    next(err);
+  });
 };
 
-module.exports = loginController;
+export default loginController;
