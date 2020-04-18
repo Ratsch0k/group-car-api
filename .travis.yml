@@ -26,9 +26,7 @@ jobs:
     - stage: "Test"
       name: "Unit Tests"
       script: npm run unitTest
-    - script: 
-      - npx sequelize-cli db:create
-      - npm run integrationTest
+    - script: npm run integrationTest
       services:
       - postgresql
       env:
