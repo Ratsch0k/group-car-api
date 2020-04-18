@@ -55,9 +55,9 @@ stages:
   - "Test"
   - "Generate typedoc"
   - name: "Deploy Development"
-    if: NOT tag IS present AND (type IN (push, pull_request)) AND fork  = false AND branch = develop
+    if: NOT tag IS present AND type = push AND fork = false AND branch = develop
   - name: "Deploy Beta"
-    if: NOT tag IS present AND (type IN (push, pull_request)) AND fork  = false AND branch = master
+    if: NOT tag IS present AND type = push AND fork = false AND branch = master
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
   - name: "Deploy Release"
