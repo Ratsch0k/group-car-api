@@ -32,7 +32,7 @@ const signUpController: RequestHandler = (req, res, next) => {
     password: req.body.password,
   }).then((user) => {
     log('User "%s" successfully created', req.body.username);
-    res.send(ModelToDtoConverter
+    res.status(201).send(ModelToDtoConverter
         .convert<UserDto>(user.get({plain: true}), UserDto));
   }).catch((err) => {
     // Handle unique constraints error differently

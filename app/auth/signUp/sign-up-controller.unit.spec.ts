@@ -27,10 +27,12 @@ describe('SignUpController', function() {
     const requestStub = stub(request);
     requestStub.body = user;
     const responseStub = stub(response);
+    response.status = stub().withArgs(201).returns(responseStub as any);
     responseStub.send = fake(() => {
       expect(responseStub.send.called);
       assert.notCalled(fakeNext);
       assert.calledWith(responseStub.send, match.instanceOf(UserDto));
+      assert.calledWith(responseStub.status, 201);
       // Get user object
       const responseUser = responseStub.send.args[0][0];
       expect(responseUser.username).to.equal(user.username);

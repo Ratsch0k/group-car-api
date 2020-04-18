@@ -48,7 +48,7 @@ describe('SignUpRouter', function() {
           });
     });
 
-    it('password is short than 6 characters', function() {
+    it('password is shorter than 6 characters', function() {
       const body = {
         username: 'demo',
         password: '12345',
@@ -115,7 +115,7 @@ describe('SignUpRouter', function() {
     return (request(app)
         .put('/auth/sign-up')
         .send(body))
-        .expect(200)
+        .expect(201)
         .then((response) => {
           expect(response.body).to.have.property('username', body.username);
           expect(response.body).to.have.property('email', body.email);
