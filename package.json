@@ -6,6 +6,25 @@
     "port": "8080",
     "public": "../group-car/build/"
   },
+  "nyc": {
+    "include": [
+      "app/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register",
+      "tsconfig-paths/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "report-dir": "./static/test/coverage",
+    "sourceMap": true,
+    "instrument": true
+  },
   "scripts": {
     "dev": "ts-node -r tsconfig-paths/register --transpile-only app/group-car.ts",
     "debug": "cross-env DEBUG=group-car:* ts-node --transpile-only -r tsconfig-paths/register app/group-car.ts",
@@ -15,12 +34,13 @@
     "prod": "tsc & cross-env NODE_ENV=production node -r tsconfig-paths/register ./build/group-car.js",
     "typedoc": "typedoc",
     "test": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*.spec.ts",
-    "unitTest": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*unit.spec.ts",
-    "integrationTest": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*integration.spec.ts",
+    "unitTest": "cross-env NODE_ENV=test DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*unit.spec.ts",
+    "integrationTest": "cross-env NODE_ENV=test DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*integration.spec.ts",
     "devMigrate": "cross-env NODE_ENV=development sequelize-cli db:migrate",
     "prodMigrate": "cross-env NODE_ENV=production sequelize-cli db:migrate"
   },
   "dependencies": {
+    "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.30",
     "@types/cookie-parser": "^1.4.2",
     "@types/debug": "^4.1.5",
@@ -29,8 +49,10 @@
     "@types/morgan": "^1.9.0",
     "@types/node": "^13.11.1",
     "@types/sequelize": "^4.28.8",
+    "@types/sinon": "^9.0.0",
     "@types/supertest": "^2.0.8",
     "@types/validator": "^13.0.0",
+    "bcrypt": "^4.0.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
@@ -39,6 +61,7 @@
     "pg": "^8.0.2",
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.6",
+    "sinon": "^9.0.2",
     "supports-color": "^7.1.0",
     "typescript": "^3.8.3"
   },
@@ -52,7 +75,9 @@
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^7.1.1",
+    "nyc": "^15.0.1",
     "sequelize-cli": "^5.5.1",
+    "source-map-support": "^0.5.16",
     "supertest": "^4.0.2",
     "ts-node": "^8.8.2",
     "tsconfig-paths": "^3.9.0",

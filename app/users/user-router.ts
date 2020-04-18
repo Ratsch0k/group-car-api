@@ -1,6 +1,11 @@
 import express from 'express';
-const router: express.Router = express.Router();
 import User from '@app/users/user';
+import ModelToDtoConverter from '@app/util/model-to-dto-converter';
+import UserDto from './user-dto';
+import debug from 'debug';
+
+const log = debug('group-car:user:router:log');
+const router: express.Router = express.Router();
 
 /**
  * User router
@@ -9,7 +14,9 @@ import User from '@app/users/user';
  */
 const userRouter: express.RequestHandler = (req, res) => {
   User.findAll().then((users: User[]) => {
-    res.send(users);
+    log(users);
+    res.send(ModelToDtoConverter
+        .convertAllSequelizeModels<UserDto>(users, UserDto));
   });
 };
 

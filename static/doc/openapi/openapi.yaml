@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Group car api
-  version: 0.1.10
+  version: 0.1.11
   
 tags:
 - name: Authentication
@@ -20,7 +20,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusObject'
-  /api/users:
+  /api/user:
     get:
       summary: Get all users
       description: Get a list of all users
@@ -60,7 +60,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
-  /auth/signup:
+  /auth/sign-up:
     put:
       summary: Sign up
       description: Signs the user up with the given attributes
@@ -73,10 +73,10 @@ paths:
             schema:
               $ref: '#/components/schemas/SignUpObject'
       responses:
-        200:
-          description: The user was succesfully signed up
+        201:
+          description: The user was successfully signed up
         400:
-          description: The request is malformed
+          description: The request is malformed, the request is missing parameters or parameters are invalid, or a user with the given username already exists.
           content:
             application/json:
               schema:
@@ -136,6 +136,10 @@ components:
           type: string
         password:
           type: string
+      example:
+        email: demo@mai.com
+        username: demo
+        password: 123456
     # Error
     RestError:
       type: object
@@ -154,7 +158,7 @@ components:
           format: date-time
         message:
           type: string
-        error:
+        detail:
           type: object
 
 # External docs

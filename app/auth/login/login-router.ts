@@ -1,6 +1,6 @@
 import express = require('express');
 import debug = require('debug');
-import NotImplementedError from '@app/errors/notImplementedError';
+import NotImplementedError from '@app/errors/not-implemented-error';
 debug('group-car:login');
 const router: express.Router = express.Router();
 

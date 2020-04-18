@@ -1,6 +1,7 @@
 type ErrorRequestHandler = import('express').ErrorRequestHandler;
-import RestError from './restError';
-import InternalError from './internalError';
+import RestError from './rest-error';
+import InternalError from './internal-error';
+import config from '@app/config';
 
 /**
  * The general error handler for errors.
@@ -14,12 +15,12 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     res.status(err.statusCode).send(new RestError(err.statusCode,
         err.message,
         err.timestamp,
-        err.errorInfo));
+        err.detail));
   } else {
-    if (process.env.NODE_ENV === 'production') {
+    if (!config.error.withStack) {
       res.status(500).send(new InternalError());
     } else {
-      res.status(500).send(new InternalError(err.stack));
+      res.status(500).send(new InternalError(undefined, err.stack));
     }
   }
 };

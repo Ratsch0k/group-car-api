@@ -2,19 +2,15 @@ import express = require('express');
 import path = require('path');
 import cookieParser = require('cookie-parser');
 import logger = require('morgan');
-import debug from 'debug';
-import errorHandler from '@app/errors/errorHandler';
-const log = debug('group-car:app:log');
-log('Environment: %s', process.env.NODE_ENV);
-
+import errorHandler from '@app/errors/error-handler';
 /**
  * Import router
  */
-import statusRouter from '@app/api/statusRouter';
-import loginRouter from '@app/authentication/login/loginRouter';
-import userRouter from '@app/users/userRouter';
-import signUpRouter from '@app/authentication/signUp/signUpRouter';
-import database from '@db';
+import statusRouter from '@app/api/status-router';
+import loginRouter from '@app/auth/login/login-router';
+import userRouter from '@app/users/user-router';
+import signUpRouter from '@app/auth/signUp/sign-up-router';
+import config from '@config';
 const app: express.Application = express();
 
 app.set('trust proxy', true);
@@ -26,7 +22,7 @@ app.use(cookieParser());
 app.use('/api/test', statusRouter);
 app.use('/auth/login', loginRouter);
 app.use('/api/user', userRouter);
-app.use('/auth/signup', signUpRouter);
+app.use('/auth/sign-up', signUpRouter);
 
 /**
  * Configure serving of documentation
@@ -34,39 +30,16 @@ app.use('/auth/signup', signUpRouter);
 app.use(express.static('static'));
 
 /**
- * Configure static serving and spa serving.
- * Check how the public path is supplied. If no environment is provided
- * do not serve static content.
- * Priority has directly provided environment variable "HTML_STATIC"
+ * Configure static service
  */
-if (process.env.npm_package_config_public || process.env.HTML_STATIC) {
-  app.use(
-      express.static(
-          path.join(
-              path.resolve(process.env.HTML_STATIC ||
-                process.env.npm_package_config_public ||
-                'static'))));
-
-  app.get('/*', (req, res) => {
-    res.sendFile(
-        path.join(
-            path.resolve(process.env.HTML_STATIC ||
-                process.env.npm_package_config_public ||
-                'static'),
-            'index.html'));
-  });
-}
+app.use(express.static(config.staticPath.path));
+app.get('/*', (req, res) =>
+  res.sendFile(
+      path.join(
+          config.staticPath.path,
+          'index.html')));
 
 // Register error handler
 app.use(errorHandler);
-
-
-// If currently in environment sync the database
-if (process.env.NODE_ENV === 'development') {
-  database.sync({force: true}).then(() => {
-    console.log('Sync database');
-  });
-}
-
 
 export default app;

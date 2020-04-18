@@ -1,0 +1,54 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Typescript",
+      "program": "${workspaceFolder}/app/group-car.ts",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "outFiles": ["${workspaceFolder}/build/**/*.js"],
+      "env": {
+        "NODE_ENV": "development",
+      },
+      "runtimeArgs": [
+        "-r", 
+        "tsconfig-paths/register"
+      ]
+    },
+    {
+      "name": "Attach",
+      "type": "node",
+      "request": "attach",
+      "port": 5858,
+      "address": "localhost",
+      "restart": false,
+      "sourceMaps": false,
+      "localRoot": "${workspaceRoot}",
+      "remoteRoot": null
+    },
+    {
+      "name": "Launch",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/build/group-car.js",
+      "stopOnEntry": true,
+      "args": [],
+      "cwd": "${workspaceRoot}",
+      "preLaunchTask": null,
+      "runtimeExecutable": null,
+      "runtimeArgs": [
+          "--nolazy",
+          "-r", 
+          "tsconfig-paths/register"
+      ],
+      "env": {
+          "NODE_ENV": "development"
+      },
+      "sourceMaps": false,
+  }
+  ]
+}
