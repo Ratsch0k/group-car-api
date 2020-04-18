@@ -16,13 +16,18 @@ cache:
 
 jobs: 
   include:
+    # Jobs for static analysis
     - stage: "Static Analysis"
       name: "Eslint"
       script: npm run eslint
     - script: npm audit
       name: "Audit"
+
+    # Building job
     - stage: "Build"
       script: npm run tsc
+
+    # Testing jobs
     - stage: "Test"
       name: "Unit Tests"
       script: npm run unitTest
@@ -36,19 +41,32 @@ jobs:
       - sudo -u postgres createuser groupcarapitest
       - sudo -u postgres psql -c "CREATE DATABASE groupcartest WITH OWNER groupcarapitest;"
       name: "Integration Tests"
+
+    # Jobs for generating documentation
     - stage: "Generate typedoc"
       script: npm run typedoc
+
+      # Deploy jobs
+    - stage: "Deploy Development"
+      script: bash scripts/deploy_dev.sh
+    - stage: "Deploy Beta"
+      script: bash scripts/deploy_beta.sh
     - stage: "Compare version and tag"
       script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
-    - stage: "Deploy"
-      script: bash scripts/ci-dep.sh
+    - stage: "Deploy Release"
+      script: bash scripts/deploy_release.sh
 
+# Define stages
 stages:
   - "Static Analysis"
   - "Build"
   - "Test"
   - "Generate typedoc"
+  - name: "Deploy Development"
+    if: NOT tag IS present AND type = push AND fork = false AND branch = develop
+  - name: "Deploy Beta"
+    if: NOT tag IS present AND type = push AND fork = false AND branch = master
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
-  - name: "Deploy"
+  - name: "Deploy Release"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
