@@ -2,8 +2,7 @@ import debug from 'debug';
 import User from '@app/users/user';
 import UserDto from '@app/users/user-dto';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
-import UsernameAlreadyExistsError from
-  '@app/users/username-already-exists-error';
+import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
 
 type RequestHandler = import('express').RequestHandler;

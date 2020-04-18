@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import {stub, match, assert} from 'sinon';
 import {expect} from 'chai';
 import * as config from '../config';
-import PasswordNotHashableError from './password-not-hashable-error';
 
 type User = import('./user').default;
 
@@ -62,7 +61,7 @@ describe('User model', function() {
       };
 
       const expectedMessage =
-        `Couldn't hash the password for user ${fakeUser.username}`;
+        `Couldn't hash the password for user "${fakeUser.username}"`;
 
       // Overwrite saltRounds in config
       const saltRounds = 2;
@@ -76,9 +75,10 @@ describe('User model', function() {
         expect(fakeUser.password).to.equal(fakeUser.password);
         assert.calledOnce(hashStub);
         assert.calledWith(hashStub, fakeUser.password.toString(), saltRounds);
-        expect(error).to.be.
-            instanceOf(PasswordNotHashableError, expectedMessage)
-            .with.property('user', fakeUser.username);
+        expect(error).to.have.property('message', expectedMessage);
+        expect(error).to.be.nested
+            .property('constructor.name', 'PasswordNotHashableError');
+        expect(error).to.have.property('user', fakeUser.username);
       });
     });
   });

@@ -7,7 +7,7 @@ import UserDto from '../../users/user-dto';
 import {expect} from 'chai';
 import {UniqueConstraintError} from 'sequelize';
 import UsernameAlreadyExistsError from
-  '../../users/username-already-exists-error';
+  '../../errors/users/username-already-exists-error';
 
 describe('SignUpController', function() {
   it('creates user', function(done) {
