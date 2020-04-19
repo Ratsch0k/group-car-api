@@ -1,7 +1,9 @@
 import path from 'path';
 import debug from 'debug';
+import jwt from './jwt-config';
 const log = debug('group-car:config');
 
+type JWTConfig = import('./jwt-config').JWTConfig;
 type SequelizeConfig = import('sequelize/types').Config;
 /**
  * Get node environment.\
@@ -25,10 +27,6 @@ export interface ErrorConfig {
 export interface DBConfig {
   sequelize: SequelizeConfig;
   withFlush: boolean;
-}
-
-export interface JWTConfig {
-  secret: string;
 }
 
 export interface Config {
@@ -96,20 +94,6 @@ const staticPathConfig: StaticPathConfig = {
 const database: DBConfig = {
   sequelize,
   withFlush,
-};
-
-// Get the secret for the jwt
-// If no secret is provided exit with 1. #
-// Server shouldn't start without the secret
-const jwtSecret = process.env.JWT_SECRET;
-if (jwtSecret === undefined) {
-  console.error('Secret for jwt tokens is not provided. Please set the ' +
-      'environment variable "JWT_SECRET" to the secret which should be used\n');
-  process.exit(1);
-}
-
-const jwt: JWTConfig = {
-  secret: jwtSecret,
 };
 
 const config: Config = {

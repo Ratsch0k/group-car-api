@@ -4,6 +4,7 @@ import UserDto from '@app/users/user-dto';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
 import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
+import {cookieOptions, generateToken} from '@app/util/jwt-util';
 
 type RequestHandler = import('express').RequestHandler;
 
@@ -31,6 +32,9 @@ const signUpController: RequestHandler = (req, res, next) => {
     password: req.body.password,
   }).then((user) => {
     log('User "%s" successfully created', req.body.username);
+    res.cookie('jwt',
+        generateToken(user),
+        cookieOptions);
     res.status(201).send(ModelToDtoConverter
         .convert<UserDto>(user.get({plain: true}), UserDto));
   }).catch((err) => {

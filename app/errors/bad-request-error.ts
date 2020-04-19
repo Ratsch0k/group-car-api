@@ -12,7 +12,7 @@ class BadRequestError extends RestError {
    * @param errorInfo More error information
    */
   constructor(message: string, errorInfo?: any) {
-    super(400, message, new Date(), errorInfo);
+    super(400, message, errorInfo);
   }
 };
 

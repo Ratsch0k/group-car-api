@@ -15,8 +15,7 @@ class NotImplementedError extends RestError {
    */
   constructor(path: string) {
     super(501,
-        `The path "${path}" is not implemented`,
-        new Date());
+        `The path "${path}" is not implemented`);
 
     this.path = path;
   }
