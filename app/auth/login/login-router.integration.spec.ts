@@ -4,16 +4,38 @@ import db, {syncPromise} from '../../db';
 import {expect} from 'chai';
 import config from '../../config';
 import User from '../../users/user';
-// Force sync database before each test
-beforeEach(async function() {
-  await syncPromise;
-  return db.sync({force: true});
-});
+
+const csrfHeaderName = config.jwt.securityOptions.tokenName;
 
 describe('LoginRouter', () => {
+  let jwt: string;
+  let csrf: string;
+
+  // Force sync database before each test
+  beforeEach(async function() {
+    const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+
+    jwt = 'FAIL';
+    // Get csrf token
+    csrf = await request(app).head('/auth')
+        .then((response) => {
+        // Save jwt cookie
+          jwt = response.header['set-cookie'].pop().split(';')[0];
+          return response.header[csrfHeaderName];
+        });
+
+
+    await syncPromise;
+    return db.sync({force: true});
+  });
+
   describe('responses with 400', function() {
     it('if no username and password given', () => {
-      return request(app).put('/auth/login').expect(400);
+      return request(app)
+          .put('/auth/login')
+          .set(csrfHeaderName, csrf)
+          .set('Cookie', [jwt])
+          .expect(400);
     });
 
     it('if user doesn\'t exist', function() {
@@ -22,7 +44,10 @@ describe('LoginRouter', () => {
         password: 'password',
       };
 
-      return request(app).put('/auth/login').send(body)
+      return request(app).put('/auth/login')
+          .set(csrfHeaderName, csrf)
+          .set('Cookie', [jwt])
+          .send(body)
           .expect(400).then((response) => {
             expect(response.body).to.have
                 .property('message', 'Username or email is invalid');
@@ -32,7 +57,7 @@ describe('LoginRouter', () => {
     });
 
     it('if password is wrong', async function() {
-      const signUpBody = {
+      const userData = {
         username: 'test',
         email: 'test@mail.com',
         password: 'testPassword',
@@ -43,11 +68,13 @@ describe('LoginRouter', () => {
         password: 'wrong password',
       };
 
-      await request(app).put('/auth/sign-up')
-          .send(signUpBody)
-          .expect(201);
+      // Create user in database
+      await User.create(userData);
+
       await request(app).put('/auth/login')
           .send(loginBody)
+          .set(csrfHeaderName, csrf)
+          .set('Cookie', [jwt])
           .expect(400)
           .then((response) => {
             expect(response.body).to.have
@@ -68,17 +95,6 @@ describe('LoginRouter', () => {
       username: 'test',
       password: 'testPassword',
     };
-
-    const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
-
-    let jwt: string = 'FAIL';
-    // Get csrf token
-    const csrf = await request(app).head('/auth')
-        .then((response) => {
-          // Save jwt cookie
-          jwt = response.header['set-cookie'].pop().split(';')[0];
-          return response.header[csrfHeaderName];
-        });
 
     // Create user in database
     await User.create(userData);
