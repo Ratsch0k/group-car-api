@@ -19,7 +19,7 @@ class UnauthorizedError extends RestError {
       _message = 'You\'re not authorized to access the resource';
     }
 
-    super(401, _message, new Date());
+    super(401, _message);
   }
 }
 

@@ -19,9 +19,15 @@ describe('LoginController', () => {
       username: 'demo',
       email: 'demo@mail.com',
       password: 'hashed',
+      isBetaUser: false,
       get() {
         return this;
       },
+    };
+
+    const expectedJwt = {
+      username: 'demo',
+      isBetaUser: false,
     };
 
     // Stub bcrypt comparing
@@ -29,21 +35,23 @@ describe('LoginController', () => {
     compareStub.resolves(true);
 
     // Stub database
-    const findOneStub = stub(User, 'findOne');
-    findOneStub.usingPromise(Bluebird).resolves(dbUser as any);
+    const findByUsernameStub = stub(User, 'findByUsername');
+    findByUsernameStub.usingPromise(Bluebird).resolves(dbUser as any);
 
     // Stub express
     const requestStub = stub(request);
     requestStub.body = requestBody;
-    const responseStub = stub(response);
+    const responseStub: any = stub(response);
+    responseStub.setJwtToken = fake();
     const next = fake();
     responseStub.send = fake(() => {
       assert.calledWith(compareStub, requestBody.password, dbUser.password);
       assert.notCalled(next);
       assert.calledOnce(responseStub.send);
       assert.calledWith(responseStub.send, match.instanceOf(UserDto));
-      assert.calledWith(findOneStub,
-          match({where: {username: requestBody.username}}));
+      assert.calledWith(findByUsernameStub, requestBody.username);
+      assert.calledOnce(responseStub.setJwtToken);
+      assert.calledWith(responseStub.setJwtToken, match(expectedJwt));
       done();
     }) as any;
 

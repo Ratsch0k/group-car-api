@@ -4,15 +4,18 @@ import cookieParser = require('cookie-parser');
 import logger = require('morgan');
 import errorHandler from '@app/errors/error-handler';
 import expressJwt from 'express-jwt';
+// import csurf from 'csurf';
 
 /**
  * Import router
  */
 import statusRouter from '@app/api/status-router';
-import loginRouter from '@app/auth/login/login-router';
 import userRouter from '@app/users/user-router';
-import signUpRouter from '@app/auth/signUp/sign-up-router';
 import config from '@config';
+import authRouter from '@app/auth';
+import jwtCsrf from './jwt/jwt-csrf';
+import {preLoginJwtValidator} from './jwt/jwt-util';
+
 const app: express.Application = express();
 
 // Add middleware
@@ -22,15 +25,17 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
+app.use(jwtCsrf());
+
 // Adding authentication routes
-app.use('/auth/login', loginRouter);
-app.use('/auth/sign-up', signUpRouter);
+app.use('/auth', authRouter);
 
 app.use('/api',
     expressJwt({
       secret: config.jwt.secret,
       getToken: config.jwt.getToken,
-    }));
+    }),
+    preLoginJwtValidator);
 
 // Add own router
 

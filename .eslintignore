@@ -12,3 +12,5 @@ build
 
 # Ignore database specific files
 db
+
+*/**/*.d.ts

@@ -4,6 +4,7 @@ import InternalError from './internal-error';
 import config from '@app/config';
 import debug from 'debug';
 import UnauthorizedRestError from './unauthorized-error';
+import ForbiddenError from './forbidden-error';
 
 type UnauthorizedError = import('express-jwt').UnauthorizedError;
 
@@ -28,6 +29,9 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
       log('Request with invalid jwt token handled. Message: %s',
           (err as UnauthorizedError).message);
       res.status(401).send(new UnauthorizedRestError('Invalid token'));
+    } else if (err.code === 'EBADCSRFTOKEN') {
+      log('Request has invalid csrf token');
+      res.status(403).send(new ForbiddenError());
     } else if (!config.error.withStack) {
       error(err.stack);
       res.status(500).send(new InternalError());

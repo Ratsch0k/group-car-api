@@ -2,17 +2,33 @@ import request from 'supertest';
 import app from '../../app';
 import {expect} from 'chai';
 import {syncPromise} from '../../db';
+import config from '../../config';
 
 describe('SignUpRouter', function() {
+  const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+  let jwt: string;
+  let csrf: string;
+
   /**
    * Wait for sync of database before each test
    */
-  beforeEach(function() {
+  beforeEach(async function() {
+    const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+
+    jwt = 'FAIL';
+    // Get csrf token
+    csrf = await request(app).head('/auth')
+        .then((response) => {
+          // Save jwt cookie
+          jwt = response.header['set-cookie'].pop().split(';')[0];
+          return response.header[csrfHeaderName];
+        });
+
     return syncPromise;
   });
 
   describe('returns 400 if', function() {
-    it('request is missing username', function() {
+    it('request is missing username', async function() {
       const body = {
         password: 'password',
         email: 'demo@mail.com',
@@ -20,6 +36,8 @@ describe('SignUpRouter', function() {
 
       return (request(app)
           .put('/auth/sign-up')
+          .set('Cookie', [jwt])
+          .set(csrfHeaderName, csrf)
           .send(body))
           .expect(400)
           .then((response) => {
@@ -38,6 +56,8 @@ describe('SignUpRouter', function() {
 
       return (request(app)
           .put('/auth/sign-up')
+          .set('Cookie', [jwt])
+          .set(csrfHeaderName, csrf)
           .send(body))
           .expect(400)
           .then((response) => {
@@ -57,6 +77,8 @@ describe('SignUpRouter', function() {
 
       return (request(app)
           .put('/auth/sign-up')
+          .set('Cookie', [jwt])
+          .set(csrfHeaderName, csrf)
           .send(body))
           .expect(400)
           .then((response) => {
@@ -75,6 +97,8 @@ describe('SignUpRouter', function() {
 
       return (request(app)
           .put('/auth/sign-up')
+          .set('Cookie', [jwt])
+          .set(csrfHeaderName, csrf)
           .send(body))
           .expect(400)
           .then((response) => {
@@ -94,6 +118,8 @@ describe('SignUpRouter', function() {
 
       return (request(app)
           .put('/auth/sign-up')
+          .set('Cookie', [jwt])
+          .set(csrfHeaderName, csrf)
           .send(body))
           .expect(400)
           .then((response) => {
@@ -114,6 +140,8 @@ describe('SignUpRouter', function() {
 
     return (request(app)
         .put('/auth/sign-up')
+        .set('Cookie', [jwt])
+        .set(csrfHeaderName, csrf)
         .send(body))
         .expect(201)
         .then((response) => {

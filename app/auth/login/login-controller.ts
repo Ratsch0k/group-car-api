@@ -4,7 +4,7 @@ import UserDto from '@app/users/user-dto';
 import bcrypt from 'bcrypt';
 import debug from 'debug';
 import InvalidLoginError from '@app/errors/login/invalid-login-error';
-import {generateToken, cookieOptions} from '@app/util/jwt-util';
+import {convertUserToJwtPayload} from '@app/jwt/jwt-util';
 
 type RequestHandler = import('express').RequestHandler;
 
@@ -30,9 +30,7 @@ const loginController: RequestHandler = (req, res, next) => {
               .then((result) => {
                 // Check if sent password is equal to stored user password
                 if (result) {
-                  res.cookie('jwt',
-                      generateToken(user),
-                      cookieOptions);
+                  res.setJwtToken(convertUserToJwtPayload(user), user.username);
                   res.send(ModelToDtoConverter
                       .convertSequelizeModel(user, UserDto));
                 } else {

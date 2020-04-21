@@ -1,6 +1,9 @@
 import config from '@config';
 import jwt from 'jsonwebtoken';
 import User from '@app/users/user';
+import {UnauthorizedError} from '@errors';
+
+type RequestHandler = import('express').RequestHandler;
 
 /**
  * Generates a jwt token with the given payload.\
@@ -13,39 +16,59 @@ import User from '@app/users/user';
  *                This parameter is needed to set the subject header
  *                in the jwt header.
  */
-export function generateToken(payload: object | string, subject?: string) {
+export function generateToken(payload: object | string,
+    subject?: string) {
   if (payload instanceof User) {
     return jwt.sign(
-        generatePayloadFromUserModel(payload),
+        convertUserToJwtPayload(payload),
         config.jwt.secret,
         config.jwt.getOptions(payload.username));
-  } else if (subject) {
-    return jwt.sign(payload, config.jwt.secret, config.jwt.getOptions(subject));
   } else {
-    throw new Error('Can\'t create a token without a subject');
+    return jwt.sign(payload,
+        config.jwt.secret,
+        config.jwt.getOptions(subject));
   }
+}
+
+export interface UserJwtPayload {
+  username: string;
+  isBetaUser: boolean;
 }
 /**
  * Generates the payload for a jwt token for the given user.\
  * The payload should includes the following:
- * - Id of the user `id`
  * - Username       `username`
  * - whether or not the user has beta access `isBetaUser`
- * - CSRF token `XSRF-TOKEN`
  * @param user The user for which the payload should be generated.
+ * @returns   The user converted into a jwt payload
  */
-export function generatePayloadFromUserModel(user: User) {
+export function convertUserToJwtPayload(user: User): UserJwtPayload {
   if (user) {
     return {
-      'id': user.id,
-      'username': user.username,
-      'isBetaUser': user.isBetaUser,
+      username: user.username,
+      isBetaUser: user.isBetaUser,
     };
   } else {
     throw new Error('Can\' generate payload if ' +
         'no user is given');
   }
 }
+
+/**
+ * Request handler which throws an `UnauthorizedError` if
+ * the provided jwt token (which is expected to be in `req.user`)
+ * was created before the user logged in or after it.
+ * @param req Http request
+ * @param res Http response
+ * @param next Next handler
+ */
+export const preLoginJwtValidator: RequestHandler = (req: any, res, next) => {
+  if (!req.user || req.user.sub === config.jwt.notLoggedInSubject) {
+    throw new UnauthorizedError();
+  } else {
+    next();
+  }
+};
 
 /**
  * Cookie options for the jwt. Same is in `config.jwt.cookieOptions`.

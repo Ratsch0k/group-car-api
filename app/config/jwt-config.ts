@@ -4,7 +4,13 @@ export interface JWTOptions {
   algorithm: 'HS512' | 'HS384' | 'HS256';
   expiresIn: string;
   issuer: string | undefined;
-  subject: string;
+  subject?: string;
+}
+
+export interface JWTSecurityOptions {
+  ignoredMethods: string[];
+  tokenName: string;
+  secretName: string;
 }
 
 export interface JWTCookieOptions {
@@ -17,10 +23,13 @@ export interface JWTCookieOptions {
 }
 
 export interface JWTConfig {
+  notLoggedInSubject: string;
+  name: string;
   secret: string;
   getToken(req: Request): string | null;
-  getOptions(username: string): JWTOptions;
+  getOptions(username?: string): JWTOptions;
   cookieOptions: JWTCookieOptions;
+  securityOptions: JWTSecurityOptions;
 }
 
 // Get the secret for the jwt
@@ -33,23 +42,29 @@ if (secret === undefined) {
   process.exit(1);
 }
 
+const name = 'jwt';
+
 /**
  * Gets the token from a request.\
  * The token should be stored in a cookie with
  * the name "jwt"
  */
 const getToken = (req: Request) => {
-  if (req.cookies['jwt']) {
-    return req.cookies['jwt'];
+  if (req.cookies[name]) {
+    return req.cookies[name];
   } else {
     return null;
   }
 };
 
+const notLoggedInSubject = 'not-logged-in';
+
 const jwt: JWTConfig = {
+  notLoggedInSubject,
+  name,
   secret,
   getToken,
-  getOptions: (username: string) => ({
+  getOptions: (username: string = notLoggedInSubject) => ({
     algorithm: 'HS512',
     expiresIn: '15m', // 15 minutes
     issuer: 'my-group-car.de',
@@ -63,6 +78,11 @@ const jwt: JWTConfig = {
     secure: process.env.NODE_ENV === 'production',
     signed: false,
     maxAge: 1000 * 60 * 15, // 15 minutes
+  },
+  securityOptions: {
+    ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
+    tokenName: 'XSRF-TOKEN',
+    secretName: 'secret',
   },
 };
 

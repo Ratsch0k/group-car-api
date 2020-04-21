@@ -16,9 +16,15 @@ describe('SignUpController', function() {
       username: 'demo',
       email: 'demo@mail.com',
       password: 'password',
+      isBetaUser: false,
       get() {
         return this;
       },
+    };
+
+    const jwt = {
+      isBetaUser: user.isBetaUser,
+      username: user.username,
     };
 
     // Creates stubs
@@ -26,13 +32,16 @@ describe('SignUpController', function() {
     createStub.usingPromise(Bluebird.Promise).resolves(user as any);
     const requestStub = stub(request);
     requestStub.body = user;
-    const responseStub = stub(response);
+    const responseStub: any = stub(response);
     response.status = stub().withArgs(201).returns(responseStub as any);
+    responseStub.setJwtToken = fake();
     responseStub.send = fake(() => {
       expect(responseStub.send.called);
       assert.notCalled(fakeNext);
       assert.calledWith(responseStub.send, match.instanceOf(UserDto));
       assert.calledWith(responseStub.status, 201);
+      assert.calledOnce(responseStub.setJwtToken);
+      assert.calledWith(responseStub.setJwtToken, match(jwt));
       // Get user object
       const responseUser = responseStub.send.args[0][0];
       expect(responseUser.username).to.equal(user.username);
