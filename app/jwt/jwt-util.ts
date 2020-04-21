@@ -15,6 +15,8 @@ type RequestHandler = import('express').RequestHandler;
  * @param subject If the payload is not an instance of the model User
  *                This parameter is needed to set the subject header
  *                in the jwt header.
+ * @returns   The jwt which contains the given payload as data and the given
+ *    subject in the sub field.
  */
 export function generateToken(payload: object | string,
     subject?: string) {
@@ -49,7 +51,7 @@ export function convertUserToJwtPayload(user: User): UserJwtPayload {
       isBetaUser: user.isBetaUser,
     };
   } else {
-    throw new Error('Can\' generate payload if ' +
+    throw new TypeError('Can\' generate payload if ' +
         'no user is given');
   }
 }

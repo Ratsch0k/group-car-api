@@ -41,9 +41,6 @@ describe('ErrorHandler', () => {
         match.instanceOf(RestError));
     sandbox.assert.calledWith(responseStub.send,
         match.has('message', error.message));
-    console.dir(error);
-    console.dir(responseStub.send.args[0]);
-    console.dir(responseStub.send.args[0].timestamp);
     sandbox.assert.calledWith(responseStub.send,
         match.has('timestamp', match.date));
     sandbox.assert.calledWith(responseStub.send,
