@@ -1,12 +1,18 @@
 import {hashPasswordOfUser} from './user';
 import bcrypt from 'bcrypt';
-import {stub, match, assert} from 'sinon';
+import {match, assert, createSandbox} from 'sinon';
 import {expect} from 'chai';
 import * as config from '../config';
 
 type User = import('./user').default;
 
+const sandbox = createSandbox();
+
 describe('User model', function() {
+  afterEach(function() {
+    sandbox.restore();
+  });
+
   describe('hashPasswordOfUser', function() {
     it('can hash string', function() {
       const password = '1234';
@@ -19,7 +25,7 @@ describe('User model', function() {
       config.default.bcrypt.saltRounds = saltRounds;
 
       const fakeHash = 'some hash';
-      const hashStub = stub(bcrypt)
+      const hashStub = sandbox.stub(bcrypt)
           .hash
           .withArgs(match.string, saltRounds)
           .resolves(fakeHash);
@@ -42,7 +48,7 @@ describe('User model', function() {
       config.default.bcrypt.saltRounds = saltRounds;
 
       const fakeHash = 'some hash';
-      const hashStub = stub(bcrypt)
+      const hashStub = sandbox.stub(bcrypt)
           .hash
           .withArgs(match.string, match.number)
           .resolves(fakeHash);
@@ -67,7 +73,7 @@ describe('User model', function() {
       const saltRounds = 2;
       config.default.bcrypt.saltRounds = saltRounds;
 
-      const hashStub = stub(bcrypt, 'hash')
+      const hashStub = sandbox.stub(bcrypt, 'hash')
           .withArgs(match.string, match.number)
           .rejects();
 

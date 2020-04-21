@@ -1,16 +1,21 @@
-import sinon, {stub, fake, assert} from 'sinon';
-import {request, response} from 'express';
+import sinon, {fake, assert} from 'sinon';
 import {signUpRouter} from './sign-up-router';
 import * as validator from 'express-validator';
 import {expect} from 'chai';
 import {InvalidRequestError} from '../../errors';
 
+const sandbox = sinon.createSandbox();
+
 describe('SignUpRouter', function() {
+  afterEach(function() {
+    sandbox.restore();
+  });
+
   it('calls next if request valid', function() {
     // Create stubs
-    const requestStub = stub(request);
-    sinon.stub(requestStub, 'ip').get(() => 'TEST IP');
-    const responseStub = stub(response);
+    const requestStub: any = sandbox.stub();
+    requestStub.ip = 'TEST IP';
+    const responseStub: any = sandbox.stub();
     const nextFake = fake();
 
     // Creates fake validation result
@@ -18,19 +23,19 @@ describe('SignUpRouter', function() {
     validationErrors.isEmpty.returns(true);
 
     // Stub validator
-    const validationResultStub = stub(validator, 'validationResult');
+    const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(validationErrors as any);
 
-    signUpRouter(requestStub as any, responseStub as any, nextFake);
+    signUpRouter(requestStub, responseStub, nextFake);
 
     assert.calledOnce(nextFake);
   });
 
   it('throws InvalidRequestError if request invalid', function() {
     // Create stubs
-    const requestStub = stub(request);
-    sinon.stub(requestStub, 'ip').get(() => 'TEST IP');
-    const responseStub = stub(response);
+    const requestStub: any = sandbox.stub();
+    requestStub.ip = 'TEST IP';
+    const responseStub: any = sandbox.stub();
     const nextFake = fake();
 
     // Creates fake validation result
@@ -49,16 +54,14 @@ describe('SignUpRouter', function() {
     validationErrors.array.returns(errorArray);
 
     // Stub validator
-    const validationResultStub = stub(validator, 'validationResult');
+    const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(validationErrors as any);
 
     const expectedMessage = 'The following fields are invalid: ' +
       `${errorArray[0].param} -> ${errorArray[0].msg}, ` +
       `${errorArray[1].param} -> ${errorArray[1].msg}`;
     expect(() =>
-      signUpRouter(requestStub as any,
-          responseStub as any,
-          nextFake))
+      signUpRouter(requestStub, responseStub, nextFake))
         .to.throw(InvalidRequestError, expectedMessage)
         .with.property('validationResult', validationErrors);
 

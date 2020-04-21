@@ -1,15 +1,20 @@
 import * as User from '../../users/user';
 import signUpController from './sign-up-controller';
-import {stub, fake, assert, match} from 'sinon';
+import {fake, assert, match, createSandbox} from 'sinon';
 import Bluebird from 'bluebird';
-import {request, response} from 'express';
 import UserDto from '../../users/user-dto';
 import {expect} from 'chai';
 import {UniqueConstraintError} from 'sequelize';
 import UsernameAlreadyExistsError from
   '../../errors/users/username-already-exists-error';
 
+const sandbox = createSandbox();
+
 describe('SignUpController', function() {
+  afterEach(function() {
+    sandbox.restore();
+  });
+
   it('creates user', function(done) {
     // Create fake user
     const user = {
@@ -28,20 +33,21 @@ describe('SignUpController', function() {
     };
 
     // Creates stubs
-    const createStub = stub(User.default, 'create');
+    const createStub = sandbox.stub(User.default, 'create');
     createStub.usingPromise(Bluebird.Promise).resolves(user as any);
-    const requestStub = stub(request);
+    const requestStub: any = sandbox.stub();
     requestStub.body = user;
-    const responseStub: any = stub(response);
-    response.status = stub().withArgs(201).returns(responseStub as any);
+    const responseStub: any = sandbox.stub();
+    responseStub.status = sandbox.stub()
+        .withArgs(201).returns(responseStub as any);
     responseStub.setJwtToken = fake();
     responseStub.send = fake(() => {
       expect(responseStub.send.called);
       assert.notCalled(fakeNext);
-      assert.calledWith(responseStub.send, match.instanceOf(UserDto));
-      assert.calledWith(responseStub.status, 201);
-      assert.calledOnce(responseStub.setJwtToken);
-      assert.calledWith(responseStub.setJwtToken, match(jwt));
+      sandbox.assert.calledWith(responseStub.send, match.instanceOf(UserDto));
+      sandbox.assert.calledWith(responseStub.status, 201);
+      sandbox.assert.calledOnce(responseStub.setJwtToken);
+      sandbox.assert.calledWith(responseStub.setJwtToken, match(jwt));
       // Get user object
       const responseUser = responseStub.send.args[0][0];
       expect(responseUser.username).to.equal(user.username);
@@ -51,9 +57,7 @@ describe('SignUpController', function() {
     }) as any;
     const fakeNext = fake();
 
-    signUpController(requestStub as any,
-      responseStub as any,
-      fakeNext);
+    signUpController(requestStub, responseStub, fakeNext);
   });
 
   it('fails to create user because username already exists', function(done) {
@@ -67,11 +71,11 @@ describe('SignUpController', function() {
     };
 
     // Create stubs
-    const createStub = stub(User.default, 'create');
+    const createStub = sandbox.stub(User.default, 'create');
     createStub.usingPromise(Bluebird.Promise)
         .rejects(new UniqueConstraintError());
-    const requestStub = stub(request);
-    const responseStub = stub();
+    const requestStub: any = sandbox.stub();
+    const responseStub: any = sandbox.stub();
     requestStub.body = user;
     const nextFake = fake((err: UsernameAlreadyExistsError) => {
       expect(err).to.be.instanceOf(UsernameAlreadyExistsError);
@@ -80,7 +84,7 @@ describe('SignUpController', function() {
       done();
     });
 
-    signUpController(requestStub as any, responseStub as any, nextFake);
+    signUpController(requestStub, responseStub, nextFake);
   });
 
   it('fails to create user due to some error', function(done) {
@@ -98,17 +102,17 @@ describe('SignUpController', function() {
     const error = new Error('CUSTOM ERROR');
 
     // Create stubs
-    const createStub = stub(User.default, 'create');
+    const createStub = sandbox.stub(User.default, 'create');
     createStub.usingPromise(Bluebird.Promise)
         .rejects(error);
-    const requestStub = stub(request);
-    const responseStub = stub();
+    const requestStub: any = sandbox.stub();
+    const responseStub: any = sandbox.stub();
     requestStub.body = user;
     const nextFake = fake((err: Error) => {
       expect(err).to.be.equal(error);
       done();
     });
 
-    signUpController(requestStub as any, responseStub as any, nextFake);
+    signUpController(requestStub, responseStub, nextFake);
   });
 });
