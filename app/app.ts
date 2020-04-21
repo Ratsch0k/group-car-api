@@ -1,7 +1,7 @@
-import express = require('express');
-import path = require('path');
-import cookieParser = require('cookie-parser');
-import logger = require('morgan');
+import express from 'express';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 import errorHandler from '@app/errors/error-handler';
 import expressJwt from 'express-jwt';
 // import csurf from 'csurf';
@@ -20,7 +20,11 @@ const app: express.Application = express();
 
 // Add middleware
 app.set('trust proxy', true);
-app.use(logger('dev'));
+
+// Only log http request if a format string is provided
+if (config.morgan.formatString !== null) {
+  app.use(morgan(config.morgan.formatString));
+}
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());

@@ -29,12 +29,17 @@ export interface DBConfig {
   withFlush: boolean;
 }
 
+export interface MorganConfig {
+  formatString: string | null;
+}
+
 export interface Config {
   database: DBConfig;
   bcrypt: BcryptConfig;
   staticPath: StaticPathConfig;
   error: ErrorConfig;
   jwt: JWTConfig;
+  morgan: MorganConfig;
 }
 
 /**
@@ -55,6 +60,10 @@ const error: ErrorConfig = {
   withStack: true,
 };
 
+const morgan: MorganConfig = {
+  formatString: 'dev',
+};
+
 let withFlush = true;
 
 // Depending on node environment changes configs
@@ -62,8 +71,10 @@ if (environment === 'production') {
   bcrypt.saltRounds = 10;
   error.withStack = false;
   withFlush = false;
+  morgan.formatString = 'common';
 } else if (environment === 'test') {
   bcrypt.saltRounds = 4;
+  morgan.formatString = null;
 }
 
 /**
@@ -102,6 +113,7 @@ const config: Config = {
   staticPath: staticPathConfig,
   error,
   jwt,
+  morgan,
 };
 
 export default config;
