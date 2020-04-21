@@ -33,9 +33,9 @@
     "tsc": "tsc",
     "prod": "tsc & cross-env NODE_ENV=production node -r tsconfig-paths/register ./build/group-car.js",
     "typedoc": "typedoc",
-    "test": "cross-env DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*.spec.ts",
-    "unitTest": "cross-env NODE_ENV=test DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*unit.spec.ts",
-    "integrationTest": "cross-env NODE_ENV=test DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*integration.spec.ts",
+    "test": "cross-env NODE_ENV=test JWT_SECRET=secret DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*.spec.ts",
+    "unitTest": "cross-env NODE_ENV=test JWT_SECRET=secret NODE_ENV=test DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*unit.spec.ts",
+    "integrationTest": "cross-env NODE_ENV=test JWT_SECRET=secret NODE_ENV=test DEBUG=group-car:* mocha -r ts-node/register -r tsconfig-paths/register app/**/*integration.spec.ts",
     "devMigrate": "cross-env NODE_ENV=development sequelize-cli db:migrate",
     "prodMigrate": "cross-env NODE_ENV=production sequelize-cli db:migrate"
   },
