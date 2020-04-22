@@ -35,12 +35,12 @@
     "tsc": "tsc",
     "prod": "tsc & cross-env NODE_ENV=production node -r tsconfig-paths/register ./build/group-car.js",
     "typedoc": "typedoc",
-    "test": "cross-env NODE_ENV=test JWT_SECRET=secret mocha app/**/*.spec.ts",
-    "unitTest": "cross-env NODE_ENV=test JWT_SECRET=secret mocha app/**/*.unit.spec.ts",
-    "integrationTest": "cross-env NODE_ENV=test JWT_SECRET=secret mocha app/**/*.integration.spec.ts",
+    "test": "cross-env NODE_ENV=test JWT_SECRET=secret mocha \"app/**/*.spec.ts\"",
+    "unitTest": "cross-env NODE_ENV=test JWT_SECRET=secret mocha \"app/**/*.unit.spec.ts\"",
+    "integrationTest": "cross-env NODE_ENV=test JWT_SECRET=secret mocha \"app/**/*.integration.spec.ts\"",
     "devMigrate": "cross-env NODE_ENV=development sequelize-cli db:migrate",
     "prodMigrate": "cross-env NODE_ENV=production sequelize-cli db:migrate",
-    "coverage": "cross-env NODE_ENV=test JWT_SECRET=secret nyc mocha app/**/*.ts --exit --reporter-options quiet=true,html=false",
+    "coverage": "cross-env NODE_ENV=test JWT_SECRET=secret nyc \"mocha app/**/*.ts\" --exit --reporter-options quiet=true,html=false",
     "marge": "marge -f index.html -o static/test/ -p Report mochawesome-report/mochawesome.json"
   },
   "dependencies": {
