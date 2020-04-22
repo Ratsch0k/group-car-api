@@ -182,3 +182,9 @@ build/
 
 # Ignore build typedoc documentation
 static/doc/typedoc/
+
+# Ignore generated code coverage
+static/test/coverage
+
+# Ignore mocha report
+mochawesome-report

@@ -10,6 +10,9 @@
     "include": [
       "app/**/*.ts"
     ],
+    "exclude": [
+      "**/*.d.ts"
+    ],
     "extension": [
       ".ts"
     ],
@@ -22,8 +25,7 @@
       "html"
     ],
     "report-dir": "./static/test/coverage",
-    "sourceMap": true,
-    "instrument": true
+    "all": true
   },
   "scripts": {
     "dev": "ts-node -r tsconfig-paths/register --transpile-only app/group-car.ts",
@@ -33,11 +35,13 @@
     "tsc": "tsc",
     "prod": "tsc & cross-env NODE_ENV=production node -r tsconfig-paths/register ./build/group-car.js",
     "typedoc": "typedoc",
-    "test": "cross-env NODE_ENV=test JWT_SECRET=secret mocha -r ts-node/register -r tsconfig-paths/register app/**/*.spec.ts",
-    "unitTest": "cross-env NODE_ENV=test JWT_SECRET=secret mocha -r ts-node/register -r tsconfig-paths/register app/**/*.unit.spec.ts",
-    "integrationTest": "cross-env NODE_ENV=test JWT_SECRET=secret mocha -r ts-node/register -r tsconfig-paths/register app/**/*.integration.spec.ts",
+    "test": "cross-env NODE_ENV=test JWT_SECRET=secret mocha app/**/*.spec.ts",
+    "unitTest": "cross-env NODE_ENV=test JWT_SECRET=secret mocha app/**/*.unit.spec.ts",
+    "integrationTest": "cross-env NODE_ENV=test JWT_SECRET=secret mocha app/**/*.integration.spec.ts",
     "devMigrate": "cross-env NODE_ENV=development sequelize-cli db:migrate",
-    "prodMigrate": "cross-env NODE_ENV=production sequelize-cli db:migrate"
+    "prodMigrate": "cross-env NODE_ENV=production sequelize-cli db:migrate",
+    "coverage": "cross-env NODE_ENV=test JWT_SECRET=secret nyc mocha app/**/*.ts --exit --reporter-options quiet=true,html=false",
+    "marge": "marge -f index.html -o static/test/ -p Report mochawesome-report/mochawesome.json"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
@@ -83,6 +87,8 @@
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
     "mocha": "^7.1.1",
+    "mochawesome": "^6.1.0",
+    "mochawesome-report-generator": "^5.1.0",
     "nyc": "^15.0.1",
     "sequelize-cli": "^5.5.1",
     "source-map-support": "^0.5.16",

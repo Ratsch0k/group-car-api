@@ -89,7 +89,7 @@ const jwtCsrf: () => RequestHandler = () => (req, res, next) => {
 
       throw new UnauthorizedError();
     }
-  } else if (isIgnoredMethod(req) && !jwt) {
+  } else if (!jwt && isIgnoredMethod(req)) {
   /*
    * If the method is an ignored method and the jwt doesn't exist on i
    * a new secret will be generated and a jwt token will be set as cookie.
