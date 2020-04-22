@@ -184,7 +184,7 @@ build/
 static/doc/typedoc/
 
 # Ignore generated code coverage
-static/test/coverage
+static/test/
 
 # Ignore mocha report
 mochawesome-report

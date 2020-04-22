@@ -35,6 +35,12 @@ echo -e "$SERVICE_CONTENT" > beta.my-group-car.de.service
 # Create new folder to use as repository, copy data and remove unnecessary files
 chmod +x scripts/remote_install_beta.sh
 chmod +x build/group-car.js
+
+# Create test report
+npm run coverage
+
+# Delete intermediate directory for report creation
+rm -r mochawesome-report
  
 # Delete node_modules for faster file transfer
 rm -r node_modules

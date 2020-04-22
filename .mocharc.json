@@ -6,6 +6,5 @@
   ],
   "recursive": true,
   "extensions": ["ts"], 
-  "reporter": "mochawesome",
   "timeout": 3000
 }
