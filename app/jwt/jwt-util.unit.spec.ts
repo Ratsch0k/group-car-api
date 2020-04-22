@@ -73,6 +73,7 @@ describe('jwt-util', function() {
       const expectedPayload = {
         username: userData.username,
         isBetaUser: userData.isBetaUser,
+        loggedIn: true,
       };
 
       let user: User;
@@ -131,12 +132,17 @@ describe('jwt-util', function() {
         },
       };
 
+      const expected = {
+        ...payload,
+        loggedIn: false,
+      };
+
       it('with subject', function() {
         const subject = 'subject';
 
         const actual: any = generateToken(payload, subject);
 
-        expect(actual.payload).to.equal(payload);
+        expect(actual.payload).to.eql(expected);
         expect(actual.secret).to.equal(config.jwt.secret);
         expect(actual.options).to.equal(subject);
 
@@ -153,7 +159,7 @@ describe('jwt-util', function() {
       it('without subject', function() {
         const actual: any = generateToken(payload);
 
-        expect(actual.payload).to.equal(payload);
+        expect(actual.payload).to.eql(expected);
         expect(actual.secret).to.equal(config.jwt.secret);
         expect(actual.options).to.equal(config.jwt.notLoggedInSubject);
 
@@ -183,6 +189,7 @@ describe('jwt-util', function() {
       const expected = {
         username: userData.username,
         isBetaUser: userData.isBetaUser,
+        loggedIn: true,
       };
 
       expect(convertUserToJwtPayload(userData)).to.be.eql(expected);
@@ -198,7 +205,7 @@ describe('jwt-util', function() {
     it('calls next if jwt not pre-login jwt', function() {
       const request: any = sandbox.stub();
       request.user = {
-        sub: 'subject',
+        loggedIn: true,
       };
 
       const next: any = sandbox.stub();
@@ -223,7 +230,7 @@ describe('jwt-util', function() {
         'of jwt is pre-login subject', function() {
       const request: any = sandbox.stub();
       request.user = {
-        sub: config.jwt.notLoggedInSubject,
+        loggedIn: false,
       };
       const next: any = sandbox.stub();
       const response: any = sandbox.stub();

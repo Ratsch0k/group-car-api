@@ -18,7 +18,7 @@ type RequestHandler = import('express').RequestHandler;
  * @returns   The jwt which contains the given payload as data and the given
  *    subject in the sub field.
  */
-export function generateToken(payload: object | string,
+export function generateToken(payload: object,
     subject?: string) {
   if (payload instanceof User) {
     return jwt.sign(
@@ -26,7 +26,11 @@ export function generateToken(payload: object | string,
         config.jwt.secret,
         config.jwt.getOptions(payload.username));
   } else {
-    return jwt.sign(payload,
+    return jwt.sign(
+        {
+          ...payload,
+          loggedIn: false,
+        },
         config.jwt.secret,
         config.jwt.getOptions(subject));
   }
@@ -35,6 +39,7 @@ export function generateToken(payload: object | string,
 export interface UserJwtPayload {
   username: string;
   isBetaUser: boolean;
+  loggedIn: boolean;
 }
 /**
  * Generates the payload for a jwt token for the given user.\
@@ -49,6 +54,7 @@ export function convertUserToJwtPayload(user: User): UserJwtPayload {
     return {
       username: user.username,
       isBetaUser: user.isBetaUser,
+      loggedIn: true,
     };
   } else {
     throw new TypeError('Can\' generate payload if ' +
@@ -65,7 +71,7 @@ export function convertUserToJwtPayload(user: User): UserJwtPayload {
  * @param next Next handler
  */
 export const preLoginJwtValidator: RequestHandler = (req: any, res, next) => {
-  if (!req.user || req.user.sub === config.jwt.notLoggedInSubject) {
+  if (!req.user || !req.user.loggedIn) {
     throw new UnauthorizedError();
   } else {
     next();

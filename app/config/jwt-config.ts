@@ -57,7 +57,7 @@ const getToken = (req: Request) => {
   }
 };
 
-const notLoggedInSubject = 'not-logged-in';
+const notLoggedInSubject = '';
 
 const jwt: JWTConfig = {
   notLoggedInSubject,

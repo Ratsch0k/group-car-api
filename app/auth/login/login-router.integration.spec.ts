@@ -4,6 +4,7 @@ import db, {syncPromise} from '../../db';
 import {expect} from 'chai';
 import config from '../../config';
 import User from '../../users/user';
+import jsonwebtoken from 'jsonwebtoken';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName;
 
@@ -112,5 +113,90 @@ describe('LoginRouter', () => {
           expect(response.body).to.have.property('updatedAt');
           expect(response.body).to.not.have.property('password');
         });
+  });
+
+  describe('responses with 401', function() {
+    it('if request is missing a jwt token', function() {
+      const loginBody = {
+        username: 'test',
+        password: 'testPassword',
+      };
+
+      return request(app).put('/auth/login')
+          .send(loginBody)
+          .expect(401);
+    });
+
+    it('if jwt token exists but without secret', function() {
+      const loginBody = {
+        username: 'test',
+        password: 'testPassword',
+      };
+
+      return request(app).put('/auth/login')
+          .send(loginBody)
+          .expect(401);
+    });
+
+    it('if csrf header exist but no jwt', function() {
+      const loginBody = {
+        username: 'test',
+        password: 'testPassword',
+      };
+
+      jwt = jsonwebtoken.sign({username: 'username'},
+          config.jwt.secret,
+          config.jwt.getOptions());
+
+      return request(app).put('/auth/login')
+          .send(loginBody)
+          .set('Cookie', [jwt])
+          .expect(401);
+    });
+
+    it('if jwt token with secret exists ' +
+        'but no header for the csrf token', function() {
+      const loginBody = {
+        username: 'test',
+        password: 'testPassword',
+      };
+
+      return request(app).put('/auth/login')
+          .set('Cookie', [jwt])
+          .send(loginBody)
+          .expect(401);
+    });
+
+    it('if jwt token and csrf header ' +
+        'exist, but jwt token has no secret', function() {
+      const loginBody = {
+        username: 'test',
+        password: 'testPassword',
+      };
+
+      jwt = jsonwebtoken.sign({username: 'username'},
+          config.jwt.secret,
+          config.jwt.getOptions());
+
+      return request(app).put('/auth/login')
+          .set(csrfHeaderName, csrf)
+          .set('Cookie', [jwt])
+          .send(loginBody)
+          .expect(401);
+    });
+
+    it('if jwt token with secret and csrf ' +
+        'header exist, but they don\'t belong together', function() {
+      const loginBody = {
+        username: 'test',
+        password: 'testPassword',
+      };
+
+      return request(app).put('/auth/login')
+          .set(csrfHeaderName, 'FAIL')
+          .set('Cookie', [jwt])
+          .send(loginBody)
+          .expect(401);
+    });
   });
 });
