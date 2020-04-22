@@ -12,7 +12,7 @@ Share you car's location with your family or group with a single press of a butt
 
 --------
 
-Source Code of the frontend for website www.groupcars.de (*if domain available*)
+Source Code of the backend for website www.my-group-car.de
 
 Used Technologies:
   - Managment
@@ -20,12 +20,71 @@ Used Technologies:
     + Travis CI
   - Frontend
     + (OAuth2.0)
-    + React.js
+    + React.js with Typescript
     + Material Design
   - Backend
-    + Node.js
+    + Node.js / Express.js with Typescript
     + Nginx
     + Postgresql
-    
+
+---
+### How to run:
+The server can run in the following configurations:
+  - `npm run dev` ts-node is used to run the typescript code. Only http request and database operations are logged
+  - `npm run debug` ts-node is used to run typescript code. Http request, database operations and logging of server code is enabled
+  - `npm run debugAll` ts-node is used to run typescript code. Every type of logging is enabled
+  - `npm run prod` Typescript code is compiled into javascript code and saved in the subdirectory `build` the the javascript code is executed (recommended for production)
+
+Configuration can be changed in `app/config`.
+
+The server needs the following environment variables to fully function:
+- **JWT_SECRET**: a cryptographically save secret to sign json web tokens
+- **NODE_ENV**: the modus in which the server should run (default is development)
+
+#### Database:
+The server can run without a connection to a database, but only static serving is fully functioning as almost everything else needs a database.\
+The database connection can be configured in the file [app/config/database-config.js](https://github.com/Ratsch0k/group-car-api/blob/master/app/config/database-config.js).
+When running in **production** or **development** the config takes the following environment variables for the connection:
+- **DB_USERNAME**: User for the database
+- **DB_PASSWORD**: Password for the user above
+- **DB_NAME**: Name of the database
+- **DB_HOSTNAME**: Hostname to the database
+
+Because the library [sequlize](https://www.npmjs.com/package/sequelize) is used, every supported type of database management system can be used.
+
+### Migrations:
+The used library [sequlize](https://www.npmjs.com/package/sequelize) also supports migrations which helps implementing changes to an already existing schema and helps to seed a database with predefined data.\
+Migrations can be found under `app/db/migrations`\
+Seeders can be found unser `app/db/seeder`\
+
+To use these you'll have to use [sequelize-cli](https://www.npmjs.com/package/sequelize-cli) (will use `database-config.js` to connect to the database)
+
+---
+
+### How to test:
+#### Unit testing: 
+Unit tests can be started with
+```
+npm run unitTest
+```
+
+### Integration testing
+Integration tests can be started with:
+```
+npm run integrationTest
+```
+**Note:** Integration tests need a database connection
+
+### Code Coverage and test report
+A test report and coverage report can be created with
+```
+npm run coverage
+```
+This will run all unit and integration tests, store the coverage report under
+`static/test/coverage` and the test report under `static/test` in form of html.
+Both reports can be accessed if the server is running with:
+- Coverage `/test/coverage`
+- Test report `/test`
+
 Author:
   - Ratsch0k
