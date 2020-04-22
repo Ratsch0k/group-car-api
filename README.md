@@ -28,20 +28,27 @@ Used Technologies:
     + Postgresql
 
 ---
-### How to run:
+## Server urls
+Every url which is not listed below will route the frontend
+ - `/doc/openapi`: Openapi / Swagger documentation
+ - `/doc/typedoc`: Code documentation via typedoc
+ - `/test`: Test report
+ - `/test/coverage`: Test coverage report
+---
+## How to run
 The server can run in the following configurations:
   - `npm run dev` ts-node is used to run the typescript code. Only http request and database operations are logged
   - `npm run debug` ts-node is used to run typescript code. Http request, database operations and logging of server code is enabled
   - `npm run debugAll` ts-node is used to run typescript code. Every type of logging is enabled
   - `npm run prod` Typescript code is compiled into javascript code and saved in the subdirectory `build` the the javascript code is executed (recommended for production)
 
-Configuration can be changed in `app/config`.
+Configuration can be changed in `app/config` and in the `package.json`.
 
 The server needs the following environment variables to fully function:
 - **JWT_SECRET**: a cryptographically save secret to sign json web tokens
 - **NODE_ENV**: the modus in which the server should run (default is development)
 
-#### Database:
+### Database
 The server can run without a connection to a database, but only static serving is fully functioning as almost everything else needs a database.\
 The database connection can be configured in the file [app/config/database-config.js](https://github.com/Ratsch0k/group-car-api/blob/master/app/config/database-config.js).
 When running in **production** or **development** the config takes the following environment variables for the connection:
@@ -52,7 +59,7 @@ When running in **production** or **development** the config takes the following
 
 Because the library [sequlize](https://www.npmjs.com/package/sequelize) is used, every supported type of database management system can be used.
 
-### Migrations:
+#### Migrations
 The used library [sequlize](https://www.npmjs.com/package/sequelize) also supports migrations which helps implementing changes to an already existing schema and helps to seed a database with predefined data.\
 Migrations can be found under `app/db/migrations`\
 Seeders can be found unser `app/db/seeder`\
@@ -61,8 +68,8 @@ To use these you'll have to use [sequelize-cli](https://www.npmjs.com/package/se
 
 ---
 
-### How to test:
-#### Unit testing: 
+## How to test
+### Unit testing:
 Unit tests can be started with
 ```
 npm run unitTest
