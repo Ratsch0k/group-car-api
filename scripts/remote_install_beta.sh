@@ -10,7 +10,7 @@ npm install
 sudo chown -R deploy node_modules
 
 # Get secrets from environment file
-source $2
+source $2 >/dev/null
 export DB_USERNAME DB_HOSTNAME DB_PASSWORD DB_NAME JWT_SECRET
 
 # Migrate database changes
