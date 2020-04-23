@@ -14,6 +14,14 @@ cache:
     - node_modules
     - static/doc/typedoc # Cache generated typescript documentation
 
+services:
+- postgresql
+
+before_script:
+  # Install postgres, create test user and test database for integration tests
+- sudo -u postgres createuser groupcarapitest
+- sudo -u postgres psql -c "CREATE DATABASE groupcartest WITH OWNER groupcarapitest;"
+
 jobs: 
   include:
     # Jobs for static analysis
@@ -32,14 +40,8 @@ jobs:
       name: "Unit Tests"
       script: npm run unitTest
     - script: npm run integrationTest
-      services:
-      - postgresql
       env:
       - NODE_ENV=test
-      before_script:
-        # Install postgres, create test user and test database for integration tests
-      - sudo -u postgres createuser groupcarapitest
-      - sudo -u postgres psql -c "CREATE DATABASE groupcartest WITH OWNER groupcarapitest;"
       name: "Integration Tests"
 
     # Jobs for generating documentation
