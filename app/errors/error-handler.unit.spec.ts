@@ -1,100 +1,102 @@
-import * as config from '../config';
-import {response} from 'express';
 import {Result} from 'express-validator';
-import sinon, {assert, match} from 'sinon';
+import sinon, {match} from 'sinon';
+import * as config from '../config';
 import errorHandler from './error-handler';
 import InternalError from './internal-error';
 import InvalidRequestError from './invalid-request-error';
 import RestError from './rest-error';
 
-/**
- * Restore default sandbox
- */
-afterEach(() => {
-  sinon.restore();
-});
+const sandbox = sinon.createSandbox();
 
 describe('ErrorHandler', () => {
+  /**
+   * Restore default sandbox
+   */
+  afterEach(() => {
+    sandbox.restore();
+  });
+
   it('throws specific Error if instanceof RestError', () => {
     // Spy and stub
-    const responseStub = sinon.stub(response);
-    const requestSpy = sinon.spy();
-    const nextSpy = sinon.spy();
-    const validationResultStub = sinon.createStubInstance(Result);
+    const responseStub: any = sandbox.stub();
+    const requestStub: any = sandbox.stub();
+    const nextStub = sinon.stub();
+    const validationResultStub: any = sandbox.createStubInstance(Result);
 
     // Stub methods
     validationResultStub.isEmpty.returns(true);
-    responseStub.status.returns(responseStub as any);
+    responseStub.status = sandbox.stub().returns(responseStub);
+    responseStub.send = sandbox.stub();
 
     // Test
-    const error = new InvalidRequestError(validationResultStub as any);
-    errorHandler(error,
-      requestSpy as any,
-      responseStub as any,
-      nextSpy);
+    const error = new InvalidRequestError(validationResultStub);
 
-    assert.notCalled(requestSpy);
-    assert.calledOnce(validationResultStub.isEmpty);
-    assert.calledOnce(responseStub.status);
-    assert.calledOnce(responseStub.send);
-    assert.calledWith(responseStub.send,
+    errorHandler(error, requestStub, responseStub, nextStub);
+
+    sandbox.assert.notCalled(requestStub);
+    sandbox.assert.calledOnce(validationResultStub.isEmpty);
+    sandbox.assert.calledOnce(responseStub.status);
+    sandbox.assert.calledOnce(responseStub.send);
+    sandbox.assert.calledWith(responseStub.send,
         match.instanceOf(RestError));
-    assert.calledWith(responseStub.send,
+    sandbox.assert.calledWith(responseStub.send,
         match.has('message', error.message));
-    assert.calledWith(responseStub.send,
-        match.has('timestamp', error.timestamp));
-    assert.calledWith(responseStub.send,
+    sandbox.assert.calledWith(responseStub.send,
+        match.has('timestamp', match.date));
+    sandbox.assert.calledWith(responseStub.send,
         match.has('statusCode', error.statusCode));
-    assert.calledWith(responseStub.send, match.has('detail', error.detail));
+    sandbox.assert.calledWith(responseStub.send,
+        match.has('detail', error.detail));
   });
 
   it('throws InternalError if not instanceof RestError', () => {
     // Spy and stub
-    const responseStub = sinon.stub(response);
-    const requestSpy = sinon.spy();
-    const nextSpy = sinon.spy();
+    const responseStub: any = sandbox.stub();
+    const requestStub: any = sandbox.stub();
+    const nextStub: any = sandbox.stub();
 
     // Stub methods
-    responseStub.status.returns(responseStub as any);
+    responseStub.status = sandbox.stub().returns(responseStub);
+    responseStub.send = sandbox.stub();
 
     // Test
     const error = new Error();
     const stack = 'SOME STACK';
     error.stack = stack;
-    errorHandler(error,
-          requestSpy as any,
-          responseStub as any,
-          nextSpy);
 
-    assert.notCalled(requestSpy);
-    assert.calledOnce(responseStub.status);
-    assert.calledOnce(responseStub.send);
-    assert.calledWith(responseStub.send, match.instanceOf(InternalError));
-    assert.calledWith(responseStub.send, match.has('stack', stack));
+    errorHandler(error, requestStub, responseStub, nextStub);
+
+    sandbox.assert.notCalled(requestStub);
+    sandbox.assert.calledOnce(responseStub.status);
+    sandbox.assert.calledOnce(responseStub.send);
+    sandbox.assert.calledWith(responseStub.send,
+        match.instanceOf(InternalError));
+    sandbox.assert.calledWith(responseStub.send,
+        match.has('stack', stack));
   });
 
   it('throws InternalError without stack if environment is production', () => {
     config.default.error.withStack = false;
 
     // Spy and stub
-    const responseStub = sinon.stub(response);
-    const requestSpy = sinon.spy();
-    const nextSpy = sinon.spy();
+    const responseStub: any = sandbox.stub();
+    const requestStub: any = sandbox.stub();
+    const nextStub: any = sandbox.stub();
 
     // Stub methods
-    responseStub.status.returns(responseStub as any);
+    responseStub.status = sandbox.stub().returns(responseStub);
+    responseStub.send = sandbox.stub();
 
     // Test
     const error = new Error();
-    errorHandler(error,
-              requestSpy as any,
-              responseStub as any,
-              nextSpy);
 
-    assert.notCalled(requestSpy);
-    assert.calledOnce(responseStub.status);
-    assert.calledOnce(responseStub.send);
-    assert.calledWith(responseStub.send, match.instanceOf(InternalError));
-    assert.calledWith(responseStub.send, match.has('stack', undefined));
+    errorHandler(error, requestStub, responseStub, nextStub);
+
+    sandbox.assert.notCalled(requestStub);
+    sandbox.assert.calledOnce(responseStub.status);
+    sandbox.assert.calledOnce(responseStub.send);
+    sandbox.assert.calledWith(responseStub.send,
+        match.instanceOf(InternalError));
+    sandbox.assert.calledWith(responseStub.send, match.has('stack', undefined));
   });
 });

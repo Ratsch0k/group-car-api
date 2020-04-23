@@ -21,7 +21,7 @@ class InternalError extends RestError {
       _message = message;
     }
 
-    super(500, _message, new Date());
+    super(500, _message);
 
     this.stack = stack;
   }

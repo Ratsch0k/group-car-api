@@ -1,28 +1,51 @@
-import express = require('express');
-import path = require('path');
-import cookieParser = require('cookie-parser');
-import logger = require('morgan');
+import express from 'express';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 import errorHandler from '@app/errors/error-handler';
+import expressJwt from 'express-jwt';
+// import csurf from 'csurf';
+
 /**
  * Import router
  */
 import statusRouter from '@app/api/status-router';
-import loginRouter from '@app/auth/login/login-router';
 import userRouter from '@app/users/user-router';
-import signUpRouter from '@app/auth/signUp/sign-up-router';
 import config from '@config';
+import authRouter from '@app/auth';
+import jwtCsrf from './jwt/jwt-csrf';
+import {preLoginJwtValidator} from './jwt/jwt-util';
+
 const app: express.Application = express();
 
+// Add middleware
 app.set('trust proxy', true);
-app.use(logger('dev'));
+
+// Only log http request if a format string is provided
+if (config.morgan.formatString !== null) {
+  app.use(morgan(config.morgan.formatString));
+}
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
+app.use(jwtCsrf());
+
+// Adding authentication routes
+app.use('/auth', authRouter);
+
+app.use('/api',
+    expressJwt({
+      secret: config.jwt.secret,
+      getToken: config.jwt.getToken,
+    }),
+    preLoginJwtValidator);
+
+// Add own router
+
 app.use('/api/test', statusRouter);
-app.use('/auth/login', loginRouter);
 app.use('/api/user', userRouter);
-app.use('/auth/sign-up', signUpRouter);
+
 
 /**
  * Configure serving of documentation
@@ -33,11 +56,12 @@ app.use(express.static('static'));
  * Configure static service
  */
 app.use(express.static(config.staticPath.path));
-app.get('/*', (req, res) =>
+app.get('/*', (req, res) => {
   res.sendFile(
       path.join(
           config.staticPath.path,
-          'index.html')));
+          'index.html'));
+});
 
 // Register error handler
 app.use(errorHandler);

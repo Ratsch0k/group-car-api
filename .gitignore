@@ -46,9 +46,6 @@ build/Release
 node_modules/
 jspm_packages/
 
-# TypeScript v1 declaration files
-typings/
-
 # TypeScript cache
 *.tsbuildinfo
 
@@ -185,3 +182,9 @@ build/
 
 # Ignore build typedoc documentation
 static/doc/typedoc/
+
+# Ignore generated code coverage
+static/test/
+
+# Ignore mocha report
+mochawesome-report

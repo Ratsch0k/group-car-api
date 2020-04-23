@@ -1,5 +1,4 @@
-import {stub, fake, assert, match} from 'sinon';
-import {request, response} from 'express';
+import {stub, fake, assert, match, createSandbox} from 'sinon';
 import User from '../../users/user';
 import bcrypt from 'bcrypt';
 
@@ -7,7 +6,13 @@ import loginController from './login-controller';
 import Bluebird from 'bluebird';
 import UserDto from '../../users/user-dto';
 
-describe('LoginController', () => {
+const sandbox = createSandbox();
+
+describe('LoginController', function() {
+  afterEach(() => {
+    sandbox.restore();
+  });
+
   it('logs in, if credentials correct', function(done) {
     const requestBody = {
       username: 'demo',
@@ -19,35 +24,45 @@ describe('LoginController', () => {
       username: 'demo',
       email: 'demo@mail.com',
       password: 'hashed',
+      isBetaUser: false,
       get() {
         return this;
       },
     };
 
+    const expectedJwt = {
+      username: 'demo',
+      isBetaUser: false,
+    };
+
     // Stub bcrypt comparing
-    const compareStub = stub(bcrypt, 'compare');
+    const compareStub = sandbox.stub(bcrypt, 'compare');
     compareStub.resolves(true);
 
     // Stub database
-    const findOneStub = stub(User, 'findOne');
-    findOneStub.usingPromise(Bluebird).resolves(dbUser as any);
+    const findByUsernameStub = sandbox.stub(User, 'findByUsername');
+    findByUsernameStub.usingPromise(Bluebird).resolves(dbUser as any);
 
     // Stub express
-    const requestStub = stub(request);
+    const requestStub: any = sandbox.stub();
     requestStub.body = requestBody;
-    const responseStub = stub(response);
+    const responseStub: any = sandbox.stub();
+    responseStub.setJwtToken = fake();
     const next = fake();
     responseStub.send = fake(() => {
-      assert.calledWith(compareStub, requestBody.password, dbUser.password);
+      sandbox.assert.calledWith(compareStub,
+          requestBody.password,
+          dbUser.password);
       assert.notCalled(next);
-      assert.calledOnce(responseStub.send);
-      assert.calledWith(responseStub.send, match.instanceOf(UserDto));
-      assert.calledWith(findOneStub,
-          match({where: {username: requestBody.username}}));
+      sandbox.assert.calledOnce(responseStub.send);
+      sandbox.assert.calledWith(responseStub.send, match.instanceOf(UserDto));
+      sandbox.assert.calledWith(findByUsernameStub, requestBody.username);
+      sandbox.assert.calledOnce(responseStub.setJwtToken);
+      sandbox.assert.calledWith(responseStub.setJwtToken, match(expectedJwt));
       done();
     }) as any;
 
-    loginController(requestStub as any, responseStub as any, next);
+    loginController(requestStub, responseStub, next);
   });
 
   describe('throws error', function() {
@@ -60,20 +75,21 @@ describe('LoginController', () => {
       const dbError = new Error('SOME MESSAGE');
 
       // Stub database
-      const findOneStub = stub(User, 'findOne');
+      const findOneStub = sandbox.stub(User, 'findOne');
       findOneStub.usingPromise(Bluebird).rejects(dbError);
 
       // Stub express
-      const requestStub = stub(request);
+      const requestStub: any = sandbox.stub();
       requestStub.body = requestBody;
-      const responseStub = stub(response);
-      const next = fake(() => {
-        assert.notCalled(responseStub.send);
+      const responseStub: any = sandbox.stub();
+      responseStub.send = sandbox.stub();
+      const next = fake((err: any) => {
+        sandbox.assert.notCalled(responseStub.send);
         assert.calledWith(next, match(dbError));
         done();
       });
 
-      loginController(requestStub as any, responseStub as any, next);
+      loginController(requestStub, responseStub, next);
     });
 
     it('if given password doesn\'t match stored hash', function(done) {
@@ -90,17 +106,18 @@ describe('LoginController', () => {
       };
 
       // Stub bcrypt comparing
-      const compareStub = stub(bcrypt, 'compare');
+      const compareStub = sandbox.stub(bcrypt, 'compare');
       compareStub.resolves(false);
 
       // Stub database
-      const findOneStub = stub(User, 'findOne');
+      const findOneStub = sandbox.stub(User, 'findOne');
       findOneStub.usingPromise(Bluebird).resolves(dbUser as any);
 
       // Stub express
-      const requestStub = stub(request);
+      const requestStub: any = sandbox.stub();
       requestStub.body = requestBody;
-      const responseStub = stub(response);
+      const responseStub: any = sandbox.stub();
+      responseStub.send = sandbox.stub();
       const next = fake(() => {
         assert.notCalled(responseStub.send);
         assert.calledWith(compareStub, requestBody.password, dbUser.password);
@@ -114,7 +131,7 @@ describe('LoginController', () => {
         done();
       }) as any;
 
-      loginController(requestStub as any, responseStub as any, next);
+      loginController(requestStub, responseStub, next);
     });
 
     it('if database can\'t find user', function(done) {
@@ -125,16 +142,17 @@ describe('LoginController', () => {
       };
 
       // Stub bcrypt comparing
-      const compareStub = stub(bcrypt, 'compare');
+      const compareStub = sandbox.stub(bcrypt, 'compare');
 
       // Stub database
-      const findOneStub = stub(User, 'findOne');
+      const findOneStub = sandbox.stub(User, 'findOne');
       findOneStub.usingPromise(Bluebird).resolves(null as any);
 
       // Stub express
-      const requestStub = stub(request);
+      const requestStub: any = sandbox.stub();
       requestStub.body = requestBody;
-      const responseStub = stub(response);
+      const responseStub: any = sandbox.stub();
+      responseStub.send = stub();
       const next = fake(() => {
         assert.notCalled(responseStub.send);
         assert.notCalled(compareStub);
@@ -149,7 +167,7 @@ describe('LoginController', () => {
         done();
       }) as any;
 
-      loginController(requestStub as any, responseStub as any, next);
+      loginController(requestStub, responseStub, next);
     });
   });
 });

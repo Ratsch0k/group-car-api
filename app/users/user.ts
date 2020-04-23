@@ -56,6 +56,15 @@ class User extends Model {
    * The date and time the user was deleted
    */
   public readonly deletedAt!: Date;
+
+  /**
+   * Search for a user by the given username.\
+   * Only returns one instance if multiple exist.
+   * @param username The username of the user to find
+   */
+  public static findByUsername(username: string) {
+    return this.findOne({where: {username}});
+  }
 }
 
 /**

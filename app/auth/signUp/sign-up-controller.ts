@@ -4,6 +4,7 @@ import UserDto from '@app/users/user-dto';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
 import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
+import {convertUserToJwtPayload} from '@app/jwt/jwt-util';
 
 type RequestHandler = import('express').RequestHandler;
 
@@ -31,6 +32,7 @@ const signUpController: RequestHandler = (req, res, next) => {
     password: req.body.password,
   }).then((user) => {
     log('User "%s" successfully created', req.body.username);
+    res.setJwtToken(convertUserToJwtPayload(user), user.username);
     res.status(201).send(ModelToDtoConverter
         .convert<UserDto>(user.get({plain: true}), UserDto));
   }).catch((err) => {

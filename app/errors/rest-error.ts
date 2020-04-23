@@ -33,19 +33,17 @@ export class RestError extends Error {
    * Creates an instance of this class.
    * @param statusCode Http status code of the error
    * @param message   Message of the error
-   * @param timestamp When the error occurred
    * @param detail     More info about the error,
    *    can be used on the client for better error visualization
    */
   constructor(statusCode: number,
       message: string,
-      timestamp: Date,
       detail?: any) {
     super();
     this.statusCode = statusCode;
     this.status = STATUS_CODES[statusCode];
     this.message = message;
-    this.timestamp = timestamp;
+    this.timestamp = new Date();
     this.detail = detail;
   }
 }
