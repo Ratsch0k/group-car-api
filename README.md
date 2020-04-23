@@ -48,6 +48,10 @@ The server needs the following environment variables to fully function:
 - **JWT_SECRET**: a cryptographically save secret to sign json web tokens
 - **NODE_ENV**: the modus in which the server should run (default is development)
 
+Optional environment variables:
+ - **HTML_STATIC**: Path to the frontend which will served on every url which is not directly served by the backend, if not set the field `config.public` in the `package.json` is 
+ - **PORT**: Port on which the server should listen, if not set the field `config.port` in the ´package.json` is used
+
 ### Database
 The server can run without a connection to a database, but only static serving is fully functioning as almost everything else needs a database.\
 The database connection can be configured in the file [app/config/database-config.js](https://github.com/Ratsch0k/group-car-api/blob/master/app/config/database-config.js).
