@@ -8,7 +8,7 @@ npm install
 
 # Get secrets from environment file
 source $2
-export DB_USERNAME DB_HOSTNAME DB_PASSWORD DB_NAME
+export DB_USERNAME DB_HOSTNAME DB_PASSWORD DB_NAME JWT_SECRET
 
 # Migrate database changes
 npm run prodMigrate

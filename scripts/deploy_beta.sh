@@ -50,4 +50,4 @@ rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER@$SERVER_IP
 
  
 # Execute remote install script on server
-ssh $SERVER_USER@$SERVER_IP $SERVER_PATH_BETA/scripts/remote_install_beta.sh $SERVER_PATH_BETA $SERVER_ENV_FILE_PATH_BETA
+ssh $SERVER_USER@$SERVER_IP sudo /bin/su - group-car-beta -s /bin/bash $SERVER_PATH_BETA/scripts/remote_install_beta.sh $SERVER_PATH_BETA $SERVER_ENV_FILE_PATH_BETA
