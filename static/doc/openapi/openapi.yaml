@@ -42,13 +42,6 @@ paths:
         200:
           description: The csrf token is in the header XSRF-TOKEN
   /auth/login:
-    head:
-      summary: Get the csrf token
-      tags:
-      - Authentication
-      responses:
-        200:
-          description: The csrf token is in the header XSRF-TOKEN
     put:
       summary: Log in
       description: Logs the user in with the given username and the given password
@@ -58,7 +51,8 @@ paths:
       - name: XSRF-TOKEN
         in: header
         required: false
-        type: string
+        schema:
+          type: string
       requestBody:
         description: Login data
         content:
@@ -75,13 +69,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestError'
   /auth/sign-up:
-    head:
-      summary: Get the csrf token
-      tags:
-      - Authentication
-      responses:
-        200:
-          description: The csrf token is in the header XSRF-TOKEN
     put:
       summary: Sign up
       description: Signs the user up with the given attributes
@@ -91,7 +78,8 @@ paths:
       - name: XSRF-TOKEN
         in: header
         required: false
-        type: string
+        schema:
+          type: string
       requestBody:
         description: The sign up properties
         content:
@@ -107,6 +95,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+  /auth/token:
+    put:
+      summary: Check if logged in
+      tags:
+      - Authentication
+      description: Check if the current state of the client indicates that it is logged in. Checks the jwt token and the payload within.
+      parameters:
+      - name: XSRF-TOKEN
+        in: header
+        required: false
+        schema:
+          type: string 
+      responses:
+        200:
+          description: The client is logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          description: The client is not logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
 # Components
 components:
   schemas:
@@ -153,6 +166,9 @@ components:
           type: string
         password: 
           type: string
+      example:
+        username: demo
+        password: 123456
     SignUpObject:
       type: object
       properties:
@@ -186,6 +202,16 @@ components:
           type: string
         detail:
           type: object
+    UnauthorizedError:
+      allOf:
+      - schema:
+          $ref: '#/components/schemas/RestError'
+      - example:
+          status: Unauthorized
+          statusCode: 401
+          message: You're not authorized to view the requested resourced.
+          date: '2020-04-29T17:52:59.221Z'
+          detail: {}
 
 # External docs
 externalDocs:
