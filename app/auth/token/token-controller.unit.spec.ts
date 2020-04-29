@@ -88,6 +88,7 @@ describe('TokenController', function() {
 
     const user = {
       deletedAt: null,
+      get: () => user,
     };
 
     // Mock database
