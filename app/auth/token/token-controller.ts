@@ -1,6 +1,8 @@
 import debug from 'debug';
 import User from '@app/users/user';
 import {UnauthorizedError} from '@errors';
+import ModelToDtoConverter from '@app/util/model-to-dto-converter';
+import UserDto from '@app/users/user-dto';
 
 type RequestHandler = import('express').RequestHandler;
 
@@ -33,7 +35,12 @@ const tokenController: RequestHandler = (req: any, res, next) => {
             next(new UnauthorizedError());
           } else {
             log('IP %s is logged in', req.ip);
-            res.status(200).send();
+            res.status(200).send(
+                ModelToDtoConverter.convert<UserDto>(
+                    user.get({plain: true}),
+                    UserDto,
+                ),
+            );
           }
         });
   } else {
