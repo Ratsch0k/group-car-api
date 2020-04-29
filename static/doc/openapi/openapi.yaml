@@ -58,7 +58,8 @@ paths:
       - name: XSRF-TOKEN
         in: header
         required: false
-        type: string
+        schema:
+          type: string
       requestBody:
         description: Login data
         content:
@@ -91,7 +92,8 @@ paths:
       - name: XSRF-TOKEN
         in: header
         required: false
-        type: string
+        schema:
+          type: string
       requestBody:
         description: The sign up properties
         content:
@@ -107,6 +109,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+  /auth/token:
+    put:
+      summary: Check if logged in
+      tags:
+      - Authentication
+      description: Check if the current state of the client indicates that it is logged in. Checks the jwt token and the payload within.
+      parameters:
+      - name: XSRF-TOKEN
+        in: header
+        required: false
+        schema:
+          type: string 
+      responses:
+        200:
+          description: The client is logged in
+        401:
+          description: The client is not logged in
 # Components
 components:
   schemas:
@@ -153,6 +172,9 @@ components:
           type: string
         password: 
           type: string
+      example:
+        username: demo
+        password: 123456
     SignUpObject:
       type: object
       properties:
