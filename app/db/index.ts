@@ -1,7 +1,6 @@
 import {Sequelize} from 'sequelize';
 type Options = import('sequelize').Options;
-const env = process.env.NODE_ENV || 'development';
-const config = require('@app/config/database-config')[env];
+import config from '@config';
 
 /**
  * An extension of the {@link Sequelize} class which also
@@ -38,9 +37,23 @@ export class Database extends Sequelize {
   }
 }
 
-const database = new Database(config.database,
-    config.username,
-    config.password,
-    config);
+const database = new Database(config.database.sequelize.database,
+    config.database.sequelize.username,
+    config.database.sequelize.password || '',
+    config.database.sequelize as unknown as Options);
+
+    // If currently in environment sync the database
+let syncPromise: Promise<void>;
+if (config.database.withFlush) {
+  syncPromise = database.sync({force: true}).then(() => {
+    console.log('Sync database');
+  });
+} else {
+  syncPromise = Promise.resolve();
+}
+
+export {
+  syncPromise,
+}
 
 export default database;

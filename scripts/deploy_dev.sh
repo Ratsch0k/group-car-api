@@ -35,6 +35,12 @@ echo -e "$SERVICE_CONTENT" > dev.my-group-car.de.service
 # Create new folder to use as repository, copy data and remove unnecessary files
 chmod +x scripts/remote_install_dev.sh
 chmod +x build/group-car.js
+
+# Create test report
+npm run coverage
+
+# Delete intermediate directory for report creation
+rm -r mochawesome-report
  
 # Delete node_modules for faster file transfer
 rm -r node_modules
@@ -44,4 +50,4 @@ rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER@$SERVER_IP
 
  
 # Execute remote install script on server
-ssh $SERVER_USER@$SERVER_IP $SERVER_PATH_DEV/scripts/remote_install_dev.sh $SERVER_PATH_DEV $SERVER_ENV_FILE_PATH_DEV
+ssh $SERVER_USER@$SERVER_IP sudo /bin/su - group-car-dev -s /bin/bash $SERVER_PATH_DEV/scripts/remote_install_dev.sh $SERVER_PATH_DEV $SERVER_ENV_FILE_PATH_DEV

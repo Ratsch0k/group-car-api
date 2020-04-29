@@ -1,0 +1,16 @@
+name: Merge Pal (PR)
+
+on:
+  pull_request:
+    types:
+      - synchronize
+      - opened
+
+jobs:
+  mergepal-merge: # run merge pal in the end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: maxkomarychev/merge-pal-action@v0.5.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

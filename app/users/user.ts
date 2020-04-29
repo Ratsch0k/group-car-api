@@ -1,5 +1,10 @@
 import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from '@db';
+import bcrypt from 'bcrypt';
+import config from '@config';
+import {PasswordNotHashableError} from '@errors';
+
+type ModelHooks = import('sequelize/types/lib/hooks').ModelHooks;
 
 /**
  * Model class for users.\
@@ -51,7 +56,38 @@ class User extends Model {
    * The date and time the user was deleted
    */
   public readonly deletedAt!: Date;
+
+  /**
+   * Search for a user by the given username.\
+   * Only returns one instance if multiple exist.
+   * @param username The username of the user to find
+   */
+  public static findByUsername(username: string) {
+    return this.findOne({where: {username}});
+  }
 }
+
+/**
+ * Sets the password of the user to it's salted hash.
+ * @param user    The user for which to hash the password
+ * @param options Options
+ */
+export const hashPasswordOfUser = (user: User) => {
+  return bcrypt.hash(user.password + '', config.bcrypt.saltRounds)
+      .then((hash: string) => {
+        user.password = hash;
+      }).catch(() => {
+        throw new PasswordNotHashableError(user.username);
+      });
+};
+
+/**
+ * Create hooks for user model.\
+ * Will be used when initializing the model.
+ */
+const hooks: Partial<ModelHooks> = {
+  beforeSave: hashPasswordOfUser,
+};
 
 /**
  * Initialize user model
@@ -99,10 +135,14 @@ User.init(
         allowNull: false,
         type: DataTypes.DATE,
       },
+      deletedAt: {
+        type: DataTypes.DATE,
+      },
     },
     {
       sequelize,
       tableName: 'users',
+      hooks,
       timestamps: true,
       paranoid: true,
     });

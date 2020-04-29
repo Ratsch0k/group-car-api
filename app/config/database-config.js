@@ -7,11 +7,12 @@ module.exports = {
     dialect: 'postgres',
   },
   test: {
-    username: 'group-car-api-test',
-    password: null,
-    database: 'group-car-test',
+    username: 'groupcarapitest',
+    password: 'groupcarapitest',
+    database: 'groupcartest',
     host: '127.0.0.1',
     dialect: 'postgres',
+    logging: false,
   },
   production: {
     username: process.env.DB_USERNAME,

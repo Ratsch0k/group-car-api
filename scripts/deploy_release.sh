@@ -44,4 +44,4 @@ rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER@$SERVER_IP
 
  
 # Execute remote install script on server
-ssh $SERVER_USER@$SERVER_IP $SERVER_PATH/scripts/remote_install_release.sh $SERVER_PATH $SERVER_ENV_FILE_PATH
+ssh $SERVER_USER@$SERVER_IP sudo /bin/su - group-car -s /bin/bash $SERVER_PATH/scripts/remote_install_release.sh $SERVER_PATH $SERVER_ENV_FILE_PATH
