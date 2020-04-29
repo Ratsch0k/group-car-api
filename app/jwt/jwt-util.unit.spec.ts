@@ -132,17 +132,12 @@ describe('jwt-util', function() {
         },
       };
 
-      const expected = {
-        ...payload,
-        loggedIn: false,
-      };
-
       it('with subject', function() {
         const subject = 'subject';
 
         const actual: any = generateToken(payload, subject);
 
-        expect(actual.payload).to.eql(expected);
+        expect(actual.payload).to.eql(payload);
         expect(actual.secret).to.equal(config.jwt.secret);
         expect(actual.options).to.equal(subject);
 
@@ -159,7 +154,7 @@ describe('jwt-util', function() {
       it('without subject', function() {
         const actual: any = generateToken(payload);
 
-        expect(actual.payload).to.eql(expected);
+        expect(actual.payload).to.eql(payload);
         expect(actual.secret).to.equal(config.jwt.secret);
         expect(actual.options).to.equal(config.jwt.notLoggedInSubject);
 

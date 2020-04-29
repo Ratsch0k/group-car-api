@@ -27,10 +27,7 @@ export function generateToken(payload: object,
         config.jwt.getOptions(payload.username));
   } else {
     return jwt.sign(
-        {
-          ...payload,
-          loggedIn: false,
-        },
+        payload,
         config.jwt.secret,
         config.jwt.getOptions(subject));
   }
