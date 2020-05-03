@@ -33,6 +33,14 @@ export interface MorganConfig {
   formatString: string | null;
 }
 
+export interface PbConfig {
+  dimensions: number;
+}
+
+export interface UserConfig {
+  pb: PbConfig;
+}
+
 export interface Config {
   database: DBConfig;
   bcrypt: BcryptConfig;
@@ -40,6 +48,7 @@ export interface Config {
   error: ErrorConfig;
   jwt: JWTConfig;
   morgan: MorganConfig;
+  user: UserConfig;
 }
 
 /**
@@ -107,6 +116,12 @@ const database: DBConfig = {
   withFlush,
 };
 
+const user: UserConfig = {
+  pb: {
+    dimensions: 512,
+  },
+};
+
 const config: Config = {
   database,
   bcrypt,
@@ -114,6 +129,7 @@ const config: Config = {
   error,
   jwt,
   morgan,
+  user,
 };
 
 export default config;

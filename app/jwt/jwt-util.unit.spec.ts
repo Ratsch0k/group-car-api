@@ -1,4 +1,4 @@
-import User from '../users/user';
+import User from '../user/user';
 import sinon, {match} from 'sinon';
 import jwt from 'jsonwebtoken';
 import config from '../config';
