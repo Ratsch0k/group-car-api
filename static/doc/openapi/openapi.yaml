@@ -6,6 +6,8 @@ info:
 tags:
 - name: Authentication
   description: Requests for authentication
+- name: User
+  description: Requests for everything user related
 
 # Paths
 paths:
@@ -132,6 +134,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+                
+  # User
+  /user/generate-pb:
+    put:
+      summary: Create new pseudo-random profile picture
+      tags:
+      - User
+      description: Generates a new pseudo-random profile picture with the given username as seed. An offset can be
+        send with the username to generate a different profile picture for the same username. The same username and offset will
+        always produce the same profile picture.
+      parameters: 
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: number
+      responses:
+        200:
+          description: The generation was successfull and the picture is returned.
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        400:
+          description: The request is missing parameters and/or is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
 # Components
 components:
   schemas:
