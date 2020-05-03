@@ -68,6 +68,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+        401:
+          description: Csrf token doesn't exist on the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
   /auth/sign-up:
     put:
       summary: Sign up
@@ -95,6 +101,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+        401:
+          description: Csrf token doesn't exist on the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
   /auth/token:
     put:
       summary: Check if logged in
@@ -204,14 +216,13 @@ components:
           type: object
     UnauthorizedError:
       allOf:
-      - schema:
-          $ref: '#/components/schemas/RestError'
+      - $ref: '#/components/schemas/RestError'
       - example:
           status: Unauthorized
           statusCode: 401
           message: You're not authorized to view the requested resourced.
-          date: '2020-04-29T17:52:59.221Z'
           detail: {}
+          timestamp: '2020-05-03T13:21:35.938Z'
 
 # External docs
 externalDocs:
