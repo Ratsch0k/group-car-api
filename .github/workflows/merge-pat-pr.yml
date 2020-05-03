@@ -13,4 +13,4 @@ jobs:
       - uses: actions/checkout@v1
       - uses: maxkomarychev/merge-pal-action@v0.5.1
         with:
-          token: ${{ secrets.WORKFLOW_MERGE_PAL }}
+          token: ${{ secrets.ACTIONS_MERGE }}

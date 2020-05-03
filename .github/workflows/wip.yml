@@ -7,6 +7,6 @@ jobs:
   wip:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.WORKFLOW_MERGE_PAL }}
+      GITHUB_TOKEN: ${{ secrets.ACTIONS_MERGE }}
     steps:
       - uses: wip/action@v1.0.0
