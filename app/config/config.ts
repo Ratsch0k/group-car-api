@@ -118,7 +118,7 @@ const database: DBConfig = {
 
 const user: UserConfig = {
   pb: {
-    dimensions: 512,
+    dimensions: 128,
   },
 };
 
