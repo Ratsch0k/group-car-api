@@ -137,7 +137,7 @@ paths:
                 
   # User
   /user/generate-pb:
-    put:
+    get:
       summary: Create new pseudo-random profile picture
       tags:
       - User
