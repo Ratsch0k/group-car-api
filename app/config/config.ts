@@ -12,6 +12,15 @@ type SequelizeConfig = import('sequelize/types').Config;
 const environment = process.env.NODE_ENV || 'development';
 log('Environment: %s', environment);
 
+/**
+ * For which type of server this server is used:
+ *  - development:  The development server
+ *  - beta:         The beta server
+ *  - release:      The release server, main server
+ */
+const serverType = process.env.SERVER_TYPE || 'development';
+log('Server: %s', serverType);
+
 export interface BcryptConfig {
   saltRounds: number;
 }
@@ -73,17 +82,21 @@ const morgan: MorganConfig = {
   formatString: 'dev',
 };
 
-let withFlush = true;
+let withFlush = false;
 
 // Depending on node environment changes configs
 if (environment === 'production') {
   bcrypt.saltRounds = 10;
   error.withStack = false;
-  withFlush = false;
   morgan.formatString = 'common';
 } else if (environment === 'test') {
   bcrypt.saltRounds = 4;
   morgan.formatString = null;
+}
+
+// Depending on server type change certain configs
+if (serverType === 'development') {
+  withFlush = true;
 }
 
 /**
