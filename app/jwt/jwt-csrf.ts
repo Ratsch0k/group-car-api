@@ -208,7 +208,15 @@ const setSecret = (tokens: Tokens, res: Response): string => {
   // Generate new secret
   const secret = tokens.secretSync();
 
-  res.cookie(config.jwt.name, generateToken({[secretName]: secret}));
+  res.cookie(
+      config.jwt.name,
+      generateToken({[secretName]: secret}),
+      {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+      },
+  );
 
   return secret;
 };
