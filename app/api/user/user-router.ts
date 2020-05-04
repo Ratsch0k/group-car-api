@@ -1,7 +1,7 @@
 import express from 'express';
-import User from '@app/users/user';
+import User from '@app/user/user';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
-import UserDto from './user-dto';
+import UserDto from '../../user/user-dto';
 
 const router: express.Router = express.Router();
 

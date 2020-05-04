@@ -6,6 +6,8 @@ info:
 tags:
 - name: Authentication
   description: Requests for authentication
+- name: User
+  description: Requests for everything user related
 
 # Paths
 paths:
@@ -68,6 +70,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+        401:
+          description: Csrf token doesn't exist on the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
   /auth/sign-up:
     put:
       summary: Sign up
@@ -95,6 +103,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+        401:
+          description: Csrf token doesn't exist on the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
   /auth/token:
     put:
       summary: Check if logged in
@@ -120,6 +134,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+                
+  # User
+  /user/generate-pb:
+    get:
+      summary: Create new pseudo-random profile picture
+      tags:
+      - User
+      description: Generates a new pseudo-random profile picture with the given username as seed. An offset can be
+        send with the username to generate a different profile picture for the same username. The same username and offset will
+        always produce the same profile picture.
+      parameters: 
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: number
+      responses:
+        200:
+          description: The generation was successfull and the picture is returned.
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        400:
+          description: The request is missing parameters and/or is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
 # Components
 components:
   schemas:
@@ -204,14 +253,13 @@ components:
           type: object
     UnauthorizedError:
       allOf:
-      - schema:
-          $ref: '#/components/schemas/RestError'
+      - $ref: '#/components/schemas/RestError'
       - example:
           status: Unauthorized
           statusCode: 401
           message: You're not authorized to view the requested resourced.
-          date: '2020-04-29T17:52:59.221Z'
           detail: {}
+          timestamp: '2020-05-03T13:21:35.938Z'
 
 # External docs
 externalDocs:

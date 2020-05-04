@@ -1,12 +1,12 @@
-import * as User from '../../users/user';
+import * as User from '../../user/user';
 import signUpController from './sign-up-controller';
 import {fake, assert, match, createSandbox} from 'sinon';
 import Bluebird from 'bluebird';
-import UserDto from '../../users/user-dto';
+import UserDto from '../../user/user-dto';
 import {expect} from 'chai';
 import {UniqueConstraintError} from 'sequelize';
 import UsernameAlreadyExistsError from
-  '../../errors/users/username-already-exists-error';
+  '../../errors/user/username-already-exists-error';
 
 const sandbox = createSandbox();
 

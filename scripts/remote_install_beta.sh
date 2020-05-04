@@ -4,6 +4,7 @@ set -e
 cd $1
 
 # Install dependencies
+npm install --build-from-source canvas
 npm install
 
 # Change owner of node_modules to deploy. Necessary for deploy user to update server
