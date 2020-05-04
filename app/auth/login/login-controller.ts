@@ -31,10 +31,12 @@ const loginController: RequestHandler = (req, res, next) => {
               .then((result) => {
                 // Check if sent password is equal to stored user password
                 if (result) {
+                  log('Login successful for IP %s', req.ip);
                   res.setJwtToken(convertUserToJwtPayload(user), user.username);
                   res.send(ModelToDtoConverter
                       .convertSequelizeModel(user, UserDto));
                 } else {
+                  error('Invalid password for IP %s', req.ip);
                   throw new InvalidLoginError();
                 }
               });
