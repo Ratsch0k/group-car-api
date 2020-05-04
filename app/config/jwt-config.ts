@@ -15,7 +15,6 @@ export interface JWTSecurityOptions {
 
 export interface JWTCookieOptions {
   httpOnly: boolean;
-  domain: string | undefined;
   sameSite: boolean;
   secure: boolean;
   signed: boolean;
@@ -72,8 +71,6 @@ const jwt: JWTConfig = {
   }),
   cookieOptions: {
     httpOnly: true,
-    domain: process.env.NODE_ENV === 'production' ?
-      'my-group-car.de' : undefined,
     sameSite: process.env.NODE_ENV === 'production',
     secure: process.env.NODE_ENV === 'production',
     signed: false,
