@@ -28,9 +28,9 @@
     "all": true
   },
   "scripts": {
-    "dev": "ts-node -r tsconfig-paths/register --transpile-only app/group-car.ts",
-    "debug": "cross-env DEBUG=group-car:* ts-node --transpile-only -r tsconfig-paths/register app/group-car.ts",
-    "debugAll": "cross-env DEBUG=* ts-node --transpile-only -r tsconfig-paths/register app/group-car.ts",
+    "dev": "cross-env SERVER_TYPE=development ts-node -r tsconfig-paths/register --transpile-only app/group-car.ts",
+    "debug": "cross-env SERVER_TYPE=development DEBUG=group-car:* ts-node --transpile-only -r tsconfig-paths/register app/group-car.ts",
+    "debug:all": "cross-env SERVER_TYPE=development DEBUG=* ts-node --transpile-only -r tsconfig-paths/register app/group-car.ts",
     "eslint": "./node_modules/.bin/eslint . --ext .js,.ts",
     "tsc": "tsc",
     "prod": "tsc & cross-env NODE_ENV=production node -r tsconfig-paths/register ./build/group-car.js",
