@@ -3,8 +3,8 @@ import User from '@app/user/user';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
 import UserDto from '../../user/user-dto';
 import {ProfilePic} from '@app/user';
-import NotFoundError from '@app/errors/not-found-error';
 import debug from 'debug';
+import {UserNotFoundError} from '@app/errors';
 
 const log = debug('group-car:user-router');
 const error = debug('group-car:user-router:error');
@@ -16,15 +16,16 @@ const router: express.Router = express.Router();
  * @param req Http request
  * @param res Http response
  */
-const userRouter: express.RequestHandler = (req, res) => {
+export const userRouter: express.RequestHandler = (req, res) => {
   User.findAll().then((users: User[]) => {
     res.send(ModelToDtoConverter
         .convertAllSequelizeModels<UserDto>(users, UserDto));
   });
 };
 
-const userProfilePicRouter: express.RequestHandler = (req, res, next) => {
-  const userId = req.params.userId;
+export const userProfilePicRouter: express.RequestHandler =
+(req, res, next) => {
+  const userId = Number.parseInt(req.params.userId, 10);
   log('User id: %s', userId);
 
   ProfilePic.findOne({
@@ -34,18 +35,20 @@ const userProfilePicRouter: express.RequestHandler = (req, res, next) => {
   }).then((pic) => {
     if (pic !== null) {
       log('Profile picture found');
-      console.log(pic.data);
       res.type('image/jpeg');
       res.send(pic.data);
     } else {
       error('Profile picture doesn\'t exist');
-      next(new NotFoundError());
+      next(new UserNotFoundError(userId));
     }
+  }).catch((err: Error) => {
+    error('ProfilePic search threw error: %s', err.message);
+    next(err);
   });
 };
 
 /**
- * Add the {@link userRouter} to the get route
+ * Add the routers to the route
  */
 router.get('/', userRouter);
 router.get('/:userId/profile-pic', userProfilePicRouter);
