@@ -169,6 +169,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+  /api/user/{userId}/profile-pic:
+    get:
+      summary: Get the profile picture
+      tags:
+      - User
+      description: Get the profile picture of the user with the given id
+      parameters: 
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: number
+      responses:
+        200:
+          description: The profile picture as jpeg
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        404:
+          description: No user with the given id exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
 # Components
 components:
   schemas:
