@@ -6,7 +6,7 @@ import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
 import {convertUserToJwtPayload} from '@app/jwt/jwt-util';
 import {ProfilePic} from '@app/user';
-import generatePb from '@app/util/generate-pb';
+import generatePic from '@app/util/generate-profile-pic';
 import config from '@config';
 
 type RequestHandler = import('express').RequestHandler;
@@ -36,9 +36,8 @@ const signUpController: RequestHandler = (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
   }).then((user) => {
-    generatePb(picDim, req.body.username, req.body.offset ?? 0)
+    generatePic(picDim, req.body.username, req.body.offset ?? 0)
         .then((data: Buffer) => {
-          console.log(data);
           return ProfilePic.create({
             data: data,
             userId: user.id,

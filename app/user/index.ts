@@ -1,5 +1,6 @@
 import express from 'express';
-import generatePbRouter from './generate-pb/generate-pb-router';
+import generatePbRouter from
+  './generate-profile-pic/generate-profile-pic-router';
 
 export const userRouter = express.Router();
 

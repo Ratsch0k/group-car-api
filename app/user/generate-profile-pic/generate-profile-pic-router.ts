@@ -1,9 +1,9 @@
 import express from 'express';
-import generatePbValidators from './generate-pb-validators';
+import generatePbValidators from './generate-profile-pic-validators';
 import debug from 'debug';
 import {validationResult} from 'express-validator';
 import {InvalidRequestError} from '@app/errors';
-import generatePbController from './generate-pb-controller';
+import generatePbController from './generate-profile-pic-controller';
 
 const log = debug('group-car:generate-pb');
 const error = debug('group-car:generate-pb:error');
@@ -29,7 +29,7 @@ const generatePbHandler: express.RequestHandler = (req, res, next) => {
 /**
  * Add the {@link generatePbRouter} to the get route
  */
-generatePbRouter.get(
+generatePbRouter.put(
     '/',
     generatePbValidators.validator,
     generatePbHandler,

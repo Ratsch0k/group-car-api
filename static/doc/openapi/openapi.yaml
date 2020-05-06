@@ -136,8 +136,8 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedError'
                 
   # User
-  /user/generate-pb:
-    get:
+  /user/generate-profile-pic:
+    put:
       summary: Create new pseudo-random profile picture
       tags:
       - User

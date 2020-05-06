@@ -14,7 +14,7 @@ registerFont('app/assets/Roboto-Regular.ttf', {family: 'Roboto'});
  * @param offset    Offset for the randomness. Used to creates a
  *                  different picture for the same username
  */
-const generatePb = (dim: number,
+const generateProfilePic = (dim: number,
     username: string,
     offset: number): Promise<Buffer> => {
   // Get a pseudo random number for the username and offset
@@ -45,4 +45,4 @@ const generatePb = (dim: number,
   });
 };
 
-export default generatePb;
+export default generateProfilePic;
