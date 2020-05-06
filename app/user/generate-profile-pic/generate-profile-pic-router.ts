@@ -29,7 +29,7 @@ const generatePbHandler: express.RequestHandler = (req, res, next) => {
 /**
  * Add the {@link generatePbRouter} to the get route
  */
-generatePbRouter.put(
+generatePbRouter.get(
     '/',
     generatePbValidators.validator,
     generatePbHandler,

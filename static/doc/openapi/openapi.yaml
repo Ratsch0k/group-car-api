@@ -137,7 +137,7 @@ paths:
                 
   # User
   /user/generate-profile-pic:
-    put:
+    get:
       summary: Create new pseudo-random profile picture
       tags:
       - User
