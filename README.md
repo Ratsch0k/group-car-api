@@ -76,13 +76,13 @@ To use these you'll have to use [sequelize-cli](https://www.npmjs.com/package/se
 ### Unit testing:
 Unit tests can be started with
 ```
-npm run unitTest
+npm run test:unit
 ```
 
 ### Integration testing
 Integration tests can be started with:
 ```
-npm run integrationTest
+npm run test:integration
 ```
 **Note:** Integration tests need a database connection
 
