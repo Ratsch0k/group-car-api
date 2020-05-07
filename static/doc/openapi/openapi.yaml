@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Group car api
-  version: 0.1.12
+  version: 0.2.1
   
 tags:
 - name: Authentication
