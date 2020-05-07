@@ -2,7 +2,7 @@ import db, {syncPromise} from '../../db';
 import request from 'supertest';
 import app from '../../app';
 import fs from 'fs';
-import { expect } from 'chai';
+import {expect} from 'chai';
 
 describe('GenerateProfilePic Route', function() {
   beforeEach(async function() {

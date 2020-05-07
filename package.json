@@ -32,6 +32,7 @@
     "debug": "cross-env SERVER_TYPE=development DEBUG=group-car:* ts-node --transpile-only -r tsconfig-paths/register app/group-car.ts",
     "debug:all": "cross-env SERVER_TYPE=development DEBUG=* ts-node --transpile-only -r tsconfig-paths/register app/group-car.ts",
     "eslint": "./node_modules/.bin/eslint . --ext .js,.ts",
+    "eslint:fix": "./node_modules/.bin/eslint . --ext .js,.ts --fix",
     "tsc": "tsc",
     "prod": "tsc & cross-env NODE_ENV=production node -r tsconfig-paths/register ./build/group-car.js",
     "typedoc": "typedoc",
