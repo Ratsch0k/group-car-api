@@ -43,8 +43,8 @@ jobs:
     # Testing jobs
     - stage: "Test"
       name: "Unit Tests"
-      script: npm run unitTest
-    - script: npm run integrationTest
+      script: npm run test:unit
+    - script: npm run test:integration
       env:
       - NODE_ENV=test
       name: "Integration Tests"

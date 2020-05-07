@@ -15,7 +15,7 @@ source $2 >/dev/null
 export DB_USERNAME DB_HOSTNAME DB_PASSWORD DB_NAME >/dev/null
 
 # Migrate database changes
-npm run devMigrate
+npm run migrate:dev
 
 # Restart service
 sudo systemctl daemon-reload

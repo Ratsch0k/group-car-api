@@ -5,6 +5,9 @@ import ModelToDtoConverter from '@app/util/model-to-dto-converter';
 import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
 import {convertUserToJwtPayload} from '@app/jwt/jwt-util';
+import {ProfilePic} from '@app/user';
+import generatePic from '@app/util/generate-profile-pic';
+import config from '@config';
 
 type RequestHandler = import('express').RequestHandler;
 
@@ -16,6 +19,8 @@ const log = debug('group-car:sign-up:controller:log');
  * Log method for error logging
  */
 const error = debug('group-car:sign-up:controller:error');
+
+const picDim = config.user.pb.dimensions;
 
 /**
  * Signs the user up.\
@@ -31,10 +36,18 @@ const signUpController: RequestHandler = (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
   }).then((user) => {
-    log('User "%s" successfully created', req.body.username);
-    res.setJwtToken(convertUserToJwtPayload(user), user.username);
-    res.status(201).send(ModelToDtoConverter
-        .convert<UserDto>(user.get({plain: true}), UserDto));
+    generatePic(picDim, req.body.username, req.body.offset ?? 0)
+        .then((data: Buffer) => {
+          return ProfilePic.create({
+            data: data,
+            userId: user.id,
+          });
+        }).then(() => {
+          log('User "%s" successfully created', req.body.username);
+          res.setJwtToken(convertUserToJwtPayload(user), user.username);
+          res.status(201).send(ModelToDtoConverter
+              .convert<UserDto>(user.get({plain: true}), UserDto));
+        });
   }).catch((err) => {
     // Handle unique constraints error differently
     if (err instanceof UniqueConstraintError) {

@@ -1,9 +1,9 @@
 import express from 'express';
-import generatePbValidators from './generate-pb-validators';
+import generatePbValidators from './generate-profile-pic-validators';
 import debug from 'debug';
 import {validationResult} from 'express-validator';
 import {InvalidRequestError} from '@app/errors';
-import generatePbController from './generate-pb-controller';
+import generateProfilePicController from './generate-profile-pic-controller';
 
 const log = debug('group-car:generate-pb');
 const error = debug('group-car:generate-pb:error');
@@ -33,7 +33,7 @@ generatePbRouter.get(
     '/',
     generatePbValidators.validator,
     generatePbHandler,
-    generatePbController,
+    generateProfilePicController,
 );
 
 export default generatePbRouter;
