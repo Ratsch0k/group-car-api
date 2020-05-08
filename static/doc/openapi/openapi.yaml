@@ -109,6 +109,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+  /auth/logout:
+    put:
+      summary: Log the client out
+      tags:
+      - Authentication
+      description: Log the client out by replacing the jwt cookie with a pre-login one
+      parameters:
+      - name: XSRF-TOKEN
+        in: header
+        required: false
+        schema:
+          type: string 
+      responses:
+        204:
+          description: The client is logged out
+        401:
+          description: The action can't be performed due to authorization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
   /auth/token:
     put:
       summary: Check if logged in
