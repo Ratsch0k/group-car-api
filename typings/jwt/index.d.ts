@@ -5,6 +5,6 @@ declare namespace Express {
   }
 
   export interface Response {
-    setJwtToken(payload: object, subject: string): void;
+    setJwtToken(payload: object, subject?: string): void;
   }
 }
