@@ -122,7 +122,7 @@ const jwtCsrf: () => RequestHandler = () => (req, res, next) => {
 
   // Add function to response which automatically sets the given
   // payload to the response
-  res.setJwtToken = (payload: object, subject: string): void => {
+  res.setJwtToken = (payload: object, subject?: string): void => {
     // Create new payload which contains the csrf secret
     const _payload = Object.assign({
       [secretName]: secret,
