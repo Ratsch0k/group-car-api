@@ -1,4 +1,4 @@
-import express = require('express');
+import express from 'express';
 import debug from 'debug';
 import loginValidators from './login-validators';
 import loginController from './login-controller';
