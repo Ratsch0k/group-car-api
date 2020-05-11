@@ -3,7 +3,7 @@ import app from '../../app';
 import db, {syncPromise} from '../../db';
 import {expect} from 'chai';
 import config from '../../config';
-import User from '../../users/user';
+import User from '../../user/user';
 import jsonwebtoken from 'jsonwebtoken';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName;

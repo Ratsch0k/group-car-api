@@ -5,5 +5,7 @@ export {default as NotImplementedError} from './not-implemented-error';
 export {default as RestError} from './rest-error';
 export {default as InvalidLoginError} from './login/invalid-login-error';
 export {default as UnauthorizedError} from './unauthorized-error';
-export * from './users';
+export {default as NotFoundError} from './not-found-error';
+export {default as UserNotFoundError} from './user/user-not-found-error';
+export * from './user';
 export {default} from './error-handler';

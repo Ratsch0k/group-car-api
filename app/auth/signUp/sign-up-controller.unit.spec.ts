@@ -1,12 +1,15 @@
-import * as User from '../../users/user';
+import * as User from '../../user/user';
 import signUpController from './sign-up-controller';
 import {fake, assert, match, createSandbox} from 'sinon';
 import Bluebird from 'bluebird';
-import UserDto from '../../users/user-dto';
+import UserDto from '../../user/user-dto';
 import {expect} from 'chai';
 import {UniqueConstraintError} from 'sequelize';
 import UsernameAlreadyExistsError from
-  '../../errors/users/username-already-exists-error';
+  '../../errors/user/username-already-exists-error';
+import * as generatePic from '../../util/generate-profile-pic';
+import * as ProfilePic from '../../user/profile-pic';
+import config from '../../config';
 
 const sandbox = createSandbox();
 
@@ -18,6 +21,7 @@ describe('SignUpController', function() {
   it('creates user', function(done) {
     // Create fake user
     const user = {
+      id: 5,
       username: 'demo',
       email: 'demo@mail.com',
       password: 'password',
@@ -31,6 +35,15 @@ describe('SignUpController', function() {
       isBetaUser: user.isBetaUser,
       username: user.username,
     };
+
+    // Mock profile pic create function
+    const picCreateStub = sandbox.stub(ProfilePic.default, 'create');
+    picCreateStub.usingPromise(Bluebird).resolves();
+
+    // Mock profile pic generation
+    const fakeData = 'DATA';
+    const generateStub = sandbox.stub(generatePic, 'default')
+        .resolves(fakeData as any);
 
     // Creates stubs
     const createStub = sandbox.stub(User.default, 'create');
@@ -48,6 +61,12 @@ describe('SignUpController', function() {
       sandbox.assert.calledWith(responseStub.status, 201);
       sandbox.assert.calledOnce(responseStub.setJwtToken);
       sandbox.assert.calledWith(responseStub.setJwtToken, match(jwt));
+      // Check generatePic call
+      const dim = config.user.pb.dimensions;
+      sandbox.assert.calledOnceWithExactly(generateStub, dim, user.username, 0);
+
+      sandbox.assert.calledOnce(picCreateStub);
+
       // Get user object
       const responseUser = responseStub.send.args[0][0];
       expect(responseUser.username).to.equal(user.username);

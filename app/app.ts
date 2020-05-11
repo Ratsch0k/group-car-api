@@ -4,17 +4,16 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import errorHandler from '@app/errors/error-handler';
 import expressJwt from 'express-jwt';
-// import csurf from 'csurf';
 
 /**
  * Import router
  */
-import statusRouter from '@app/api/status-router';
-import userRouter from '@app/users/user-router';
 import config from '@config';
 import authRouter from '@app/auth';
 import jwtCsrf from './jwt/jwt-csrf';
 import {preLoginJwtValidator} from './jwt/jwt-util';
+import apiRouter from './api';
+import {userRouter} from './user';
 
 const app: express.Application = express();
 
@@ -34,17 +33,17 @@ app.use(jwtCsrf());
 // Adding authentication routes
 app.use('/auth', authRouter);
 
+// Add user routers
+app.use('/user', userRouter);
+
+// Add api routers
 app.use('/api',
     expressJwt({
       secret: config.jwt.secret,
       getToken: config.jwt.getToken,
     }),
-    preLoginJwtValidator);
-
-// Add own router
-
-app.use('/api/test', statusRouter);
-app.use('/api/user', userRouter);
+    preLoginJwtValidator,
+    apiRouter);
 
 
 /**

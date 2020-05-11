@@ -1,12 +1,13 @@
-import User from '@app/users/user';
+import User from '@app/user/user';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
-import UserDto from '@app/users/user-dto';
+import UserDto from '@app/user/user-dto';
 import bcrypt from 'bcrypt';
 import debug from 'debug';
 import InvalidLoginError from '@app/errors/login/invalid-login-error';
 import {convertUserToJwtPayload} from '@app/jwt/jwt-util';
 
 type RequestHandler = import('express').RequestHandler;
+type UserType = import('@app/user/user').default;
 
 const log = debug('group-car:login:controller:log');
 const error = debug('group-car:login:controller:error');
@@ -19,7 +20,7 @@ const error = debug('group-car:login:controller:error');
  */
 const loginController: RequestHandler = (req, res, next) => {
   User.findByUsername(req.body.username)
-      .then((user: User | null) => {
+      .then((user: UserType | null) => {
         if (user === null) {
           error('User "%s" doesn\'t exist', req.body.username);
           throw new InvalidLoginError();
@@ -30,10 +31,12 @@ const loginController: RequestHandler = (req, res, next) => {
               .then((result) => {
                 // Check if sent password is equal to stored user password
                 if (result) {
+                  log('Login successful for IP %s', req.ip);
                   res.setJwtToken(convertUserToJwtPayload(user), user.username);
                   res.send(ModelToDtoConverter
                       .convertSequelizeModel(user, UserDto));
                 } else {
+                  error('Invalid password for IP %s', req.ip);
                   throw new InvalidLoginError();
                 }
               });

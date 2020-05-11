@@ -17,6 +17,11 @@ cache:
 services:
 - postgresql
 
+install:
+- sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+- npm install --build-from-source canvas
+- npm install
+
 before_script:
   # Install postgres, create test user and test database for integration tests
 - sudo -u postgres createuser groupcarapitest
@@ -38,8 +43,8 @@ jobs:
     # Testing jobs
     - stage: "Test"
       name: "Unit Tests"
-      script: npm run unitTest
-    - script: npm run integrationTest
+      script: npm run test:unit
+    - script: npm run test:integration
       env:
       - NODE_ENV=test
       name: "Integration Tests"

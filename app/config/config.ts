@@ -12,6 +12,15 @@ type SequelizeConfig = import('sequelize/types').Config;
 const environment = process.env.NODE_ENV || 'development';
 log('Environment: %s', environment);
 
+/**
+ * For which type of server this server is used:
+ *  - development:  The development server
+ *  - beta:         The beta server
+ *  - release:      The release server, main server
+ */
+const serverType = process.env.SERVER_TYPE || 'development';
+log('Server: %s', serverType);
+
 export interface BcryptConfig {
   saltRounds: number;
 }
@@ -33,6 +42,14 @@ export interface MorganConfig {
   formatString: string | null;
 }
 
+export interface PbConfig {
+  dimensions: number;
+}
+
+export interface UserConfig {
+  pb: PbConfig;
+}
+
 export interface Config {
   database: DBConfig;
   bcrypt: BcryptConfig;
@@ -40,6 +57,7 @@ export interface Config {
   error: ErrorConfig;
   jwt: JWTConfig;
   morgan: MorganConfig;
+  user: UserConfig;
 }
 
 /**
@@ -64,17 +82,21 @@ const morgan: MorganConfig = {
   formatString: 'dev',
 };
 
-let withFlush = true;
+let withFlush = false;
 
 // Depending on node environment changes configs
 if (environment === 'production') {
   bcrypt.saltRounds = 10;
   error.withStack = false;
-  withFlush = false;
   morgan.formatString = 'common';
 } else if (environment === 'test') {
   bcrypt.saltRounds = 4;
   morgan.formatString = null;
+}
+
+// Depending on server type change certain configs
+if (serverType === 'development') {
+  withFlush = true;
 }
 
 /**
@@ -107,6 +129,12 @@ const database: DBConfig = {
   withFlush,
 };
 
+const user: UserConfig = {
+  pb: {
+    dimensions: 128,
+  },
+};
+
 const config: Config = {
   database,
   bcrypt,
@@ -114,6 +142,7 @@ const config: Config = {
   error,
   jwt,
   morgan,
+  user,
 };
 
 export default config;

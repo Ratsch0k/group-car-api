@@ -11,12 +11,15 @@ class UserDto {
    * @param updatedAt   When the user was last updated
    * @param deletedAt   When the user was deleted
    */
-  constructor(username: string,
+  constructor(
+      id: number,
+      username: string,
       email: string,
       isBetaUser: boolean,
       createdAt: Date,
       updatedAt: Date,
       deletedAt: Date) {
+    this.id = id;
     this.username = username;
     this.email = email;
     this.isBetaUser = isBetaUser;
@@ -24,6 +27,11 @@ class UserDto {
     this.updatedAt = updatedAt;
     this.deletedAt = deletedAt;
   }
+
+  /**
+   * Primary key.
+   */
+  public id: number;
 
   /**
    * Username (not email).\

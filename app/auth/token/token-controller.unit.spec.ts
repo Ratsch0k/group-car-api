@@ -2,7 +2,7 @@ import {createSandbox, match} from 'sinon';
 import tokenController from './token-controller';
 import {expect} from 'chai';
 import {UnauthorizedError} from '../../errors';
-import User from '../../users/user';
+import User from '../../user/user';
 import Bluebird from 'bluebird';
 
 const sandbox = createSandbox();
