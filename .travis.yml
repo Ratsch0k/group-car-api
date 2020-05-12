@@ -19,7 +19,7 @@ services:
 
 install:
 - sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-- npm_config_build_from_source=true yarn add --build-from-source canvas
+- npm_config_build_from_source=true yarn add canvas
 - yarn install
 
 before_script:

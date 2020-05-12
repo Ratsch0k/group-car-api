@@ -4,7 +4,7 @@ set -e
 cd $1
 
 # Install dependencies
-npm_config_build_from_source=true yarn add --build-from-source canvas
+npm_config_build_from_source=true yarn add canvas
 yarn install
 
 # Change owner of node_modules to deploy. Necessary for deploy user to update server
