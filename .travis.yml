@@ -19,8 +19,8 @@ services:
 
 install:
 - sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-- npm install --build-from-source canvas
-- npm install
+- npm_config_build_from_source=true yarn add --build-from-source canvas
+- yarn install
 
 before_script:
   # Install postgres, create test user and test database for integration tests
@@ -32,26 +32,26 @@ jobs:
     # Jobs for static analysis
     - stage: "Static Analysis"
       name: "Eslint"
-      script: npm run eslint
-    - script: npm audit
+      script: yarn eslint
+    - script: yarn audit
       name: "Audit"
 
     # Building job
     - stage: "Build"
-      script: npm run tsc
+      script: yarn tsc
 
     # Testing jobs
     - stage: "Test"
       name: "Unit Tests"
-      script: npm run test:unit
-    - script: npm run test:integration
+      script: yarn test:unit
+    - script: yarn test:integration
       env:
       - NODE_ENV=test
       name: "Integration Tests"
 
     # Jobs for generating documentation
     - stage: "Generate typedoc"
-      script: npm run typedoc
+      script: yarn typedoc
 
       # Deploy jobs
     - stage: "Deploy Development"

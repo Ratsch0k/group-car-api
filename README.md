@@ -37,10 +37,10 @@ Every url which is not listed below will route the frontend
 ---
 ## How to run
 The server can run in the following configurations:
-  - `npm run dev` ts-node is used to run the typescript code. Only http request and database operations are logged
-  - `npm run debug` ts-node is used to run typescript code. Http request, database operations and logging of server code is enabled
-  - `npm run debugAll` ts-node is used to run typescript code. Every type of logging is enabled
-  - `npm run prod` Typescript code is compiled into javascript code and saved in the subdirectory `build` the the javascript code is executed (recommended for production)
+  - `yarn dev` ts-node is used to run the typescript code. Only http request and database operations are logged
+  - `yarn debug` ts-node is used to run typescript code. Http request, database operations and logging of server code is enabled
+  - `yarn debugAll` ts-node is used to run typescript code. Every type of logging is enabled
+  - `yarn prod` Typescript code is compiled into javascript code and saved in the subdirectory `build` the the javascript code is executed (recommended for production)
 
 Configuration can be changed in `app/config` and in the `package.json`.
 
@@ -76,20 +76,20 @@ To use these you'll have to use [sequelize-cli](https://www.npmjs.com/package/se
 ### Unit testing:
 Unit tests can be started with
 ```
-npm run test:unit
+yarn test:unit
 ```
 
 ### Integration testing
 Integration tests can be started with:
 ```
-npm run test:integration
+yarn test:integration
 ```
 **Note:** Integration tests need a database connection
 
 ### Code Coverage and test report
 A test report and coverage report can be created with
 ```
-npm run coverage
+yarn coverage
 ```
 This will run all unit and integration tests, store the coverage report under
 `static/test/coverage` and the test report under `static/test` in form of html.

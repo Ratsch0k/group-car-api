@@ -3,7 +3,7 @@
 set -ev
  
 # Build code
-npm run tsc
+yarn tsc
  
 # encrypt key
 openssl aes-256-cbc -K $encrypted_c28e77baa059_key -iv $encrypted_c28e77baa059_iv -in deploy-key.enc -out deploy-key -d

@@ -3,7 +3,7 @@
 set -ev
  
 # Build code
-npm run tsc
+yarn tsc
  
 # encrypt key
 openssl aes-256-cbc -K $encrypted_c28e77baa059_key -iv $encrypted_c28e77baa059_iv -in deploy-key.enc -out deploy-key -d
@@ -38,7 +38,7 @@ chmod +x scripts/remote_install_beta.sh
 chmod +x build/group-car.js
 
 # Create test report
-npm run coverage
+yarn coverage
 
 # Delete intermediate directory for report creation
 rm -r mochawesome-report
