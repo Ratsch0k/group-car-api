@@ -1,7 +1,6 @@
 import * as express from 'express';
-import signUpValidators from '@app/auth/signUp/sign-up-validators';
 import signUpController from '@app/auth/signUp/sign-up-controller';
-import {validationResult} from 'express-validator';
+import {validationResult, check} from 'express-validator';
 import {InvalidRequestError} from '@app/errors';
 import debug from 'debug';
 
@@ -15,7 +14,11 @@ const router: express.Router = express.Router();
  * @param res   Http response
  * @param next  Next handler
  */
-export const signUpValidator: express.RequestHandler = (req, res, next) => {
+export const signUpValidationHandler: express.RequestHandler = (
+    req,
+    res,
+    next,
+) => {
   log('IP %s requested sign up', req.ip);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -26,9 +29,24 @@ export const signUpValidator: express.RequestHandler = (req, res, next) => {
   }
 };
 
+export const signUpValidator = {
+  validator: [
+    check('username').notEmpty().escape().trim(),
+    check('email').escape().trim().isEmail()
+        .withMessage('Email has to be a valid email address'),
+    check('password').isLength({min: 6})
+        .withMessage('Password has to be at least 6 characters long'),
+  ],
+};
+
 /**
- * Add the {@link signUpValidator} to the router
+ * Add the {@link signUpValidationHandler} to the router
  */
-router.put('/', signUpValidators.validator, signUpValidator, signUpController);
+router.put(
+    '/',
+    signUpValidator.validator,
+    signUpValidationHandler,
+    signUpController,
+);
 
 export default router;

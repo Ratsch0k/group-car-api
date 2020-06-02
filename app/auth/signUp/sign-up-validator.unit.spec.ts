@@ -1,5 +1,5 @@
 import sinon, {fake, assert} from 'sinon';
-import {signUpValidator} from './sign-up-validator';
+import {signUpValidationHandler} from './sign-up-validator';
 import * as validator from 'express-validator';
 import {expect} from 'chai';
 import {InvalidRequestError} from '../../errors';
@@ -26,7 +26,7 @@ describe('SignUpValidator', function() {
     const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(validationErrors as any);
 
-    signUpValidator(requestStub, responseStub, nextFake);
+    signUpValidationHandler(requestStub, responseStub, nextFake);
 
     assert.calledOnce(nextFake);
   });
@@ -61,7 +61,7 @@ describe('SignUpValidator', function() {
       `${errorArray[0].param} -> ${errorArray[0].msg}, ` +
       `${errorArray[1].param} -> ${errorArray[1].msg}`;
     expect(() =>
-      signUpValidator(requestStub, responseStub, nextFake))
+      signUpValidationHandler(requestStub, responseStub, nextFake))
         .to.throw(InvalidRequestError, expectedMessage)
         .with.property('validationResult', validationErrors);
 
