@@ -2,7 +2,7 @@ import {createSandbox, match} from 'sinon';
 import ProfilePic from '../../user/profile-pic';
 import Bluebird from 'bluebird';
 import {expect} from 'chai';
-import {userProfilePicRouter} from './user-controller';
+import {userProfilePicController} from './user-controller';
 import {UserNotFoundError} from '../../errors';
 
 const sandbox = createSandbox();
@@ -47,7 +47,7 @@ describe('GetUserProfilePicture', function() {
     });
 
 
-    userProfilePicRouter(req, res, next);
+    userProfilePicController(req, res, next);
   });
 
   it('throws UserNotFoundError if no profile pic is found', function(done) {
@@ -69,7 +69,7 @@ describe('GetUserProfilePicture', function() {
       done();
     });
 
-    userProfilePicRouter(req, res, next);
+    userProfilePicController(req, res, next);
   });
 
   it('calls next with error thrown by ProfilePic.findOne', function(done) {
@@ -93,6 +93,6 @@ describe('GetUserProfilePicture', function() {
       done();
     });
 
-    userProfilePicRouter(req, res, next);
+    userProfilePicController(req, res, next);
   });
 });

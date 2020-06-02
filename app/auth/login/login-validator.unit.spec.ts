@@ -1,4 +1,4 @@
-import {loginRouter} from './login-router';
+import {loginValidator} from './login-validator';
 import {fake, assert} from 'sinon';
 import * as validator from 'express-validator';
 import {Result} from 'express-validator';
@@ -28,7 +28,7 @@ describe('LoginRouter', function() {
     const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(result as any);
 
-    loginRouter(requestStub as any, responseStub as any, nextFake);
+    loginValidator(requestStub as any, responseStub as any, nextFake);
 
     assert.calledOnce(nextFake);
     sandbox.assert.calledOnce(validationResultStub);
@@ -65,7 +65,10 @@ describe('LoginRouter', function() {
     const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(result as any);
 
-    expect(() => loginRouter(requestStub as any, responseStub as any, nextFake))
+    expect(() => loginValidator(
+      requestStub as any,
+      responseStub as any,
+      nextFake))
         .to.throw(InvalidRequestError, expectedErrorMessage)
         .with.property('validationResult', result);
 

@@ -13,7 +13,7 @@ export interface Status {
  * @param req Http request
  * @param res Http response
  */
-const statusRouter: express.RequestHandler = (req, res) => {
+const statusController: express.RequestHandler = (req, res) => {
   database.isAvailable().then((avail: boolean) => {
     const status: Status = {
       server: 'up',
@@ -27,6 +27,6 @@ const statusRouter: express.RequestHandler = (req, res) => {
 /**
  * Add the {@link statusRouter} to the get route
  */
-router.get('/', statusRouter);
+router.get('/', statusController);
 
 export default router;

@@ -1,5 +1,5 @@
 import sinon, {fake, assert} from 'sinon';
-import {signUpRouter} from './sign-up-router';
+import {signUpValidator} from './sign-up-validator';
 import * as validator from 'express-validator';
 import {expect} from 'chai';
 import {InvalidRequestError} from '../../errors';
@@ -26,7 +26,7 @@ describe('SignUpRouter', function() {
     const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(validationErrors as any);
 
-    signUpRouter(requestStub, responseStub, nextFake);
+    signUpValidator(requestStub, responseStub, nextFake);
 
     assert.calledOnce(nextFake);
   });
@@ -61,7 +61,7 @@ describe('SignUpRouter', function() {
       `${errorArray[0].param} -> ${errorArray[0].msg}, ` +
       `${errorArray[1].param} -> ${errorArray[1].msg}`;
     expect(() =>
-      signUpRouter(requestStub, responseStub, nextFake))
+      signUpValidator(requestStub, responseStub, nextFake))
         .to.throw(InvalidRequestError, expectedMessage)
         .with.property('validationResult', validationErrors);
 

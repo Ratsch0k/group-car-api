@@ -16,14 +16,14 @@ const router: express.Router = express.Router();
  * @param req Http request
  * @param res Http response
  */
-export const userRouter: express.RequestHandler = (req, res) => {
+export const userController: express.RequestHandler = (req, res) => {
   User.findAll().then((users: User[]) => {
     res.send(ModelToDtoConverter
         .convertAllSequelizeModels<UserDto>(users, UserDto));
   });
 };
 
-export const userProfilePicRouter: express.RequestHandler =
+export const userProfilePicController: express.RequestHandler =
 (req, res, next) => {
   const userId = Number.parseInt(req.params.userId, 10);
   log('User id: %s', userId);
@@ -50,7 +50,7 @@ export const userProfilePicRouter: express.RequestHandler =
 /**
  * Add the routers to the route
  */
-router.get('/', userRouter);
-router.get('/:userId/profile-pic', userProfilePicRouter);
+router.get('/', userController);
+router.get('/:userId/profile-pic', userProfilePicController);
 
 export default router;
