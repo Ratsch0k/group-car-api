@@ -2,7 +2,7 @@ import {createSandbox, match} from 'sinon';
 import ProfilePic from '../../user/profile-pic';
 import Bluebird from 'bluebird';
 import {expect} from 'chai';
-import {userProfilePicRouter} from './user-router';
+import {userProfilePicRouter} from './user-controller';
 import {UserNotFoundError} from '../../errors';
 
 const sandbox = createSandbox();
