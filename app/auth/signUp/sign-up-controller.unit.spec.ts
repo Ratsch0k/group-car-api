@@ -1,14 +1,14 @@
-import * as User from '../../user/user';
+import * as User from '../../models/user';
 import signUpController from './sign-up-controller';
 import {fake, assert, match, createSandbox} from 'sinon';
 import Bluebird from 'bluebird';
-import UserDto from '../../user/user-dto';
+import UserDto from '../../models/user/user-dto';
 import {expect} from 'chai';
 import {UniqueConstraintError} from 'sequelize';
 import UsernameAlreadyExistsError from
   '../../errors/user/username-already-exists-error';
 import * as generatePic from '../../util/generate-profile-pic';
-import * as ProfilePic from '../../user/profile-pic';
+import * as ProfilePic from '../../models/user/profile-pic';
 import config from '../../config';
 
 const sandbox = createSandbox();

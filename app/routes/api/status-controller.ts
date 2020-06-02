@@ -25,7 +25,7 @@ const statusController: express.RequestHandler = (req, res) => {
 };
 
 /**
- * Add the {@link statusRouter} to the get route
+ * Add the {@link statusController} to the get route
  */
 router.get('/', statusController);
 

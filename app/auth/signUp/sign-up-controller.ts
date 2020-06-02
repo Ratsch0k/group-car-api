@@ -1,11 +1,11 @@
 import debug from 'debug';
-import User from '@app/user/user';
-import UserDto from '@app/user/user-dto';
+import User from '@app/models/user/user';
+import UserDto from '@app/models/user/user-dto';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
 import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
 import {convertUserToJwtPayload} from '@app/jwt/jwt-util';
-import {ProfilePic} from '@app/user';
+import {ProfilePic} from '@app/models/user';
 import generatePic from '@app/util/generate-profile-pic';
 import config from '@config';
 

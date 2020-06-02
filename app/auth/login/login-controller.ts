@@ -1,13 +1,13 @@
-import User from '@app/user/user';
+import User from '@models/user';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
-import UserDto from '@app/user/user-dto';
+import UserDto from '@models/user/user-dto';
 import bcrypt from 'bcrypt';
 import debug from 'debug';
-import InvalidLoginError from '@app/errors/login/invalid-login-error';
+import {InvalidLoginError} from '@errors';
 import {convertUserToJwtPayload} from '@app/jwt/jwt-util';
 
 type RequestHandler = import('express').RequestHandler;
-type UserType = import('@app/user/user').default;
+type UserType = import('@models/user').default;
 
 const log = debug('group-car:login:controller:log');
 const error = debug('group-car:login:controller:error');

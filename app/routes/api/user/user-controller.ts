@@ -1,8 +1,6 @@
 import express from 'express';
-import User from '@app/user/user';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
-import UserDto from '../../user/user-dto';
-import {ProfilePic} from '@app/user';
+import User, {ProfilePic, UserDto} from '@app/models/user';
 import debug from 'debug';
 import {UserNotFoundError} from '@app/errors';
 

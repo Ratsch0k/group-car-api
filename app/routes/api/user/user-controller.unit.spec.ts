@@ -1,9 +1,9 @@
 import {createSandbox, match} from 'sinon';
-import ProfilePic from '../../user/profile-pic';
+import {ProfilePic} from '../../../models/user';
 import Bluebird from 'bluebird';
 import {expect} from 'chai';
 import {userProfilePicController} from './user-controller';
-import {UserNotFoundError} from '../../errors';
+import {UserNotFoundError} from '../../../errors';
 
 const sandbox = createSandbox();
 

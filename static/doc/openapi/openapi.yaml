@@ -41,11 +41,7 @@ paths:
       tags:
       - Authentication
       parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string
+      - $ref: '#/components/parameters/XsrfParameter'
       requestBody:
         description: Login data
         content:
@@ -74,11 +70,7 @@ paths:
       tags:
       - Authentication
       parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string
+      - $ref: '#/components/parameters/XsrfParameter'
       requestBody:
         description: The sign up properties
         content:
@@ -99,7 +91,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /auth/logout:
     put:
       summary: Log the client out
@@ -107,11 +99,7 @@ paths:
       - Authentication
       description: Log the client out by replacing the jwt cookie with a pre-login one
       parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string 
+      - $ref: '#/components/parameters/XsrfParameter'
       responses:
         204:
           description: The client is logged out
@@ -124,11 +112,7 @@ paths:
       - Authentication
       description: Check if the current state of the client indicates that it is logged in. Checks the jwt token and the payload within.
       parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string 
+      - $ref: '#/components/parameters/XsrfParameter'
       responses:
         200:
           description: The client is logged in
@@ -204,6 +188,8 @@ paths:
       tags:
       - Group
       description: Create a new group with the currently logged in user as admin and owner.
+      parameters:
+      - $ref: '#/components/parameters/XsrfParameter'
       requestBody:
         description: The initial group data.
         content:
@@ -393,6 +379,15 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InternalServerErrorSchema'
+            
+  # Parameter
+  parameters:
+    XsrfParameter:
+      name: XSRF-TOKEN
+      in: header
+      required: false
+      schema:
+        type: string
 # External docs
 externalDocs:
   description: Code documentation is here

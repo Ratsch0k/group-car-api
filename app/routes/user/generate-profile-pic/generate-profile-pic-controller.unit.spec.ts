@@ -1,7 +1,7 @@
 import {createSandbox} from 'sinon';
 import generateProfilePicController from './generate-profile-pic-controller';
-import * as generatePic from '../../util/generate-profile-pic';
-import config from '../../config';
+import * as generatePic from '../../../util/generate-profile-pic';
+import config from '../../../config';
 
 const sandbox = createSandbox();
 

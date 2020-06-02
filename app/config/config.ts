@@ -1,13 +1,14 @@
 import path from 'path';
 import debug from 'debug';
 import jwt from './jwt-config';
+
 const log = debug('group-car:config');
 
 type JWTConfig = import('./jwt-config').JWTConfig;
 type SequelizeConfig = import('sequelize/types').Config;
 /**
  * Get node environment.\
- * If none provided assume development.
+ * If none provided, assume development.
  */
 const environment = process.env.NODE_ENV || 'development';
 log('Environment: %s', environment);
@@ -50,7 +51,13 @@ export interface UserConfig {
   pb: PbConfig;
 }
 
+export interface AuthConfig {
+  disableXsrfProtection: boolean;
+  disableApiProtection: boolean;
+}
+
 export interface Config {
+  auth: AuthConfig;
   database: DBConfig;
   bcrypt: BcryptConfig;
   staticPath: StaticPathConfig;
@@ -58,6 +65,7 @@ export interface Config {
   jwt: JWTConfig;
   morgan: MorganConfig;
   user: UserConfig;
+  serverType: string;
 }
 
 /**
@@ -82,6 +90,11 @@ const morgan: MorganConfig = {
   formatString: 'dev',
 };
 
+const auth: AuthConfig = {
+  disableApiProtection: false,
+  disableXsrfProtection: false,
+};
+
 let withFlush = false;
 
 // Depending on node environment changes configs
@@ -89,6 +102,9 @@ if (environment === 'production') {
   bcrypt.saltRounds = 10;
   error.withStack = false;
   morgan.formatString = 'common';
+} else if (environment === 'development') {
+  auth.disableApiProtection = true;
+  auth.disableXsrfProtection = true;
 } else if (environment === 'test') {
   bcrypt.saltRounds = 4;
   morgan.formatString = null;
@@ -136,6 +152,7 @@ const user: UserConfig = {
 };
 
 const config: Config = {
+  auth,
   database,
   bcrypt,
   staticPath: staticPathConfig,
@@ -143,6 +160,7 @@ const config: Config = {
   jwt,
   morgan,
   user,
+  serverType,
 };
 
 export default config;

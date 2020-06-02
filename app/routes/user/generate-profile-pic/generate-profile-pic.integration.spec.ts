@@ -1,6 +1,6 @@
-import db, {syncPromise} from '../../db';
+import db, {syncPromise} from '../../../db';
 import request from 'supertest';
-import app from '../../app';
+import app from '../../../app';
 import {expect} from 'chai';
 
 describe('GenerateProfilePic Route', function() {
