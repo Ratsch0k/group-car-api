@@ -27,7 +27,7 @@ export const signUpValidator: express.RequestHandler = (req, res, next) => {
 };
 
 /**
- * Add the {@link signUpRouter} to the router
+ * Add the {@link signUpValidator} to the router
  */
 router.put('/', signUpValidators.validator, signUpValidator, signUpController);
 

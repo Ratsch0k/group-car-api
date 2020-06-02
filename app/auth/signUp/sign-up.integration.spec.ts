@@ -5,7 +5,7 @@ import {syncPromise} from '../../db';
 import config from '../../config';
 import jsonwebtoken from 'jsonwebtoken';
 
-describe('SignUpRouter', function() {
+describe('SignUpValidator', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
   let jwt: string;
   let csrf: string;

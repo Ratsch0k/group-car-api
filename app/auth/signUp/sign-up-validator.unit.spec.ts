@@ -6,7 +6,7 @@ import {InvalidRequestError} from '../../errors';
 
 const sandbox = sinon.createSandbox();
 
-describe('SignUpRouter', function() {
+describe('SignUpValidator', function() {
   afterEach(function() {
     sandbox.restore();
   });

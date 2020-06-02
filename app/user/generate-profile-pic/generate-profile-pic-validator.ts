@@ -10,7 +10,7 @@ const error = debug('group-car:generate-pb:error');
 const generatePbRouter: express.Router = express.Router();
 
 /**
- * Router for generating profile pictures.
+ * Handler for generating profile pictures.
  * @param req Http request
  * @param res Http response
  */
@@ -27,7 +27,7 @@ const generatePbHandler: express.RequestHandler = (req, res, next) => {
 };
 
 /**
- * Add the {@link generatePbRouter} to the get route
+ * Add the {@link generatePbHandler} to the get route
  */
 generatePbRouter.get(
     '/',

@@ -9,7 +9,7 @@ const log = debug('group-car:login:log');
 const router: express.Router = express.Router();
 
 /**
- * Login router
+ * Login validator
  * @param req Http request
  * @param res Http response
  */
@@ -24,7 +24,7 @@ export const loginValidator: express.RequestHandler = (req, res, next) => {
 };
 
 /**
- * Add the {@link loginRouter} to the router
+ * Add the {@link loginValidator} to the router
  */
 router.put('/', loginValidators.validator, loginValidator, loginController);
 

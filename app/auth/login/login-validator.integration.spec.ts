@@ -8,7 +8,7 @@ import jsonwebtoken from 'jsonwebtoken';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName;
 
-describe('LoginRouter', () => {
+describe('LoginValidator', () => {
   let jwt: string;
   let csrf: string;
 
