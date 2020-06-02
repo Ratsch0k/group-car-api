@@ -1,7 +1,6 @@
 import express from 'express';
-import generatePbValidators from './generate-profile-pic-validators';
 import debug from 'debug';
-import {validationResult} from 'express-validator';
+import {validationResult, query, oneOf} from 'express-validator';
 import {InvalidRequestError} from '@app/errors';
 import generateProfilePicController from './generate-profile-pic-controller';
 
@@ -26,12 +25,26 @@ const generatePbHandler: express.RequestHandler = (req, res, next) => {
   }
 };
 
+export const generatePbValidator = {
+  validator: [
+    query('username').notEmpty()
+        .withMessage('Username should not be empty').escape().trim(),
+    oneOf([
+      query('offset').optional(),
+      query('offset').isNumeric({no_symbols: true})
+          .withMessage('Offset has to be either undefined or ' +
+            'a string which represents an integer').toInt(10),
+    ]),
+  ],
+};
+
+
 /**
  * Add the {@link generatePbHandler} to the get route
  */
 generatePbRouter.get(
     '/',
-    generatePbValidators.validator,
+    generatePbValidator.validator,
     generatePbHandler,
     generateProfilePicController,
 );
