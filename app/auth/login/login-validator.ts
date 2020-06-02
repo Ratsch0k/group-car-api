@@ -25,19 +25,17 @@ export const loginValidationHandler: express.RequestHandler = (
   }
 };
 
-export const loginValidator = {
-  validator: [
-    check('username').notEmpty().escape().trim(),
-    check('password').notEmpty(),
-  ],
-};
+export const loginValidator = [
+  check('username').notEmpty().escape().trim(),
+  check('password').notEmpty(),
+];
 
 /**
  * Add the {@link loginValidationHandler} to the router
  */
 router.put(
     '/',
-    loginValidator.validator,
+    loginValidator,
     loginValidationHandler,
     loginController,
 );

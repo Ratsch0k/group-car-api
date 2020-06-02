@@ -25,18 +25,16 @@ const generatePbHandler: express.RequestHandler = (req, res, next) => {
   }
 };
 
-export const generatePbValidator = {
-  validator: [
-    query('username').notEmpty()
-        .withMessage('Username should not be empty').escape().trim(),
-    oneOf([
-      query('offset').optional(),
-      query('offset').isNumeric({no_symbols: true})
-          .withMessage('Offset has to be either undefined or ' +
+export const generatePbValidator = [
+  query('username').notEmpty()
+      .withMessage('Username should not be empty').escape().trim(),
+  oneOf([
+    query('offset').optional(),
+    query('offset').isNumeric({no_symbols: true})
+        .withMessage('Offset has to be either undefined or ' +
             'a string which represents an integer').toInt(10),
-    ]),
-  ],
-};
+  ]),
+];
 
 
 /**
@@ -44,7 +42,7 @@ export const generatePbValidator = {
  */
 generatePbRouter.get(
     '/',
-    generatePbValidator.validator,
+    generatePbValidator,
     generatePbHandler,
     generateProfilePicController,
 );
