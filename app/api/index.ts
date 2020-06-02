@@ -1,6 +1,6 @@
 import express from 'express';
 import userRouter from './user';
-import statusRouter from './status-router';
+import statusRouter from './status-controller';
 
 const apiRouter = express.Router();
 

@@ -1,6 +1,6 @@
 import * as express from 'express';
-import loginRouter from './login/login-router';
-import signUpRouter from './signUp/sign-up-router';
+import loginRouter from './login/login-validator';
+import signUpRouter from './signUp/sign-up-validator';
 import csrfRouter from './csrf/csrf-router';
 import tokenRouter from './token/token-router';
 import logoutRouter from './logout/logout-router';
