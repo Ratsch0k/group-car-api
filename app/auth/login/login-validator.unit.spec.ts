@@ -1,4 +1,4 @@
-import {loginValidator} from './login-validator';
+import {loginValidationHandler} from './login-validator';
 import {fake, assert} from 'sinon';
 import * as validator from 'express-validator';
 import {Result} from 'express-validator';
@@ -28,7 +28,7 @@ describe('LoginValidator', function() {
     const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(result as any);
 
-    loginValidator(requestStub as any, responseStub as any, nextFake);
+    loginValidationHandler(requestStub as any, responseStub as any, nextFake);
 
     assert.calledOnce(nextFake);
     sandbox.assert.calledOnce(validationResultStub);
@@ -65,7 +65,7 @@ describe('LoginValidator', function() {
     const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(result as any);
 
-    expect(() => loginValidator(
+    expect(() => loginValidationHandler(
       requestStub as any,
       responseStub as any,
       nextFake))
