@@ -51,13 +51,7 @@ export interface UserConfig {
   pb: PbConfig;
 }
 
-export interface AuthConfig {
-  disableXsrfProtection: boolean;
-  disableApiProtection: boolean;
-}
-
 export interface Config {
-  auth: AuthConfig;
   database: DBConfig;
   bcrypt: BcryptConfig;
   staticPath: StaticPathConfig;
@@ -90,10 +84,6 @@ const morgan: MorganConfig = {
   formatString: 'dev',
 };
 
-const auth: AuthConfig = {
-  disableApiProtection: false,
-  disableXsrfProtection: false,
-};
 
 let withFlush = false;
 
@@ -102,9 +92,6 @@ if (environment === 'production') {
   bcrypt.saltRounds = 10;
   error.withStack = false;
   morgan.formatString = 'common';
-} else if (environment === 'development') {
-  auth.disableApiProtection = true;
-  auth.disableXsrfProtection = true;
 } else if (environment === 'test') {
   bcrypt.saltRounds = 4;
   morgan.formatString = null;
@@ -152,7 +139,6 @@ const user: UserConfig = {
 };
 
 const config: Config = {
-  auth,
   database,
   bcrypt,
   staticPath: staticPathConfig,
