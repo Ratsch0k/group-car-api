@@ -141,7 +141,7 @@ User.init(
     },
     {
       sequelize,
-      modelName: 'users',
+      modelName: 'user',
       hooks,
       timestamps: true,
       paranoid: true,
