@@ -4,9 +4,9 @@ declare namespace Express {
     getSecret(): string;
     user?: {
       username?: string;
-      userId?: number;
+      id?: number;
       isBetaUser?: boolean;
-      loggedIn?: boolean;
+      loggedIn: boolean;
     };
   }
 

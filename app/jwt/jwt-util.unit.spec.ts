@@ -9,6 +9,7 @@ import {
 } from './jwt-util';
 import {expect} from 'chai';
 import {UnauthorizedError} from '../errors';
+import Bluebird from 'bluebird';
 
 const sandbox = sinon.createSandbox();
 
@@ -73,7 +74,7 @@ describe('jwt-util', function() {
        */
       const expectedPayload = {
         username: userData.username,
-        userId: userData.id,
+        id: userData.id,
         isBetaUser: userData.isBetaUser,
         loggedIn: true,
       };
@@ -186,7 +187,7 @@ describe('jwt-util', function() {
 
       const expected = {
         username: userData.username,
-        userId: 1,
+        id: 1,
         isBetaUser: userData.isBetaUser,
         loggedIn: true,
       };
@@ -201,18 +202,25 @@ describe('jwt-util', function() {
   });
 
   describe('preLoginJwtValidator', function() {
-    it('calls next if jwt not pre-login jwt', function() {
+    it('calls next if jwt not pre-login jwt', function(done) {
       const request: any = sandbox.stub();
       request.user = {
         loggedIn: true,
+        id: 42,
       };
 
-      const next: any = sandbox.stub();
+      const userFindStub = sandbox.stub(User, 'findByPk');
+      userFindStub.usingPromise(Bluebird).resolves(true as any);
+
+      const next: any = sandbox.stub().callsFake(() => {
+        sandbox.assert.calledOnce(userFindStub);
+        (sandbox.assert.calledWith as any)(userFindStub, request.user.id);
+        sandbox.assert.calledOnce(next);
+        done();
+      });
       const response: any = sandbox.stub();
 
       preLoginJwtValidator(request, response, next);
-
-      sandbox.assert.calledOnce(next);
     });
 
     it('throws UnauthorizedError if jwt doesn\'t exist on request', function() {
@@ -237,6 +245,29 @@ describe('jwt-util', function() {
       expect(() => preLoginJwtValidator(request, response, next))
           .to.throw(UnauthorizedError);
       sandbox.assert.notCalled(next);
+    });
+
+    it('throws UnauthorizedError if no ' +
+      'user with the user id exists', function(done) {
+      const request: any = sandbox.stub();
+      request.user = {
+        loggedIn: true,
+        id: 42,
+      };
+
+      const userFindStub = sandbox.stub(User, 'findByPk');
+      userFindStub.usingPromise(Bluebird).resolves(null as any);
+
+      const next: any = sandbox.stub().callsFake(() => {
+        sandbox.assert.calledOnce(userFindStub);
+        (sandbox.assert.calledWith as any)(userFindStub, request.user.id);
+        sandbox.assert.calledOnce(next);
+        sandbox.assert.calledWith(next, match.instanceOf(UnauthorizedError));
+        done();
+      });
+      const response: any = sandbox.stub();
+
+      preLoginJwtValidator(request, response, next);
     });
   });
 });

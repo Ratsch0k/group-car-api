@@ -5,7 +5,7 @@ type RequestHandler = import('express').RequestHandler;
 
 const createGroupController: RequestHandler = (req, res, next) => {
   // Get id of user
-  User.findByPk(req.user?.userId).then((user: User | null) => {
+  User.findByPk(req.user?.id).then((user: User | null) => {
     if (user) {
       Group.create({
         name: req.body.name,
@@ -15,7 +15,7 @@ const createGroupController: RequestHandler = (req, res, next) => {
         res.status(201).send(group);
       });
     } else {
-      next(new UserNotFoundError(req.user!.userId!));
+      next(new UserNotFoundError(req.user!.id!));
     }
   }).catch((err: any) => {
     next(err);
