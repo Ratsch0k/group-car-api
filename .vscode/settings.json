@@ -4,5 +4,7 @@
     "openapi",
     "postgres",
     "typedoc"
-  ]
+  ],
+  "editor.tabSize": 2,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrace": false
 }

@@ -1,5 +1,5 @@
 import debug from 'debug';
-import {User, UserDto, ProfilePic } from '@models';
+import {User, UserDto, ProfilePic} from '@models';
 import ModelToDtoConverter from '@util/model-to-dto-converter';
 import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
