@@ -1,5 +1,5 @@
 import {createSandbox, match} from 'sinon';
-import {ProfilePic} from '../../../models/user';
+import {ProfilePic} from '../../../models';
 import Bluebird from 'bluebird';
 import {expect} from 'chai';
 import {userProfilePicController} from './user-controller';

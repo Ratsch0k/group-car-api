@@ -62,6 +62,7 @@ describe('jwt-util', function() {
        */
       const userData = {
         username: 'test',
+        id: 1,
         isBetaUser: true,
         email: 'test@mail.com',
         password: '123456',
@@ -72,6 +73,7 @@ describe('jwt-util', function() {
        */
       const expectedPayload = {
         username: userData.username,
+        userId: userData.id,
         isBetaUser: userData.isBetaUser,
         loggedIn: true,
       };
@@ -175,6 +177,7 @@ describe('jwt-util', function() {
     it('converts successfully', function() {
       const userData: any = {
         username: 'test',
+        id: 1,
         email: 'test@mail.com',
         password: 'password',
         isBetaUser: true,
@@ -183,6 +186,7 @@ describe('jwt-util', function() {
 
       const expected = {
         username: userData.username,
+        userId: 1,
         isBetaUser: userData.isBetaUser,
         loggedIn: true,
       };

@@ -35,6 +35,7 @@ export function generateToken(payload: object,
 
 export interface UserJwtPayload {
   username: string;
+  userId: number;
   isBetaUser: boolean;
   loggedIn: boolean;
 }
@@ -51,6 +52,7 @@ export function convertUserToJwtPayload(user: User): UserJwtPayload {
     return {
       username: user.username,
       isBetaUser: user.isBetaUser,
+      userId: user.id,
       loggedIn: true,
     };
   } else {
