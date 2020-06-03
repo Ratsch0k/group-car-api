@@ -1,6 +1,5 @@
 import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from '@db';
-import {User} from '../user';
 
 /**
  * This model represents the binary data for the profile picture
@@ -31,6 +30,5 @@ ProfilePic.init({
   timestamps: false,
 });
 
-ProfilePic.belongsTo(User);
 
 export default ProfilePic;
