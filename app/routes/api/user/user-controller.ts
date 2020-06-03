@@ -1,8 +1,8 @@
 import express from 'express';
-import ModelToDtoConverter from '@app/util/model-to-dto-converter';
-import User, {ProfilePic, UserDto} from '@app/models/user';
+import ModelToDtoConverter from '@util/model-to-dto-converter';
+import {User, ProfilePic, UserDto} from '@models';
 import debug from 'debug';
-import {UserNotFoundError} from '@app/errors';
+import {UserNotFoundError} from '@errors';
 
 const log = debug('group-car:user-router');
 const error = debug('group-car:user-router:error');

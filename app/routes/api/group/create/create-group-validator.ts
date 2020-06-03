@@ -1,6 +1,6 @@
 import {body, validationResult} from 'express-validator';
 import debug from 'debug';
-import {InvalidRequestError} from '@app/errors';
+import {InvalidRequestError} from '@errors';
 import {Router} from 'express';
 
 type RequestHandler = import('express').RequestHandler;
