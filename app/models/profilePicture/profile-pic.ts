@@ -1,6 +1,6 @@
 import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from '@db';
-import User from './user';
+import {User} from '../user';
 
 /**
  * This model represents the binary data for the profile picture

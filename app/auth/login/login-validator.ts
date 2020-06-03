@@ -2,7 +2,7 @@ import express from 'express';
 import debug from 'debug';
 import loginController from './login-controller';
 import {validationResult, check} from 'express-validator';
-import {InvalidRequestError} from '@app/errors';
+import {InvalidRequestError} from '@errors';
 
 const log = debug('group-car:login:log');
 const router: express.Router = express.Router();

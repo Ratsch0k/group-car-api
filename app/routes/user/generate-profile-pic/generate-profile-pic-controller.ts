@@ -1,4 +1,4 @@
-import generatePic from '@app/util/generate-profile-pic';
+import generatePic from '@util/generate-profile-pic';
 import config from '@config';
 
 type RequestHandler = import('express').RequestHandler;

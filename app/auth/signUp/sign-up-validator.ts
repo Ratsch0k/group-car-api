@@ -1,7 +1,7 @@
 import * as express from 'express';
 import signUpController from '@app/auth/signUp/sign-up-controller';
 import {validationResult, check} from 'express-validator';
-import {InvalidRequestError} from '@app/errors';
+import {InvalidRequestError} from '@errors';
 import debug from 'debug';
 
 const log = debug('group-car:sign-up:router:log');

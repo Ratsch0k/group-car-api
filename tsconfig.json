@@ -46,6 +46,7 @@
       "@app/*": ["app/*", "build/*"],
       "@config": ["app/config", "build/config"],
       "@errors": ["app/errors", "build/errors"],
+      "@models": ["app/models", "build/models"],
       "@models/*": ["app/models/*", "build/models/*"],
       "@routes/*": ["app/routes/*", "build/routes/*"],
       "@util/*": ["app/util/*", "build/util/*"],

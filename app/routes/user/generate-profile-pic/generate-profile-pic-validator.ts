@@ -1,7 +1,7 @@
 import express from 'express';
 import debug from 'debug';
 import {validationResult, query, oneOf} from 'express-validator';
-import {InvalidRequestError} from '@app/errors';
+import {InvalidRequestError} from '@errors';
 import generateProfilePicController from './generate-profile-pic-controller';
 
 const log = debug('group-car:generate-pb');

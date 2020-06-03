@@ -1,6 +1,6 @@
 import config from '@config';
 import jwt from 'jsonwebtoken';
-import User from '@app/models/user/user';
+import {User} from '@models';
 import {UnauthorizedError} from '@errors';
 
 type RequestHandler = import('express').RequestHandler;
