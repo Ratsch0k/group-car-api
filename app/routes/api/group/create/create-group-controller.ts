@@ -7,7 +7,7 @@ const createGroupController: RequestHandler = (req, res, next) => {
   // Get id of user
   User.findByPk(req.user?.id).then((user: User | null) => {
     if (user) {
-      Group.create({
+      return Group.create({
         name: req.body.name,
         description: req.body.description,
         ownerId: user.id,

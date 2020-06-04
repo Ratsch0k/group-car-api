@@ -1,5 +1,11 @@
 import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from '@db';
+import {Membership} from '../membership';
+import {InternalError} from '@app/errors';
+
+type ModelHooks = import('sequelize/types/lib/hooks').ModelHooks;
+type HookReturn = import('sequelize/types/lib/hooks').HookReturn;
+type CreateOptions = import('sequelize').CreateOptions;
 
 /**
  * Model class for groups.
@@ -41,6 +47,31 @@ class Group extends Model {
 }
 
 /**
+ * Creates a new membership for the owner/creater of the group for that
+ * group.\
+ * Gives the owner/creater admin permissions.
+ * @param group    The newly created group
+ */
+export const createMembershipForOwner = (
+    group: Group,
+) => {
+  return Membership.create({
+    groupId: group.id,
+    userId: group.ownerId,
+    isAdmin: true,
+  }).then(() => {
+    return;
+  }).catch(() => {
+    throw new InternalError();
+  });
+};
+
+// Create the hooks object
+const hooks: Partial<ModelHooks> = {
+  afterCreate: createMembershipForOwner,
+};
+
+/**
  * Initialize the group model.
  */
 Group.init(
@@ -66,6 +97,7 @@ Group.init(
     {
       sequelize,
       modelName: 'group',
+      hooks: hooks,
     },
 );
 
