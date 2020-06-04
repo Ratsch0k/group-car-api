@@ -48,9 +48,7 @@ export const createGroupValidator = [
       .optional({nullable: true})
       // But if it exists it has to be a non empty string
       .isString()
-      .withMessage('Description has to a string')
-      .notEmpty()
-      .withMessage('Username has to be a non empty string')
+      .withMessage('Description has to be a string')
       // Sanitize description
       .trim()
       .escape(),

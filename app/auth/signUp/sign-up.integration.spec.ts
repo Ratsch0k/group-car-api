@@ -14,8 +14,6 @@ describe('SignUpValidator', function() {
    * Wait for sync of database before each test
    */
   beforeEach(async function() {
-    const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
-
     jwt = 'FAIL';
     // Get csrf token
     csrf = await request(app).head('/auth')
