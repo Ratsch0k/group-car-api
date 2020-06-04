@@ -1,6 +1,6 @@
 {
   "name": "group-car-api",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "config": {
     "port": "8080",
@@ -42,7 +42,7 @@
     "migrate:dev": "cross-env NODE_ENV=development sequelize-cli db:migrate",
     "migrate:prod": "cross-env NODE_ENV=production sequelize-cli db:migrate",
     "coverage": "cross-env NODE_ENV=test JWT_SECRET=secret nyc mocha \"app/**/*.spec.ts\" --exit --reporter mochawesome --reporter-options quiet=true,html=false",
-    "postcoverage": "npm run marge",
+    "postcoverage": "yarn marge",
     "marge": "marge -f index.html -o static/test/ -p Report mochawesome-report/mochawesome.json"
   },
   "dependencies": {
