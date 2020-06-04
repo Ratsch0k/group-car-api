@@ -1,8 +1,7 @@
 import debug from 'debug';
-import User from '@app/user/user';
+import {User, UserDto} from '@models';
 import {UnauthorizedError} from '@errors';
-import ModelToDtoConverter from '@app/util/model-to-dto-converter';
-import UserDto from '@app/user/user-dto';
+import ModelToDtoConverter from '@util/model-to-dto-converter';
 
 type RequestHandler = import('express').RequestHandler;
 

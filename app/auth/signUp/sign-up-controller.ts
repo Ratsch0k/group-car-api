@@ -1,12 +1,10 @@
 import debug from 'debug';
-import User from '@app/user/user';
-import UserDto from '@app/user/user-dto';
-import ModelToDtoConverter from '@app/util/model-to-dto-converter';
+import {User, UserDto, ProfilePic} from '@models';
+import ModelToDtoConverter from '@util/model-to-dto-converter';
 import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
 import {convertUserToJwtPayload} from '@app/jwt/jwt-util';
-import {ProfilePic} from '@app/user';
-import generatePic from '@app/util/generate-profile-pic';
+import generatePic from '@util/generate-profile-pic';
 import config from '@config';
 
 type RequestHandler = import('express').RequestHandler;

@@ -22,7 +22,8 @@ const secretName = config.jwt.securityOptions.secretName;
  * Creates a middleware for csrf protection with jwt tokens.\
  * Expects the jwt token to in a cookie.
  */
-const jwtCsrf: () => RequestHandler = () => (req, res, next) => {
+const jwtCsrf: () =>
+RequestHandler = () => (req, res, next) => {
   const tokens = new Tokens();
 
   /**

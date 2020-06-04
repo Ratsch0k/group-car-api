@@ -1,10 +1,9 @@
 import {stub, fake, assert, match, createSandbox} from 'sinon';
-import User from '../../user/user';
+import {User, UserDto} from '../../models/user';
 import bcrypt from 'bcrypt';
 
 import loginController from './login-controller';
 import Bluebird from 'bluebird';
-import UserDto from '../../user/user-dto';
 
 const sandbox = createSandbox();
 

@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import errorHandler from '@app/errors/error-handler';
+import errorHandler from '@errors';
 import expressJwt from 'express-jwt';
 
 /**
@@ -12,8 +12,8 @@ import config from '@config';
 import authRouter from '@app/auth';
 import jwtCsrf from './jwt/jwt-csrf';
 import {preLoginJwtValidator} from './jwt/jwt-util';
-import apiRouter from './api';
-import {userRouter} from './user';
+import apiRouter from './routes/api';
+import {userRouter} from './routes/user';
 
 const app: express.Application = express();
 
@@ -36,14 +36,17 @@ app.use('/auth', authRouter);
 // Add user routers
 app.use('/user', userRouter);
 
-// Add api routers
-app.use('/api',
+// Add api router
+app.use(
+    '/api',
     expressJwt({
       secret: config.jwt.secret,
       getToken: config.jwt.getToken,
     }),
     preLoginJwtValidator,
-    apiRouter);
+    apiRouter,
+);
+app.use('/api', apiRouter);
 
 
 /**

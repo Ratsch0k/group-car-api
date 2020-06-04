@@ -1,6 +1,6 @@
 import config from '@config';
 import jwt from 'jsonwebtoken';
-import User from '@app/user/user';
+import {User} from '@models';
 import {UnauthorizedError} from '@errors';
 
 type RequestHandler = import('express').RequestHandler;
@@ -35,6 +35,7 @@ export function generateToken(payload: object,
 
 export interface UserJwtPayload {
   username: string;
+  id: number;
   isBetaUser: boolean;
   loggedIn: boolean;
 }
@@ -51,6 +52,7 @@ export function convertUserToJwtPayload(user: User): UserJwtPayload {
     return {
       username: user.username,
       isBetaUser: user.isBetaUser,
+      id: user.id,
       loggedIn: true,
     };
   } else {
@@ -71,7 +73,14 @@ export const preLoginJwtValidator: RequestHandler = (req: any, res, next) => {
   if (!req.user || !req.user.loggedIn) {
     throw new UnauthorizedError();
   } else {
-    next();
+    // Check if a user with the user id exists
+    User.findByPk(req.user.id).then((user) => {
+      if (user) {
+        next();
+      } else {
+        next(new UnauthorizedError());
+      }
+    });
   }
 };
 

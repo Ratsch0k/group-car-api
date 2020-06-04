@@ -1,13 +1,14 @@
 import path from 'path';
 import debug from 'debug';
 import jwt from './jwt-config';
+
 const log = debug('group-car:config');
 
 type JWTConfig = import('./jwt-config').JWTConfig;
 type SequelizeConfig = import('sequelize/types').Config;
 /**
  * Get node environment.\
- * If none provided assume development.
+ * If none provided, assume development.
  */
 const environment = process.env.NODE_ENV || 'development';
 log('Environment: %s', environment);
@@ -58,6 +59,7 @@ export interface Config {
   jwt: JWTConfig;
   morgan: MorganConfig;
   user: UserConfig;
+  serverType: string;
 }
 
 /**
@@ -81,6 +83,7 @@ const error: ErrorConfig = {
 const morgan: MorganConfig = {
   formatString: 'dev',
 };
+
 
 let withFlush = false;
 
@@ -143,6 +146,7 @@ const config: Config = {
   jwt,
   morgan,
   user,
+  serverType,
 };
 
 export default config;

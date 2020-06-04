@@ -8,6 +8,8 @@ tags:
   description: Requests for authentication
 - name: User
   description: Requests for everything user related
+- name: Group
+  description: Requests for everything groups related
 
 # Paths
 paths:
@@ -22,17 +24,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusObject'
-  /api/user:
-    get:
-      summary: Get all users
-      description: Get a list of all users
-      responses:
-        200:
-          description: The list of all users
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserList'
   
   # Authentication
   /auth:
@@ -50,11 +41,7 @@ paths:
       tags:
       - Authentication
       parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string
+      - $ref: '#/components/parameters/XsrfParameter'
       requestBody:
         description: Login data
         content:
@@ -75,7 +62,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /auth/sign-up:
     put:
       summary: Sign up
@@ -83,11 +70,7 @@ paths:
       tags:
       - Authentication
       parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string
+      - $ref: '#/components/parameters/XsrfParameter'
       requestBody:
         description: The sign up properties
         content:
@@ -108,7 +91,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /auth/logout:
     put:
       summary: Log the client out
@@ -116,20 +99,12 @@ paths:
       - Authentication
       description: Log the client out by replacing the jwt cookie with a pre-login one
       parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string 
+      - $ref: '#/components/parameters/XsrfParameter'
       responses:
         204:
           description: The client is logged out
         401:
-          description: The action can't be performed due to authorization.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
   /auth/token:
     put:
       summary: Check if logged in
@@ -137,11 +112,7 @@ paths:
       - Authentication
       description: Check if the current state of the client indicates that it is logged in. Checks the jwt token and the payload within.
       parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string 
+      - $ref: '#/components/parameters/XsrfParameter'
       responses:
         200:
           description: The client is logged in
@@ -150,11 +121,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         401:
-          description: The client is not logged in
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
                 
   # User
   /user/generate-profile-pic:
@@ -185,11 +152,7 @@ paths:
                 type: string
                 format: binary
         400:
-          description: The request is missing parameters and/or is malformed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
+          $ref: '#/components/responses/BadRequestErrorResponse'
   /api/user/{userId}/profile-pic:
     get:
       summary: Get the profile picture
@@ -216,8 +179,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestError'
+                
+  
+  # Group
+  /api/group:
+    post:
+      summary: Creates a new group
+      tags:
+      - Group
+      description: Create a new group with the currently logged in user as admin and owner.
+      parameters:
+      - $ref: '#/components/parameters/XsrfParameter'
+      requestBody:
+        description: The initial group data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupRequest'
+      responses:
+        201:
+          description: The group was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupData'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+          
+          
 # Components
 components:
+
+  # Schemas
   schemas:
     # Status
     StatusObject:
@@ -232,6 +229,7 @@ components:
       enum:
       - 'up'
       - 'down'
+      
     # User
     User:
       type: object
@@ -250,10 +248,43 @@ components:
         updatedAt:
           type: string
           format: date-time
-    UserList:
-      type: array
-      items:
-        $ref: '#/components/schemas/User'
+          
+    # Group
+    GroupRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      example: 
+        name: Family group
+        description: Our new group for the family
+    GroupData:
+      type: object
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        owner:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          
     # Authentication
     LoginObject:
       type: object
@@ -278,6 +309,7 @@ components:
         email: demo@mai.com
         username: demo
         password: 123456
+        
     # Error
     RestError:
       type: object
@@ -298,7 +330,7 @@ components:
           type: string
         detail:
           type: object
-    UnauthorizedError:
+    UnauthorizedErrorSchema:
       allOf:
       - $ref: '#/components/schemas/RestError'
       - example:
@@ -307,7 +339,55 @@ components:
           message: You're not authorized to view the requested resourced.
           detail: {}
           timestamp: '2020-05-03T13:21:35.938Z'
-
+    BadRequestErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/RestError'
+      - example:
+          status: Bad Request
+          statusCode: 400
+          message: The sent request is missing required attributes.
+          detail: {}
+          timestamp: '2020-05-03T13:21:35.938Z'
+    InternalServerErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/RestError'
+      - example:
+          status: Internal Server Error
+          statusCode: 500
+          message: An unexpected error occurred.
+          detail: {}
+          timestamp: '2020-05-03T13:21:35.938Z'
+          
+  # Responses
+  responses:
+    # Error
+    BadRequestErrorResponse:
+      description: The sent request is malformed or missing required attributes.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestErrorSchema'
+    UnauthorizedErrorResponse:
+      description: The user who sent the request in not authorized for the requested action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedErrorSchema'
+    InternalServerErrorResponse:
+      description: The server encountered an unexpected error while handling the request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerErrorSchema'
+            
+  # Parameter
+  parameters:
+    XsrfParameter:
+      name: XSRF-TOKEN
+      in: header
+      required: false
+      schema:
+        type: string
 # External docs
 externalDocs:
   description: Code documentation is here
