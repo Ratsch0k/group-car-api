@@ -2,15 +2,17 @@ import config from '../../../../config';
 import request from 'supertest';
 import app from '../../../../app';
 import db, {syncPromise} from '../../../../db';
+import {expect} from 'chai';
 
 
-describe('CreateGroupValidator', function() {
+describe('CreateGroup', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
   let jwt: string;
   let csrf: string;
+  let user: any;
 
-  const user = {
+  const signUpBody = {
     username: 'test',
     email: 'test@mail.com',
     password: 'password',
@@ -35,10 +37,11 @@ describe('CreateGroupValidator', function() {
         .put('/auth/sign-up')
         .set(csrfHeaderName, csrf)
         .set('Cookie', [jwt])
-        .send(user)
+        .send(signUpBody)
         .expect(201)
         .then((response) => {
           jwt = response.header['set-cookie'].pop().split(';')[0];
+          user = response.body;
         });
     csrf = await request(app).head('/auth')
         .set('Cookie', [jwt])
@@ -52,7 +55,10 @@ describe('CreateGroupValidator', function() {
         .post('/api/group')
         .set(csrfHeaderName, csrf)
         .set('Cookie', [jwt])
-        .expect(400);
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).to.include('name');
+        });
   });
 
   it('responses with 400 if name is not a string', function() {
@@ -65,7 +71,10 @@ describe('CreateGroupValidator', function() {
         .set(csrfHeaderName, csrf)
         .set('Cookie', [jwt])
         .send(body)
-        .expect(400);
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).to.include('name');
+        });
   });
 
   it('responses with 400 if name is an empty string', function() {
@@ -78,7 +87,10 @@ describe('CreateGroupValidator', function() {
         .set(csrfHeaderName, csrf)
         .set('Cookie', [jwt])
         .send(body)
-        .expect(400);
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).to.include('name');
+        });
   });
 
   it('responses with 201 if name is correct but description ' +
@@ -92,7 +104,11 @@ describe('CreateGroupValidator', function() {
         .set(csrfHeaderName, csrf)
         .set('Cookie', [jwt])
         .send(body)
-        .expect(201);
+        .expect(201)
+        .then((response) => {
+          expect(response.body.ownerId).to.equal(user.id);
+          expect(response.body.name).to.equal(body.name);
+        });
   });
 
   it('responses with 400 if name is correct but description ' +
@@ -107,7 +123,10 @@ describe('CreateGroupValidator', function() {
         .set(csrfHeaderName, csrf)
         .set('Cookie', [jwt])
         .send(body)
-        .expect(400);
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).to.include('description');
+        });
   });
 
   it('responses with 201 if name is correct but description ' +
@@ -122,7 +141,12 @@ describe('CreateGroupValidator', function() {
         .set(csrfHeaderName, csrf)
         .set('Cookie', [jwt])
         .send(body)
-        .expect(201);
+        .expect(201)
+        .then((response) => {
+          expect(response.body.ownerId).to.equal(user.id);
+          expect(response.body.name).to.equal(body.name);
+          expect(response.body.description).to.equal(body.description);
+        });
   });
 
   it('responses with 201 if name is correct but description ' +
@@ -137,6 +161,11 @@ describe('CreateGroupValidator', function() {
         .set(csrfHeaderName, csrf)
         .set('Cookie', [jwt])
         .send(body)
-        .expect(201);
+        .expect(201)
+        .then((response) => {
+          expect(response.body.ownerId).to.equal(user.id);
+          expect(response.body.name).to.equal(body.name);
+          expect(response.body.description).to.equal(body.description);
+        });
   });
 });
