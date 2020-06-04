@@ -8,9 +8,9 @@ import {expect} from 'chai';
 describe('CreateGroup', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
-  let jwt: string;
   let csrf: string;
   let user: any;
+  let agent: request.SuperTest<request.Test>;
 
   const signUpBody = {
     username: 'test',
@@ -23,38 +23,34 @@ describe('CreateGroup', function() {
     await syncPromise;
     await db.sync({force: true});
 
-    jwt = 'FAIL';
+    agent = request.agent(app);
+
     // Get csrf token
-    csrf = await request(app).head('/auth')
+    csrf = await agent.head('/auth')
         .then((response) => {
           // Save jwt cookie
-          jwt = response.header['set-cookie'].pop().split(';')[0];
           return response.header[csrfHeaderName];
         });
 
     // Sign up to access api and set new jwt
-    await request(app)
+    await agent
         .put('/auth/sign-up')
         .set(csrfHeaderName, csrf)
-        .set('Cookie', [jwt])
         .send(signUpBody)
         .expect(201)
         .then((response) => {
-          jwt = response.header['set-cookie'].pop().split(';')[0];
           user = response.body;
         });
-    csrf = await request(app).head('/auth')
-        .set('Cookie', [jwt])
+    csrf = await agent.head('/auth')
         .then((response) => {
           return response.header[csrfHeaderName];
         });
   });
 
   it('responses with 400 if name is missing', function() {
-    return request(app)
+    return agent
         .post('/api/group')
         .set(csrfHeaderName, csrf)
-        .set('Cookie', [jwt])
         .expect(400)
         .then((response) => {
           expect(response.body.message).to.include('name');
@@ -66,10 +62,9 @@ describe('CreateGroup', function() {
       name: 12,
     };
 
-    return request(app)
+    return agent
         .post('/api/group')
         .set(csrfHeaderName, csrf)
-        .set('Cookie', [jwt])
         .send(body)
         .expect(400)
         .then((response) => {
@@ -82,10 +77,9 @@ describe('CreateGroup', function() {
       name: '',
     };
 
-    return request(app)
+    return agent
         .post('/api/group')
         .set(csrfHeaderName, csrf)
-        .set('Cookie', [jwt])
         .send(body)
         .expect(400)
         .then((response) => {
@@ -99,10 +93,9 @@ describe('CreateGroup', function() {
       name: 'NAME',
     };
 
-    return request(app)
+    return agent
         .post('/api/group')
         .set(csrfHeaderName, csrf)
-        .set('Cookie', [jwt])
         .send(body)
         .expect(201)
         .then((response) => {
@@ -118,10 +111,9 @@ describe('CreateGroup', function() {
       description: 11,
     };
 
-    return request(app)
+    return agent
         .post('/api/group')
         .set(csrfHeaderName, csrf)
-        .set('Cookie', [jwt])
         .send(body)
         .expect(400)
         .then((response) => {
@@ -136,10 +128,9 @@ describe('CreateGroup', function() {
       description: '',
     };
 
-    return request(app)
+    return agent
         .post('/api/group')
         .set(csrfHeaderName, csrf)
-        .set('Cookie', [jwt])
         .send(body)
         .expect(201)
         .then((response) => {
@@ -156,10 +147,9 @@ describe('CreateGroup', function() {
       description: 'DESC',
     };
 
-    return request(app)
+    return agent
         .post('/api/group')
         .set(csrfHeaderName, csrf)
-        .set('Cookie', [jwt])
         .send(body)
         .expect(201)
         .then((response) => {
