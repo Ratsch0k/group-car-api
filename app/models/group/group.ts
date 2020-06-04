@@ -2,10 +2,12 @@ import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from '@db';
 import {Membership} from '../membership';
 import {InternalError} from '@app/errors';
+import debug from 'debug';
 
 type ModelHooks = import('sequelize/types/lib/hooks').ModelHooks;
-type HookReturn = import('sequelize/types/lib/hooks').HookReturn;
-type CreateOptions = import('sequelize').CreateOptions;
+
+const error = debug('group-car:group:error');
+const log = debug('group-car:group');
 
 /**
  * Model class for groups.
@@ -60,8 +62,19 @@ export const createMembershipForOwner = (
     userId: group.ownerId,
     isAdmin: true,
   }).then(() => {
+    log(
+        'Created admin membership for user %d and group %d',
+        group.ownerId,
+        group.id,
+    );
     return;
-  }).catch(() => {
+  }).catch((err) => {
+    error(
+        'Couldn\'t create admin membership for user %d and group %d, error: %o',
+        group.ownerId,
+        group.id,
+        err,
+    );
     throw new InternalError();
   });
 };
