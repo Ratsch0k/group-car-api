@@ -158,6 +158,9 @@ const checkRequestConfig = (req: Request): any => {
 
   let jwt;
   try {
+    log(req.cookies);
+    log(jwtToken);
+    log(config.jwt.secret);
     jwt = jsonwebtoken.verify(jwtToken, config.jwt.secret);
   } catch (err) {
     warn('Malformed jwt. Couldn\'t verify.');

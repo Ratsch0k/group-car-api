@@ -50,7 +50,9 @@ describe('jwt-csrf', function() {
 
       it('throws UnauthorizedError if no jwt ' +
           'exists', function() {
-        config.jwt.getToken = sandbox.stub().returns(null);
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns(null as any);
 
         tokenVerifyStub = sandbox.stub(Tokens.prototype, 'verify');
 
@@ -65,7 +67,9 @@ describe('jwt-csrf', function() {
       it('throws UnauthorizedError if no jwt ' +
       'exists but the csrf header', function() {
         request.get = sandbox.stub().withArgs(csrfHeaderName).returns('TEST');
-        config.jwt.getToken = sandbox.stub().returns(null);
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns(null as any);
 
         tokenVerifyStub = sandbox.stub(Tokens.prototype, 'verify');
 
@@ -79,7 +83,9 @@ describe('jwt-csrf', function() {
 
       it('throws UnauthorizedError if jwt has no ' +
           'secret', function() {
-        config.jwt.getToken = sandbox.stub().returns({});
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns({} as any);
 
         tokenVerifyStub = sandbox.stub(Tokens.prototype, 'verify');
 
@@ -93,7 +99,9 @@ describe('jwt-csrf', function() {
       it('throws UnauthorizedError if jwt has no ' +
       'secret but the csrf header exists', function() {
         request.get = sandbox.stub().withArgs(csrfHeaderName).returns('TEST');
-        config.jwt.getToken = sandbox.stub().returns({});
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns({} as any);
 
         tokenVerifyStub = sandbox.stub(Tokens.prototype, 'verify');
 
@@ -109,9 +117,11 @@ describe('jwt-csrf', function() {
         request.get = sandbox.stub().withArgs(csrfHeaderName)
             .returns(undefined);
 
-        config.jwt.getToken = sandbox.stub().returns({
-          [secretName]: 'TEST',
-        });
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns({
+              [secretName]: 'TEST',
+            } as any);
 
         tokenVerifyStub = sandbox.stub(Tokens.prototype, 'verify');
 
@@ -126,9 +136,11 @@ describe('jwt-csrf', function() {
       'and csrf header exist but secret doesn\'t belong to token', function() {
         request.get = sandbox.stub().withArgs(csrfHeaderName).returns('TEST');
 
-        config.jwt.getToken = sandbox.stub().returns({
-          [secretName]: 'TEST',
-        });
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns({
+              [secretName]: 'TEST',
+            } as any);
 
         /**
          * Stub verify method of tokens to return true
@@ -152,7 +164,9 @@ describe('jwt-csrf', function() {
         const jwt = {
           [secretName]: secret,
         };
-        config.jwt.getToken = sandbox.stub().returns(jwt);
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns(jwt as any);
 
         /**
          * Stub verify method of tokens to return true
@@ -178,7 +192,9 @@ describe('jwt-csrf', function() {
         const jwt = {
           [secretName]: secret,
         };
-        config.jwt.getToken = sandbox.stub().returns(jwt);
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns(jwt as any);
 
         /**
          * Stub verify method of tokens to return true
@@ -214,7 +230,9 @@ describe('jwt-csrf', function() {
         const jwt = {
           [secretName]: secret,
         };
-        config.jwt.getToken = sandbox.stub().returns(jwt);
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns(jwt as any);
 
         /**
          * Stub verify method of tokens to return true
@@ -261,8 +279,9 @@ describe('jwt-csrf', function() {
         const jwt = {
           [secretName]: secret,
         };
-        config.jwt.getToken = sandbox.stub().returns(jwt);
-
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns(jwt as any);
         /**
          * Stub verify method of tokens to return true
          * if secret and token are equal.
@@ -288,8 +307,9 @@ describe('jwt-csrf', function() {
       });
 
       it('creates new jwt with just the secret if no jwt exists', function() {
-        config.jwt.getToken = sandbox.stub().returns(null);
-
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .returns(null as any);
         /**
          * Stub generateToken method.
          */
@@ -321,7 +341,10 @@ describe('jwt-csrf', function() {
         const jwt = {
           username: 'TEST',
         };
-        config.jwt.getToken = sandbox.stub().withArgs(request).returns(jwt);
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .withArgs(request)
+            .returns(jwt as any);
 
         /**
          * Stub generateToken method.
@@ -364,8 +387,10 @@ describe('jwt-csrf', function() {
         const jwt = {
           [secretName]: secret,
         };
-        config.jwt.getToken = sandbox.stub().withArgs(request).returns(jwt);
-
+        sandbox
+            .stub(config.jwt, 'getToken')
+            .withArgs(request)
+            .returns(jwt as any);
         jwtCsrfHandler(request, response, next);
 
         sandbox.assert.notCalled(secretSyncStub);
