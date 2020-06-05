@@ -10,8 +10,8 @@ export interface Status {
 
 /**
  * Status router
- * @param req Http request
- * @param res Http response
+ * @param req - Http request
+ * @param res - Http response
  */
 const statusController: express.RequestHandler = (req, res) => {
   database.isAvailable().then((avail: boolean) => {

@@ -14,13 +14,15 @@ const log = debug('group-car:group');
  */
 class Group extends Model {
   /**
-   * Id of the group.\
+   * Id of the group.
+   *
    * Primary key.
    */
   public id!: number;
 
   /**
-   * The name of the group.\
+   * The name of the group.
+   *
    * Multiple groups can have the same name.
    */
   public name!: string;
@@ -31,7 +33,8 @@ class Group extends Model {
   public descriptions!: string;
 
   /**
-   * The userId of the owner.\
+   * The userId of the owner.
+   *
    * In the beginning this id will reference the user which created the group.
    * But the owner can transfer his/her ownership to another user of the group.
    */
@@ -50,13 +53,14 @@ class Group extends Model {
 
 /**
  * Creates a new membership for the owner/creater of the group for that
- * group.\
+ * group.
+ *
  * Gives the owner/creater admin permissions.
- * @param group    The newly created group
+ * @param group - The newly created group
  */
 export const createMembershipForOwner = (
     group: Group,
-) => {
+): Promise<void> => {
   return Membership.create({
     groupId: group.id,
     userId: group.ownerId,

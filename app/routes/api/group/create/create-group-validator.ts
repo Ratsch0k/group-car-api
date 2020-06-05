@@ -10,9 +10,9 @@ const error = debug('group-car:group:create:error');
 
 /**
  * Handles the validation result of the create group request.
- * @param req   Express request
- * @param res   Express response
- * @param next  Next handler
+ * @param req  -  Express request
+ * @param res  -  Express response
+ * @param next -  Next handler
  */
 export const createGroupValidationHandler: RequestHandler = (
     req,

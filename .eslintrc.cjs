@@ -5,6 +5,7 @@ module.exports = {
   },
   'extends': [
     'google',
+    'plugin:@typescript-eslint/recommended',
   ],
   'globals': {
     'Atomics': 'readonly',
@@ -12,14 +13,19 @@ module.exports = {
   },
   'parser': '@typescript-eslint/parser',
   'parserOptions': {
-    'ecmaVersion': 2018,
-    'sourceType': 'module',
+    ecmaVersion: 2018,
+    sourceType: 'module',
+    project: "./tsconfig.json",
+    tsconfigRootDir: __dirname,
   },
   'plugins': [
     '@typescript-eslint',
+    "@typescript-eslint/eslint-plugin",
+    "eslint-plugin-tsdoc",
   ],
   'rules': {
     "new-cap": "off",
-    "valid-jsdoc": "off"
+    "valid-jsdoc": "off",
+    "tsdoc/syntax": "warn"
   },
 };

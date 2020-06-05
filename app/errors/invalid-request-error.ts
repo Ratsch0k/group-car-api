@@ -12,13 +12,14 @@ class InvalidRequestError extends BadRequestError {
 
   /**
    * Creates an instance of this class.
-   * @param validationResult The result of the validation
+   * @param validationResult - The result of the validation
    */
   constructor(validationResult: Result) {
-    let message: string = '';
+    let message = '';
     if (!validationResult.isEmpty()) {
       message += 'The following fields are invalid: ';
-      const resultArray: any[] = validationResult.array();
+      const resultArray: Array<Record<string, unknown>> =
+          validationResult.array();
       for (let i = 0; i < resultArray.length; i++) {
         message += `${resultArray[i].param} -> ${resultArray[i].msg}, `;
       }
@@ -27,7 +28,7 @@ class InvalidRequestError extends BadRequestError {
       message = message.substring(0, message.length - 2);
     }
 
-    super(message, validationResult);
+    super(message, validationResult as unknown as Record<string, unknown>);
 
     this.validationResult = validationResult;
   }

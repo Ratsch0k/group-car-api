@@ -1,13 +1,15 @@
 import path from 'path';
 import debug from 'debug';
 import jwt from './jwt-config';
+import dbConfig from './database-config';
 
 const log = debug('group-car:config');
 
 type JWTConfig = import('./jwt-config').JWTConfig;
 type SequelizeConfig = import('sequelize/types').Config;
 /**
- * Get node environment.\
+ * Get node environment.
+ *
  * If none provided, assume development.
  */
 const environment = process.env.NODE_ENV || 'development';
@@ -65,7 +67,9 @@ export interface Config {
 /**
  * Add database config
  */
-const sequelize: SequelizeConfig = require('./database-config')[environment];
+const sequelize: SequelizeConfig =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (dbConfig as any)[environment];
 
 /**
  * Initialize BcryptConfig with default value.

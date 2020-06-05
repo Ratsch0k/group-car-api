@@ -1,6 +1,6 @@
 /**
- * Pseudo-random number generator.\
- * @param seed Seed for the generation
+ * Pseudo-random number generator.
+ * @param seed - Seed for the generation
  */
 const prng = (seed: number): number => {
   let t = seed += 0x6D2B79F5;

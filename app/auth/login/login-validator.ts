@@ -9,8 +9,8 @@ const router: express.Router = express.Router();
 
 /**
  * Login validator
- * @param req Http request
- * @param res Http response
+ * @param req - Http request
+ * @param res - Http response
  */
 export const loginValidationHandler: express.RequestHandler = (
     req,

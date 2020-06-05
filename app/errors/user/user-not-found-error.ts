@@ -11,9 +11,9 @@ class UserNotFoundError extends NotFoundError {
 
   /**
    * Creates an instance of this class.
-   * @param userId User id of the user which can not be found
+   * @param userId - User id of the user which can not be found
    */
-  constructor(userId: number, detail?: any) {
+  constructor(userId: number, detail?: Record<string, unknown>) {
     super(`The user with id "${userId}" doesn\'t exist`, detail);
 
     this.userId = userId;

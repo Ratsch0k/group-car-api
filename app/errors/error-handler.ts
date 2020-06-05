@@ -13,11 +13,12 @@ const error = debug('group-car:error-handler:error');
 
 /**
  * The general error handler for errors.
- * @param err Thrown error
- * @param req Request
- * @param res Response
+ * @param err - Thrown error
+ * @param req - Request
+ * @param res - Response
  */
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof RestError) {
     log('Handling error: "%s"', err.constructor.name);
     res.status(err.statusCode).send(new RestError(err.statusCode,

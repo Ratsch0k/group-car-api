@@ -2,8 +2,8 @@ type RequestHandler = import('express').RequestHandler;
 
 /**
  * A simple controller which removes the jwt cookie for the client.
- * @param req   Request
- * @param res   Response
+ * @param req - Request
+ * @param res - Response
  */
 const logoutController: RequestHandler = (req, res) => {
   res.setJwtToken({});

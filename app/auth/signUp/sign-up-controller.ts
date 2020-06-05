@@ -21,11 +21,12 @@ const error = debug('group-car:sign-up:controller:error');
 const picDim = config.user.pb.dimensions;
 
 /**
- * Signs the user up.\
+ * Signs the user up.
+ *
  * Creates a new user with the given properties.
- * @param req   Http request, information about user in `req.body`
- * @param res   Http response
- * @param next  The next request handler
+ * @param req  - Http request, information about user in `req.body`
+ * @param res  - Http response
+ * @param next - The next request handler
  */
 const signUpController: RequestHandler = (req, res, next) => {
   log('Create new user for "%s"', req.body.username);

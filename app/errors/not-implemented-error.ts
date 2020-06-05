@@ -11,7 +11,7 @@ class NotImplementedError extends RestError {
 
   /**
    * Creates an instance of this class.
-   * @param path Request path which is not implemented
+   * @param path - Request path which is not implemented
    */
   constructor(path: string) {
     super(501,
