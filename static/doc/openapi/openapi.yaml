@@ -195,7 +195,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GroupRequest'
+              $ref: '#/components/schemas/CreateGroupRequest'
       responses:
         201:
           description: The group was successfully created
@@ -209,8 +209,36 @@ paths:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
-          
-          
+  /api/group/{groupId}:
+      put:
+        summary: Updates a group
+        tags:
+        - Group
+        description: Updated the group with the given data. The user can only update a group if the user is an admin of that group.
+        parameters: 
+        - $ref: '#/components/parameters/XsrfParameter'
+        - name: groupId
+          in: path
+          schema:
+            type: integer
+          required: true
+        requestBody:
+          description: The data with which the group should be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupRequest'
+        responses:
+          200:
+            description: The updated group
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/GroupData'
+          400:
+            $ref: '#/components/responses/BadRequestErrorResponse'
+          401:
+            $ref: '#/components/responses/UnauthorizedErrorResponse'
 # Components
 components:
 
@@ -252,8 +280,6 @@ components:
     # Group
     GroupRequest:
       type: object
-      required:
-      - name
       properties:
         name:
           type: string
@@ -262,6 +288,15 @@ components:
       example: 
         name: Family group
         description: Our new group for the family
+    CreateGroupRequest:
+      allOf:
+      - type: object # Override required of GroupData
+        required:
+        - name
+        properties:
+          name:
+            type: string
+      - $ref: '#/components/schemas/GroupRequest'
     GroupData:
       type: object
       required:
