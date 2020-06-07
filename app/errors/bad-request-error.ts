@@ -12,7 +12,7 @@ class BadRequestError extends RestError {
    * @param message   - Message of the error
    * @param errorInfo - More error information
    */
-  constructor(message: string, detail?: Record<string, unknown>) {
+  constructor(message = 'Bad Request', detail?: Record<string, unknown>) {
     super(400, message, detail);
   }
 }
