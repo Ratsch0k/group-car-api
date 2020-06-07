@@ -2,7 +2,7 @@ import sinon, {match} from 'sinon';
 import {Membership, Group} from '../../../../models';
 import {expect} from 'chai';
 import {updateGroupRequestChecker, updateGroupRequestHandler} from './update-group-controller';
-import {BadRequestError, NotMemberOfGroupError, NotAdminOfGroupError, GroupNotFoundError} from '@app/errors';
+import {BadRequestError, NotMemberOfGroupError, NotAdminOfGroupError, GroupNotFoundError} from '../../../../errors';
 import Bluebird from 'bluebird';
 import groupRouter from '../group-router';
 import { doesNotMatch } from 'assert';
