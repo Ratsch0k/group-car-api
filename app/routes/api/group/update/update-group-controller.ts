@@ -26,8 +26,8 @@ type RequestHandler = import('express').RequestHandler;
  * @param next  - Next function
  */
 export const updateGroupRequestChecker: RequestHandler= (req, res, next) => {
-  const userId = req.user?.id;
-  const groupId = parseInt(req.params.groupId, 10);
+  const userId = req.user && req.user.id;
+  const groupId = req.params.groupId && parseInt(req.params.groupId, 10);
 
   if (userId && groupId) {
     /*
@@ -46,20 +46,18 @@ export const updateGroupRequestChecker: RequestHandler= (req, res, next) => {
         next(new NotAdminOfGroupError());
       } else {
         // Check if the group exists
-        Group.findByPk(req.params.groupId)
+        Group.findByPk(groupId)
             .then((group: Group | null) => {
               if (group == null) {
                 next(new GroupNotFoundError(groupId));
               } else {
                 next();
               }
-            }).catch((error) => {
-              next(error);
-            });
+            }).catch(next);
       }
-    });
+    }).catch(next);
   } else {
-    throw new BadRequestError();
+    throw new BadRequestError('Missing information');
   }
 };
 
@@ -87,9 +85,7 @@ export const updateGroupRequestHandler: RequestHandler = (req, res, next) => {
       })
       .then((value: [number, Group[]]) => {
         res.send(value[1][0]);
-      }).catch((error) => {
-        next(error);
-      });
+      }).catch(next);
 };
 
 const updateGroupController = Router({mergeParams: true}).use(
