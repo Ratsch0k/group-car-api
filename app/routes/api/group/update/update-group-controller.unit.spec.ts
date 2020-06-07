@@ -70,9 +70,10 @@ describe('UpdateGroup', function() {
                 }
               }),
             );
-            sandbox.assert.calledOnceWithExactly(next,
+            sandbox.assert.calledOnceWithExactly(
+              next,
               match.instanceOf(NotMemberOfGroupError)); 
-              done();
+            done();
           });
 
           updateGroupRequestChecker(req, res, next);
