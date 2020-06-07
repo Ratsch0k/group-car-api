@@ -5,6 +5,7 @@ import config from '@config';
 import debug from 'debug';
 import UnauthorizedRestError from './unauthorized-error';
 import ForbiddenError from './forbidden-error';
+import BadRequestError from './bad-request-error';
 
 type UnauthorizedError = import('express-jwt').UnauthorizedError;
 
@@ -33,12 +34,14 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     } else if (err.code === 'EBADCSRFTOKEN') {
       log('Request has invalid csrf token');
       res.status(403).send(new ForbiddenError());
+    } else if (err instanceof SyntaxError) {
+      res.status(400).send(new BadRequestError('Malformed request'));
     } else if (!config.error.withStack) {
       error(err.stack);
       res.status(500).send(new InternalError());
     } else {
       error(err.stack);
-      res.status(500).send(new InternalError(undefined, err.stack));
+      res.status(500).send(new InternalError(err.message, err.stack));
     }
   }
 };
