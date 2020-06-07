@@ -9,6 +9,22 @@ import {Router} from 'express';
 
 type RequestHandler = import('express').RequestHandler;
 
+/**
+ * Checks if the request is correct and fulfills constraints before sending it
+ * to the handler for execution.
+ *
+ * The following constraints have to be checked:
+ * - The request has to have the userId and the groupId
+ * - The user has to be a member of the group he/she requested to update
+ * - The user has to be an admin of the group
+ * - The group has to exist
+ *
+ * If all constraints are fulfilled the request will be send to
+ * {@link updateGroupRequestHandler}
+ * @param req   - Http request
+ * @param res   - Http response
+ * @param next  - Next function
+ */
 export const updateGroupRequestChecker: RequestHandler= (req, res, next) => {
   const userId = req.user?.id;
   const groupId = parseInt(req.params.groupId, 10);
@@ -47,6 +63,16 @@ export const updateGroupRequestChecker: RequestHandler= (req, res, next) => {
   }
 };
 
+/**
+ * Handles the request to update a group.
+ *
+ * Updates the group and responses with the update group data.
+ *
+ * ***This handler doesn't check for any constraints.***
+ * @param req   - Http request
+ * @param res   - Http response
+ * @param next  - Next function
+ */
 export const updateGroupRequestHandler: RequestHandler = (req, res, next) => {
   Group.update(
       {
