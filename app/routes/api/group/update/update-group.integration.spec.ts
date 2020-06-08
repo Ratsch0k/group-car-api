@@ -1,0 +1,137 @@
+import config from '../../../../config';
+import request from 'supertest';
+import app from '../../../../app';
+import db, {syncPromise} from '../../../../db';
+import {expect} from 'chai';
+import {Group, Membership, User} from '../../../../models';
+
+
+describe('UpdateGroup', function() {
+  describe('user is not logged in:', function() {
+    const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+
+    let csrf: string;
+    let agent: request.SuperTest<request.Test>;
+
+    // Force sync database before each test
+    beforeEach(async function() {
+      await syncPromise;
+      await db.sync({force: true});
+  
+      agent = request.agent(app);
+  
+      // Get csrf token
+      csrf = await agent.head('/auth')
+          .then((response) => {
+            // Save jwt cookie
+            return response.header[csrfHeaderName];
+          });
+    });
+
+    it('responses with 401', function() {
+      return agent.put('/api/group/10').expect(401);
+    });
+  });
+
+  describe('user is logged in:', function() {
+    const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+
+    let csrf: string;
+    let user: any;
+    let agent: request.SuperTest<request.Test>;
+  
+    const signUpBody = {
+      username: 'test',
+      email: 'test@mail.com',
+      password: 'password',
+    };
+  
+    // Force sync database before each test
+    beforeEach(async function() {
+      await syncPromise;
+      await db.sync({force: true});
+  
+      agent = request.agent(app);
+  
+      // Get csrf token
+      csrf = await agent.head('/auth')
+          .then((response) => {
+            // Save jwt cookie
+            return response.header[csrfHeaderName];
+          });
+  
+      // Sign up to access api and set new jwt
+      await agent
+          .put('/auth/sign-up')
+          .set(csrfHeaderName, csrf)
+          .send(signUpBody)
+          .expect(201)
+          .then((response) => {
+            user = response.body;
+          });
+      csrf = await agent.head('/auth')
+          .then((response) => {
+            return response.header[csrfHeaderName];
+          });
+    });
+
+    it('responses with 401 if user not member of group', function() {
+        return agent.put('/api/group/1').expect(401);
+    });
+
+    it('responses with 401 if user not admin of group', function() {
+      // Create owner of group
+      const ownerData = {
+        username: 'OWNER',
+        password: 'OWNER PASSWORD',
+        email: 'OWNER@OWNER.com',
+      }
+      // Create the database entries manually and then send request
+      User.create(ownerData).then((owner) => {
+        expect(owner).to.be.not.null;
+        const groupData = {
+          name: 'TEST',
+          description: 'DESC',
+          ownerId: owner.id,
+        }
+        return Group.create(groupData);
+      }).then((group) => {
+        expect(group).to.be.not.null;
+        return Membership.create({
+          groupId: group.id,
+          userId: user.id,
+          isAdmin: false,
+        }).then(() => group);
+      }).then((group) =>
+        agent.put(`/api/group/${group.id}`).expect(401));;
+    });
+
+    it('responses with 404 if user is admin of group but group doesn\'t exist', function() {
+
+    });
+
+    it('responses with 401 if user not logged in', function() {
+
+    })
+  
+    it('responses with 400 if name if not a string', function() {
+  
+    });
+  
+    it('responses with 400 if name is an empty string', function() {
+  
+    });
+  
+    it('changes name field of group successfully', function() {
+  
+    });
+  
+    it('responses with 400 if descriptions is not a string', function() {
+  
+    });
+  
+    it('changes descriptions field successfully', function() {
+  
+    });
+  });
+});
