@@ -47,6 +47,11 @@ export const updateGroupValidator = [
       .withMessage('Description has to be a string')
       .trim()
       .escape(),
+  body('ownerId')
+      .not()
+      .exists()
+      .withMessage('OwnerId can\'t be changed by this request. ' +
+        'Use the transfer ownership request'),
   param('groupId')
       .exists()
       .withMessage('groupId is missing')

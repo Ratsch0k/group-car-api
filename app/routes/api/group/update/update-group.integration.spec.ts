@@ -4,6 +4,8 @@ import app from '../../../../app';
 import db, {syncPromise} from '../../../../db';
 import {expect} from 'chai';
 import {Group, Membership, User} from '../../../../models';
+import sinon from 'sinon';
+import Bluebird from 'bluebird';
 
 
 describe('UpdateGroup', function() {
@@ -87,7 +89,7 @@ describe('UpdateGroup', function() {
         email: 'OWNER@OWNER.com',
       }
       // Create the database entries manually and then send request
-      User.create(ownerData).then((owner) => {
+      return User.create(ownerData).then((owner) => {
         expect(owner).to.be.not.null;
         const groupData = {
           name: 'TEST',
@@ -103,35 +105,150 @@ describe('UpdateGroup', function() {
           isAdmin: false,
         }).then(() => group);
       }).then((group) =>
-        agent.put(`/api/group/${group.id}`).expect(401));;
+        agent.put(`/api/group/${group.id}`).set(csrfHeaderName, csrf).expect(401));
     });
 
     it('responses with 404 if user is admin of group but group doesn\'t exist', function() {
+      // Create the database entries manually and then send request
+      const groupData = {
+        name: 'name',
+        description: 'desc',
+        ownerId: user.id,
+      };
+      
+      // Stub Group.findByPk to simulate that the group somehow doesn't exist. Could be an extreme edge case
+      const groupFindByPkStub: any = sinon.stub(Group, 'findByPk')
+        .usingPromise(Bluebird).resolves(null as any);
 
+      return Group.create(groupData)
+        .then((group) =>
+          agent.put(`/api/group/${group.id}`)
+            .set(csrfHeaderName, csrf)
+            .expect(404))
+        .then(() => {
+          sinon.assert.calledOnce(groupFindByPkStub);
+          sinon.restore();
+        });
     });
-
-    it('responses with 401 if user not logged in', function() {
-
-    })
   
     it('responses with 400 if name if not a string', function() {
-  
+      // Create the database entries manually and then send request
+      const groupData = {
+        name: 'name',
+        description: 'desc',
+        ownerId: user.id,
+      };
+      const requestBody = {
+        name: 10,
+      }
+      return Group.create(groupData)
+        .then((group) =>
+          agent.put(`/api/group/${group.id}`)
+            .set(csrfHeaderName, csrf)
+            .send(requestBody)
+            .expect(400));
     });
   
     it('responses with 400 if name is an empty string', function() {
-  
+      // Create the database entries manually and then send request
+      const groupData = {
+        name: 'name',
+        description: 'desc',
+        ownerId: user.id,
+      };
+      const requestBody = {
+        name: '',
+      }
+      return Group.create(groupData)
+        .then((group) =>
+          agent.put(`/api/group/${group.id}`)
+            .set(csrfHeaderName, csrf)
+            .send(requestBody)
+            .expect(400));
     });
   
     it('changes name field of group successfully', function() {
-  
+        // Create the database entries manually and then send request
+        const groupData = {
+          name: 'name',
+          description: 'desc',
+          ownerId: user.id,
+        };
+        const requestBody = {
+          name: 'new name',
+        }
+        return Group.create(groupData)
+          .then((group) =>
+            agent.put(`/api/group/${group.id}`)
+              .set(csrfHeaderName, csrf)
+              .send(requestBody)
+              .expect(200).then((response) => {
+                expect(response.body).to.include({
+                  name: requestBody.name,
+                  description: groupData.description,
+                  ownerId: groupData.ownerId
+                });
+              }));
     });
   
     it('responses with 400 if descriptions is not a string', function() {
-  
+      // Create the database entries manually and then send request
+      const groupData = {
+        name: 'name',
+        description: 'desc',
+        ownerId: user.id,
+      };
+      const requestBody = {
+        description: 14,
+      }
+      return Group.create(groupData)
+        .then((group) =>
+          agent.put(`/api/group/${group.id}`)
+            .set(csrfHeaderName, csrf)
+            .send(requestBody)
+            .expect(400));
     });
   
     it('changes descriptions field successfully', function() {
+      // Create the database entries manually and then send request
+      const groupData = {
+        name: 'name',
+        description: 'desc',
+        ownerId: user.id,
+      };
+      const requestBody = {
+        description: 'new desc',
+      }
+      return Group.create(groupData)
+        .then((group) =>
+          agent.put(`/api/group/${group.id}`)
+            .set(csrfHeaderName, csrf)
+            .send(requestBody)
+            .expect(200).then((response) => {
+              expect(response.body).to.include({
+                name: groupData.name,
+                description: requestBody.description,
+                ownerId: groupData.ownerId
+              });
+            }));
+    });
   
+    it('cannot changes ownerId of group', function() {
+      // Create the database entries manually and then send request
+      const groupData = {
+        name: 'name',
+        description: 'desc',
+        ownerId: user.id,
+      };
+      const requestBody = {
+        ownerId: 'new desc',
+      }
+      return Group.create(groupData)
+        .then((group) =>
+          agent.put(`/api/group/${group.id}`)
+            .set(csrfHeaderName, csrf)
+            .send(requestBody)
+            .expect(400));
     });
   });
 });
