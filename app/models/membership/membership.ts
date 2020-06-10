@@ -2,10 +2,12 @@ import {Model, DataTypes} from 'sequelize';
 import {default as sequelize} from '@db';
 
 /**
- * Model class for memberships.\
+ * Model class for memberships.
+ *
  * If a user has joined a group,
  * this relation is stored in this table
- * as a membership.\
+ * as a membership.
+ *
  * A membership also defines if the user
  * is an admin of the group.
  */
@@ -34,7 +36,7 @@ class Membership extends Model {
    * Date when the membership was last updated.
    */
   public readonly updatedAt!: Date;
-};
+}
 
 Membership.init(
     {

@@ -10,9 +10,9 @@ const router: express.Router = express.Router();
 
 /**
  * Handles the result of the validation.
- * @param req   Http request
- * @param res   Http response
- * @param next  Next handler
+ * @param req  - Http request
+ * @param res  - Http response
+ * @param next - Next handler
  */
 export const signUpValidationHandler: express.RequestHandler = (
     req,

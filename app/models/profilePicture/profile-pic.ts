@@ -3,7 +3,8 @@ import {default as sequelize} from '@db';
 
 /**
  * This model represents the binary data for the profile picture
- * of a user.\
+ * of a user.
+ *
  * The data is in a separate table to avoid loading the data
  * every time the user data is loaded.
  */

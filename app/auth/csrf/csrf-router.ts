@@ -6,7 +6,7 @@ const router = express.Router();
  * Sets the XSRF-TOKEN header to the head request
  */
 router.head('/', (req, res, next) => {
-  res.set('XSRF-TOKEN', req.getCsrfToken!());
+  res.set('XSRF-TOKEN', req.getCsrfToken?.());
   next();
 });
 

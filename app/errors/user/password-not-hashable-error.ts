@@ -11,7 +11,7 @@ class PasswordNotHashableError extends InternalError {
 
   /**
    * Creates an instance of this class.
-   * @param user The user of which the password is
+   * @param user - The user of which the password is
    */
   constructor(user: string) {
     super(`Couldn't hash the password for user "${user}"`);

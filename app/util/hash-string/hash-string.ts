@@ -1,11 +1,11 @@
 /**
  * Generates a hash for the given string with the given seed.
- * @param str   The string for which to generate the hash
- * @param seed  A seed which can change the output
+ * @param str  - The string for which to generate the hash
+ * @param seed - A seed which can change the output
  *  even if the string is the same
  */
 const hashString = (str: string, seed: number): Promise<number> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let h1 = 0xdeadbeef ^ seed; let h2 = 0x41c6ce57 ^ seed;
     for (let i = 0, ch; i < str.length; i++) {
       ch = str.charCodeAt(i);

@@ -10,8 +10,8 @@ const generatePbRouter: express.Router = express.Router();
 
 /**
  * Handler for generating profile pictures.
- * @param req Http request
- * @param res Http response
+ * @param req - Http request
+ * @param res - Http response
  */
 const generatePbHandler: express.RequestHandler = (req, res, next) => {
   log('IP %s requested generation of profile picture', req.ip);

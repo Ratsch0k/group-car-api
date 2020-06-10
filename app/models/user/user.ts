@@ -7,36 +7,42 @@ import {PasswordNotHashableError} from '@errors';
 type ModelHooks = import('sequelize/types/lib/hooks').ModelHooks;
 
 /**
- * Model class for users.\
+ * Model class for users.
+ *
  * Represents a column of the table 'users' in the database
  */
 class User extends Model {
   /**
-   * The id of the user.\
+   * The id of the user.
+   *
    * Primary key.
    */
   public id!: number;
 
   /**
-   * Username (not email).\
+   * Username (not email).
+   *
    * Is unique
    */
   public username!: string;
 
   /**
-   * Email of the user.\
+   * Email of the user.
+   *
    * Is not allowed to be null or empty
    */
   public email!: string;
 
   /**
-   * Password of the user, is hashed with bcrypt.\
+   * Password of the user, is hashed with bcrypt.
+   *
    * Is not allowed to be null or empty
    */
   public password!: string;
 
   /**
-   * Whether or not the user has access to the beta build.\
+   * Whether or not the user has access to the beta build.
+   *
    * The default value is false and is never updated by a client request.
    */
   public isBetaUser!: boolean;
@@ -58,21 +64,22 @@ class User extends Model {
   public readonly deletedAt!: Date;
 
   /**
-   * Search for a user by the given username.\
+   * Search for a user by the given username.
+   *
    * Only returns one instance if multiple exist.
-   * @param username The username of the user to find
+   * @param username - The username of the user to find
    */
-  public static findByUsername(username: string) {
+  public static findByUsername(username: string): Promise<User | null> {
     return this.findOne({where: {username}});
   }
 }
 
 /**
  * Sets the password of the user to it's salted hash.
- * @param user    The user for which to hash the password
- * @param options Options
+ * @param user    - The user for which to hash the password
+ * @param options - Options
  */
-export const hashPasswordOfUser = (user: User) => {
+export const hashPasswordOfUser = (user: User): Promise<void> => {
   return bcrypt.hash(user.password + '', config.bcrypt.saltRounds)
       .then((hash: string) => {
         user.password = hash;
@@ -82,7 +89,8 @@ export const hashPasswordOfUser = (user: User) => {
 };
 
 /**
- * Create hooks for user model.\
+ * Create hooks for user model.
+ *
  * Will be used when initializing the model.
  */
 const hooks: Partial<ModelHooks> = {

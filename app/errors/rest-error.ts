@@ -27,18 +27,18 @@ export class RestError extends Error {
   /**
    * The error object which was thrown.
    */
-  public readonly detail?: any;
+  public readonly detail?: Record<string, unknown>;
 
   /**
    * Creates an instance of this class.
-   * @param statusCode Http status code of the error
-   * @param message   Message of the error
-   * @param detail     More info about the error,
+   * @param statusCode - Http status code of the error
+   * @param message    -  Message of the error
+   * @param detail     -  More info about the error,
    *    can be used on the client for better error visualization
    */
   constructor(statusCode: number,
       message: string,
-      detail?: any) {
+      detail?: Record<string, unknown>) {
     super();
     this.statusCode = statusCode;
     this.status = STATUS_CODES[statusCode];

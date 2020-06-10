@@ -5,15 +5,9 @@ import {RestError} from './rest-error';
  */
 class NotFoundError extends RestError {
   /**
-   * The stack trace of the error.\
-   * Should only be used in a non production setting.
-   */
-  public readonly stack?: string;
-
-  /**
    * Creates an instance of this class.
    */
-  constructor(message?: string, stack?: string) {
+  constructor(message?: string, detail?: Record<string, unknown>) {
     let _message: string;
     if (message === undefined) {
       _message = 'Entity not found';
@@ -21,9 +15,7 @@ class NotFoundError extends RestError {
       _message = message;
     }
 
-    super(404, _message);
-
-    this.stack = stack;
+    super(404, _message, detail);
   }
 }
 

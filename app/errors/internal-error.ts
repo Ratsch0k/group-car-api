@@ -5,7 +5,8 @@ import {RestError} from './rest-error';
  */
 class InternalError extends RestError {
   /**
-   * The stack trace of the error.\
+   * The stack trace of the error.
+   *
    * Should only be used in a non production setting.
    */
   public readonly stack?: string;

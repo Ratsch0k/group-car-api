@@ -91,7 +91,7 @@ describe('jwt-util', function() {
       it('with subject', function() {
         const subject = 'subject';
 
-        const actual: any = generateToken(user, subject);
+        const actual: any = generateToken(user as any, subject);
 
         expect(actual.payload).to.eql(expectedPayload);
         expect(actual.secret).to.equal(config.jwt.secret);
@@ -108,7 +108,7 @@ describe('jwt-util', function() {
       });
 
       it('without subject', function() {
-        const actual: any = generateToken(user);
+        const actual: any = generateToken(user as any);
 
         expect(actual.payload).to.eql(expectedPayload);
         expect(actual.secret).to.equal(config.jwt.secret);

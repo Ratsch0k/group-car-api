@@ -9,3 +9,4 @@ export {default as NotFoundError} from './not-found-error';
 export {default as UserNotFoundError} from './user/user-not-found-error';
 export * from './user';
 export {default} from './error-handler';
+export * from './group';

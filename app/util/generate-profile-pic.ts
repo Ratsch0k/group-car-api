@@ -8,11 +8,11 @@ registerFont('app/assets/Roboto-Regular.ttf', {family: 'Roboto'});
  * Generates a pseudo-random generated profile picture for
  * the given username. The first to characters will be
  * shown inside the pb.
- * @param dim       Dimension of profile picture in pixel
+ * @param dim      - Dimension of profile picture in pixel
  *                  (will be used for width and height)
- * @param username  The username for which to create the pb
- * @param offset    Offset for the randomness. Used to creates a
- *                  different picture for the same username
+ * @param username - The username for which to create the pb
+ * @param offset   - Offset for the randomness. Used to creates a
+ *                   different picture for the same username
  */
 const generateProfilePic = (dim: number,
     username: string,

@@ -6,7 +6,7 @@ import RestError from './rest-error';
 class ForbiddenError extends RestError {
   /**
    * Creates an instance of this class.
-   * @param message An optional message.
+   * @param message - An optional message.
    *      If not provided a default message is used.
    */
   constructor(message?: string) {

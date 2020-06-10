@@ -1,12 +1,12 @@
-import {body, validationResult} from 'express-validator';
+import {body, validationResult, param} from 'express-validator';
 import debug from 'debug';
 import {InvalidRequestError} from '@errors';
 import {Router} from 'express';
 
 type RequestHandler = import('express').RequestHandler;
 
-const log = debug('group-car:group:create');
-const error = debug('group-car:group:create:error');
+const log = debug('group-car:group:update');
+const error = debug('group-car:group:update:error');
 
 /**
  * Handles the validation result of the create group request.
@@ -14,15 +14,15 @@ const error = debug('group-car:group:create:error');
  * @param res  -  Express response
  * @param next -  Next handler
  */
-export const createGroupValidationHandler: RequestHandler = (
+export const updateGroupValidationHandler: RequestHandler = (
     req,
     res,
     next,
 ) => {
-  log('IP %s requested creation of user', req.ip);
+  log('IP %s requested update of user', req.ip);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    error('Create user request for IP %s failed validation', req.ip);
+    error('Update user request for IP %s failed validation', req.ip);
     throw new InvalidRequestError(errors);
   } else {
     next();
@@ -32,35 +32,39 @@ export const createGroupValidationHandler: RequestHandler = (
 /**
  * The validation chain for the create group request.
  */
-export const createGroupValidator = [
+export const updateGroupValidator = [
   body('name')
-      .exists()
-      .withMessage('Name is missing')
+      .optional()
       .isString()
       .withMessage('Name has to be a string')
       .notEmpty()
       .withMessage('Name has to be a non empty string')
-      // Sanitize name
       .trim()
       .escape(),
   body('description')
-      // Description doesn't have to exist
-      .optional({nullable: true})
-      // But if it exists it has to be a non empty string
+      .optional()
       .isString()
       .withMessage('Description has to be a string')
-      // Sanitize description
       .trim()
       .escape(),
+  body('ownerId')
+      .not()
+      .exists()
+      .withMessage('OwnerId can\'t be changed by this request. ' +
+        'Use the transfer ownership request'),
+  param('groupId')
+      .exists()
+      .withMessage('groupId is missing')
+      .toInt(),
 ];
 
 /**
  * Router for connecting the validator chain and the validation handler
  */
-const createGroupValidationRouter = Router().use(
+const createGroupValidationRouter = Router({mergeParams: true}).use(
     '/',
-    createGroupValidator,
-    createGroupValidationHandler,
+    updateGroupValidator,
+    updateGroupValidationHandler,
 );
 
 export default createGroupValidationRouter;

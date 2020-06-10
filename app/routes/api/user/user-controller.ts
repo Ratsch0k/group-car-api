@@ -11,8 +11,8 @@ const router: express.Router = express.Router();
 
 /**
  * User router
- * @param req Http request
- * @param res Http response
+ * @param req - Http request
+ * @param res - Http response
  */
 export const userController: express.RequestHandler = (req, res) => {
   User.findAll().then((users: User[]) => {

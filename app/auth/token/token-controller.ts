@@ -19,15 +19,15 @@ const error = debug('group-car:token:controller:error');
  * exists and if the user does exist respond with ok, if not
  * respond with `Unauthorized`. This route let's the frontend check
  * if it's still logged in. Or if for example the token expired.
- * @param req   Http request, expects payload of jwt to be in `req.user`
- * @param res   Http response
- * @param next  The next request handler
+ * @param req  - Http request, expects payload of jwt to be in `req.user`
+ * @param res  - Http response
+ * @param next - The next request handler
  */
-const tokenController: RequestHandler = (req: any, res, next) => {
-  const username = req.user.username;
+const tokenController: RequestHandler = (req, res, next) => {
+  const username = req.user?.username;
 
-  if (username) {
-    User.findByUsername(req.user.username)
+  if (username !== undefined) {
+    User.findByUsername(username)
         .then((user: User | null) => {
           if (user === null || user.deletedAt !== null) {
             error('%s in jwt of IP %s doesn\'t exist', username, req.ip);

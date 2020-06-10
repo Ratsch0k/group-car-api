@@ -13,9 +13,9 @@ const error = debug('group-car:login:controller:error');
 
 /**
  * Login controller
- * @param username Username of the login request
- * @param password Password of the login request
- * @return Whether or not the login was successful
+ * @param username - Username of the login request
+ * @param password - Password of the login request
+ * @returns Whether or not the login was successful
  */
 const loginController: RequestHandler = (req, res, next) => {
   User.findByUsername(req.body.username)
