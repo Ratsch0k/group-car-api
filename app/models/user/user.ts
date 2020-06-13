@@ -109,11 +109,14 @@ User.init(
         type: DataTypes.INTEGER,
       },
       username: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(25),
         allowNull: false,
         unique: true,
         validate: {
           notEmpty: true,
+          min: 4,
+          max: 25,
+          notContains: ' ',
         },
       },
       password: {
@@ -121,6 +124,7 @@ User.init(
         allowNull: false,
         validate: {
           notEmpty: true,
+          min: 6,
         },
       },
       email: {
