@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Group} from '../../../../models';
 import sinon, {match} from 'sinon';
 import createGroupController from './create-group-controller';

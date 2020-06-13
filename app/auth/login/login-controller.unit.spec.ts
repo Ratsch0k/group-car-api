@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {stub, fake, assert, match, createSandbox} from 'sinon';
 import {User, UserDto} from '../../models/user';
 import bcrypt from 'bcrypt';
@@ -82,7 +83,7 @@ describe('LoginController', function() {
       requestStub.body = requestBody;
       const responseStub: any = sandbox.stub();
       responseStub.send = sandbox.stub();
-      const next = fake((err: any) => {
+      const next = fake(() => {
         sandbox.assert.notCalled(responseStub.send);
         assert.calledWith(next, match(dbError));
         done();

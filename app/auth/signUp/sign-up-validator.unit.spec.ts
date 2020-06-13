@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import sinon, {fake, assert} from 'sinon';
 import {signUpValidationHandler} from './sign-up-validator';
 import * as validator from 'express-validator';

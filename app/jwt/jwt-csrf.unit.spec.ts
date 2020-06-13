@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import jwtCsrf from './jwt-csrf';
 import sinon, {match, fake} from 'sinon';
 import config from '../config';
