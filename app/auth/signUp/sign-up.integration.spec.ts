@@ -70,7 +70,7 @@ describe('SignUpValidator', function() {
 
     it('username is longer than 25 characters', async function() {
       const body = {
-        username: 'B'.repeat(25),
+        username: 'B'.repeat(26),
         password: 'password',
         email: 'demo@mail.com',
       };
@@ -154,7 +154,7 @@ describe('SignUpValidator', function() {
     it('password is longer than 255 characters', function() {
       const body = {
         username: 'demo',
-        password: 'A'.repeat(255),
+        password: 'A'.repeat(256),
         email: 'demo@mail.com',
       };
 
@@ -221,11 +221,11 @@ describe('SignUpValidator', function() {
       email: 'demo@mail.com',
     };
 
-    return (request(app)
+    return request(app)
         .put('/auth/sign-up')
         .set('Cookie', [jwt])
         .set(csrfHeaderName, csrf)
-        .send(body))
+        .send(body)
         .expect(201)
         .then((response) => {
           expect(response.body).to.have.property('username', body.username);
