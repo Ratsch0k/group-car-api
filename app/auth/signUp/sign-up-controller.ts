@@ -3,7 +3,7 @@ import {User, UserDto, ProfilePic} from '@models';
 import ModelToDtoConverter from '@util/model-to-dto-converter';
 import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
-import {convertUserToJwtPayload} from '@app/jwt/jwt-util';
+import {convertUserToJwtPayload} from '@app/auth/jwt/jwt-util';
 import generatePic from '@util/generate-profile-pic';
 import config from '@config';
 
