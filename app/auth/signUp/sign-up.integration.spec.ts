@@ -47,6 +47,69 @@ describe('SignUpValidator', function() {
           });
     });
 
+    it('username is shorter than 4 characters', async function() {
+      const body = {
+        username: 'abc',
+        password: 'password',
+        email: 'demo@mail.com',
+      };
+
+      return (request(app)
+          .put('/auth/sign-up')
+          .set('Cookie', [jwt])
+          .set(csrfHeaderName, csrf)
+          .send(body))
+          .expect(400)
+          .then((response) => {
+            expect(response.body).to.have.property('statusCode', 400);
+            expect(response.body).to.have.property('status');
+            expect(response.body).to.have.property('message');
+            expect(response.body).to.have.property('timestamp');
+          });
+    });
+
+    it('username is longer than 25 characters', async function() {
+      const body = {
+        username: 'B'.repeat(25),
+        password: 'password',
+        email: 'demo@mail.com',
+      };
+
+      return (request(app)
+          .put('/auth/sign-up')
+          .set('Cookie', [jwt])
+          .set(csrfHeaderName, csrf)
+          .send(body))
+          .expect(400)
+          .then((response) => {
+            expect(response.body).to.have.property('statusCode', 400);
+            expect(response.body).to.have.property('status');
+            expect(response.body).to.have.property('message');
+            expect(response.body).to.have.property('timestamp');
+          });
+    });
+
+    it('username contains whitespace', async function() {
+      const body = {
+        username: 'Basdf asdf',
+        password: 'password',
+        email: 'demo@mail.com',
+      };
+
+      return (request(app)
+          .put('/auth/sign-up')
+          .set('Cookie', [jwt])
+          .set(csrfHeaderName, csrf)
+          .send(body))
+          .expect(400)
+          .then((response) => {
+            expect(response.body).to.have.property('statusCode', 400);
+            expect(response.body).to.have.property('status');
+            expect(response.body).to.have.property('message');
+            expect(response.body).to.have.property('timestamp');
+          });
+    });
+
     it('request is missing password', function() {
       const body = {
         username: 'demo',
@@ -71,6 +134,27 @@ describe('SignUpValidator', function() {
       const body = {
         username: 'demo',
         password: '12345',
+        email: 'demo@mail.com',
+      };
+
+      return (request(app)
+          .put('/auth/sign-up')
+          .set('Cookie', [jwt])
+          .set(csrfHeaderName, csrf)
+          .send(body))
+          .expect(400)
+          .then((response) => {
+            expect(response.body).to.have.property('statusCode', 400);
+            expect(response.body).to.have.property('status');
+            expect(response.body).to.have.property('message');
+            expect(response.body).to.have.property('timestamp');
+          });
+    });
+
+    it('password is longer than 255 characters', function() {
+      const body = {
+        username: 'demo',
+        password: 'A'.repeat(255),
         email: 'demo@mail.com',
       };
 

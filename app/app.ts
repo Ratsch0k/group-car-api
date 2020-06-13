@@ -10,8 +10,8 @@ import expressJwt from 'express-jwt';
  */
 import config from '@config';
 import authRouter from '@app/auth';
-import jwtCsrf from './jwt/jwt-csrf';
-import {preLoginJwtValidator} from './jwt/jwt-util';
+import jwtCsrf from './auth/jwt/jwt-csrf';
+import {preLoginJwtValidator} from './auth/jwt/jwt-util';
 import apiRouter from './routes/api';
 import {userRouter} from './routes/user';
 

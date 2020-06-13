@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import jwtCsrf from './jwt-csrf';
 import sinon, {match, fake} from 'sinon';
-import config from '../config';
+import config from '../../config';
 import jsonwebtoken from 'jsonwebtoken';
 import {expect} from 'chai';
-import UnauthorizedError from '../errors/unauthorized-error';
+import UnauthorizedError from '../../errors/unauthorized-error';
 import Tokens from 'csrf';
 import * as util from './jwt-util';
 

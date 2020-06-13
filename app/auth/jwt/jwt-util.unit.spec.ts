@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import User from '../models/user/user';
+import User from '../../models/user/user';
 import sinon, {match} from 'sinon';
 import jwt from 'jsonwebtoken';
-import config from '../config';
+import config from '../../config';
 import {
   generateToken,
   convertUserToJwtPayload,
   preLoginJwtValidator,
 } from './jwt-util';
 import {expect} from 'chai';
-import {UnauthorizedError} from '../errors';
+import {UnauthorizedError} from '../../errors';
 import Bluebird from 'bluebird';
 
 const sandbox = sinon.createSandbox();
