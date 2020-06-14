@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {createSandbox} from 'sinon';
 import generateProfilePicController from './generate-profile-pic-controller';
 import * as generatePic from '../../../util/generate-profile-pic';

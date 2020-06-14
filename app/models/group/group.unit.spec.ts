@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {createMembershipForOwner} from './group';
 import {Membership} from '../membership';
 import sinon, {match} from 'sinon';

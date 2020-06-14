@@ -1,6 +1,6 @@
 import * as express from 'express';
 import signUpController from '@app/auth/signUp/sign-up-controller';
-import {validationResult, check} from 'express-validator';
+import {validationResult, body} from 'express-validator';
 import {InvalidRequestError} from '@errors';
 import debug from 'debug';
 
@@ -30,15 +30,27 @@ export const signUpValidationHandler: express.RequestHandler = (
 };
 
 export const signUpValidator = [
-  check('username').notEmpty().escape().trim(),
-  check('email').escape().trim().isEmail()
+  body('username')
+      .isString()
+      .trim()
+      .notEmpty()
+      .isLength({min: 4, max: 25})
+      .withMessage('Username has to be between 4 and 25 characters long')
+      .custom((value: string) => {
+        if (/\s/.test(value)) {
+          throw new Error('Username should not contain whitespace');
+        }
+        return true;
+      })
+      .escape(),
+  body('email').escape().trim().isEmail()
       .withMessage('Email has to be a valid email address'),
-  check('password').isLength({min: 6})
+  body('password').isLength({min: 6, max: 255})
       .withMessage('Password has to be at least 6 characters long'),
 ];
 
 /**
- * Add the {@link signUpValidationHandler} to the router
+ * Add the {@link signUpValidationHandler} to the router.
  */
 router.put(
     '/',

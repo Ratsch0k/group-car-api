@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as User from '../../models/user/user';
 import signUpController from './sign-up-controller';
 import {fake, assert, match, createSandbox} from 'sinon';

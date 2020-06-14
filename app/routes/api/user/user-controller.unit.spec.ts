@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {createSandbox, match} from 'sinon';
 import {ProfilePic} from '../../../models';
 import Bluebird from 'bluebird';

@@ -16,6 +16,3 @@ db
 */**/*.d.ts
 
 mochawesome-report
-
-# Ignore tests (to many rules would hinder writing tests)
-app/**/*.spec.ts

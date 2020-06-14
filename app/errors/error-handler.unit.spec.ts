@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Result} from 'express-validator';
 import sinon, {match} from 'sinon';
 import * as config from '../config';
