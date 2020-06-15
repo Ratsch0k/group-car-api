@@ -5,18 +5,11 @@ import {NotFoundError} from '@errors';
  */
 class UserNotFoundError extends NotFoundError {
   /**
-   * The username which already exists.
-   */
-  public readonly userId: number;
-
-  /**
    * Creates an instance of this class.
    * @param userId - User id of the user which can not be found
    */
-  constructor(userId: number, detail?: Record<string, unknown>) {
-    super(`The user with id "${userId}" doesn\'t exist`, detail);
-
-    this.userId = userId;
+  constructor(userId: number) {
+    super(`The user with id "${userId}" doesn\'t exist`, {userId});
   }
 }
 

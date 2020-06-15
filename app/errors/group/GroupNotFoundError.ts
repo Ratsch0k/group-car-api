@@ -6,9 +6,9 @@ import NotFoundError from '../not-found-error';
 export class GroupNotFoundError extends NotFoundError {
   /**
    * Creates an instance of this class
-   * @param id - Id of the group which doesn't exist
+   * @param groupId - Id of the group which doesn't exist
    */
-  constructor(id: number) {
-    super(`Group with id ${id} doesn\'t exist`, {groupId: id});
+  constructor(groupId: number) {
+    super(`Group with id ${groupId} doesn\'t exist`, {groupId});
   }
 }
