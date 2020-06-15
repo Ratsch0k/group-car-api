@@ -1,33 +1,6 @@
-import {body, validationResult, param} from 'express-validator';
-import debug from 'debug';
-import {InvalidRequestError} from '@errors';
+import {body, param} from 'express-validator';
 import {Router} from 'express';
-
-type RequestHandler = import('express').RequestHandler;
-
-const log = debug('group-car:group:update');
-const error = debug('group-car:group:update:error');
-
-/**
- * Handles the validation result of the create group request.
- * @param req  -  Express request
- * @param res  -  Express response
- * @param next -  Next handler
- */
-export const updateGroupValidationHandler: RequestHandler = (
-    req,
-    res,
-    next,
-) => {
-  log('IP %s requested update of user', req.ip);
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error('Update user request for IP %s failed validation', req.ip);
-    throw new InvalidRequestError(errors);
-  } else {
-    next();
-  }
-};
+import {createValidationResultHandler} from '@util/validation-result-handler';
 
 /**
  * The validation chain for the create group request.
@@ -55,7 +28,7 @@ export const updateGroupValidator = [
   param('groupId')
       .exists()
       .withMessage('groupId is missing')
-      .toInt(),
+      .toInt(10),
 ];
 
 /**
@@ -64,7 +37,10 @@ export const updateGroupValidator = [
 const createGroupValidationRouter = Router({mergeParams: true}).use(
     '/',
     updateGroupValidator,
-    updateGroupValidationHandler,
+    createValidationResultHandler({
+      debugScope: 'group-car:group:update',
+      requestName: 'update of user',
+    }),
 );
 
 export default createGroupValidationRouter;
