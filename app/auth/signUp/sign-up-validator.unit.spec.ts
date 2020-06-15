@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sinon, {fake, assert} from 'sinon';
-import {signUpValidationHandler} from './sign-up-validator';
 import * as validator from 'express-validator';
 import {expect} from 'chai';
 import {InvalidRequestError} from '../../errors';
+import {createValidationResultHandler} from
+  '../../util/validation-result-handler';
 
 const sandbox = sinon.createSandbox();
 
@@ -26,6 +27,12 @@ describe('SignUpValidator', function() {
     // Stub validator
     const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(validationErrors as any);
+
+    const signUpValidationHandler =
+    createValidationResultHandler(
+        {debugScope: 'sign-up:test',
+          requestName: 'test',
+        });
 
     signUpValidationHandler(requestStub, responseStub, nextFake);
 
@@ -61,6 +68,13 @@ describe('SignUpValidator', function() {
     const expectedMessage = 'The following fields are invalid: ' +
       `${errorArray[0].param} -> ${errorArray[0].msg}, ` +
       `${errorArray[1].param} -> ${errorArray[1].msg}`;
+
+    const signUpValidationHandler =
+      createValidationResultHandler(
+          {debugScope: 'sign-up:test',
+            requestName: 'test',
+          });
+
     expect(() =>
       signUpValidationHandler(requestStub, responseStub, nextFake))
         .to.throw(InvalidRequestError, expectedMessage)
