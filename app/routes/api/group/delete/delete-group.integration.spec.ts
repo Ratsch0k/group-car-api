@@ -60,13 +60,7 @@ describe('DeleteGroup', function() {
 
     await agent.delete('/api/group/3').expect(401);
   });
-
-  it('responses with 400 if groupId is missing', function() {
-    return agent.delete('/api/group/')
-        .set(csrfHeaderName, csrf)
-        .then((res) => console.dir(res.body));
-  });
-
+  
   it('responses with 400 if groupId is not a number', function() {
     return agent.delete('/api/group/test')
         .set(csrfHeaderName, csrf)
