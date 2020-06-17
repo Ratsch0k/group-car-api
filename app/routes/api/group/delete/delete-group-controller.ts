@@ -11,7 +11,7 @@ type RequestHandler = import('express').RequestHandler;
 
 const deleteGroupController: RequestHandler = (req, res, next) => {
   const userId = req.user?.id;
-  const groupId = req.params.groupId as unknown as number;
+  const groupId = req.params.groupId && parseInt(req.params.groupId, 10);
 
   if (userId && groupId) {
     Membership.findOne({where: {groupId, userId}}).then((membership) => {

@@ -7,8 +7,7 @@ import {createValidationResultHandler} from '@util/validation-result-handler';
  */
 export const deleteGroupValidator = [
   param('groupId')
-      .exists().withMessage('Group id is missing')
-      .toInt(10),
+      .exists().withMessage('Group id is missing'),
 ];
 
 const deleteGroupValidationRouter = Router({mergeParams: true}).use(
