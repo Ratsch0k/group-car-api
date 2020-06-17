@@ -213,11 +213,7 @@ paths:
         description: Updated the group with the given data. The user can only update a group if the user is an admin of that group.
         parameters: 
         - $ref: '#/components/parameters/XsrfParameter'
-        - name: groupId
-          in: path
-          schema:
-            type: integer
-          required: true
+        - $ref: '#/components/parameters/GroupId'
         requestBody:
           description: The data with which the group should be updated
           content:
@@ -244,11 +240,7 @@ paths:
         description: Delete the group which has the given id if the user which requests the action is the owner of that group
         parameters: 
         - $ref: '#/components/parameters/XsrfParameter'
-        - name: groupId
-          in: path
-          schema:
-            type: integer
-          required: true
+        - $ref: '#/components/parameters/GroupId'
         responses:
           204:
             description: Successfully deleted the group
@@ -256,6 +248,33 @@ paths:
             $ref: '#/components/responses/UnauthorizedErrorResponse'
           404:
             $ref: '#/components/responses/GroupNotFoundErrorResponse'
+  /api/group/{groupId}/invite:
+    post:
+      summary: Invites a user to the group
+      tags:
+      - Group
+      description: Invites a user to the group
+      parameters: 
+      - $ref: '#/components/parameters/XsrfParameter'
+      - $ref: '#/components/parameters/GroupId'
+      requestBody:
+        description: Information about who to invite
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+      responses:
+        204:
+          description: 'The user was successully invited'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/UserNotFoundErrorResponse'
 # Components
 components:
 
@@ -475,6 +494,12 @@ components:
       required: false
       schema:
         type: string
+    GroupId:
+      name: groupId
+      in: path
+      schema:
+        type: integer
+      required: true
 # External docs
 externalDocs:
   description: Code documentation is here
