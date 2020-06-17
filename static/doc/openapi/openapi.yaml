@@ -64,7 +64,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /auth/sign-up:
-    put:
+    post:
       summary: Sign up
       description: Signs the user up with the given attributes
       tags:

@@ -34,7 +34,7 @@ describe('SignUpValidator', function() {
       };
 
       return (request(app)
-          .put('/auth/sign-up')
+          .post('/auth/sign-up')
           .set('Cookie', [jwt])
           .set(csrfHeaderName, csrf)
           .send(body))
@@ -55,7 +55,7 @@ describe('SignUpValidator', function() {
       };
 
       return (request(app)
-          .put('/auth/sign-up')
+          .post('/auth/sign-up')
           .set('Cookie', [jwt])
           .set(csrfHeaderName, csrf)
           .send(body))
@@ -76,7 +76,7 @@ describe('SignUpValidator', function() {
       };
 
       return (request(app)
-          .put('/auth/sign-up')
+          .post('/auth/sign-up')
           .set('Cookie', [jwt])
           .set(csrfHeaderName, csrf)
           .send(body))
@@ -97,7 +97,7 @@ describe('SignUpValidator', function() {
       };
 
       return (request(app)
-          .put('/auth/sign-up')
+          .post('/auth/sign-up')
           .set('Cookie', [jwt])
           .set(csrfHeaderName, csrf)
           .send(body))
@@ -117,7 +117,7 @@ describe('SignUpValidator', function() {
       };
 
       return (request(app)
-          .put('/auth/sign-up')
+          .post('/auth/sign-up')
           .set('Cookie', [jwt])
           .set(csrfHeaderName, csrf)
           .send(body))
@@ -138,7 +138,7 @@ describe('SignUpValidator', function() {
       };
 
       return (request(app)
-          .put('/auth/sign-up')
+          .post('/auth/sign-up')
           .set('Cookie', [jwt])
           .set(csrfHeaderName, csrf)
           .send(body))
@@ -159,7 +159,7 @@ describe('SignUpValidator', function() {
       };
 
       return (request(app)
-          .put('/auth/sign-up')
+          .post('/auth/sign-up')
           .set('Cookie', [jwt])
           .set(csrfHeaderName, csrf)
           .send(body))
@@ -179,7 +179,7 @@ describe('SignUpValidator', function() {
       };
 
       return (request(app)
-          .put('/auth/sign-up')
+          .post('/auth/sign-up')
           .set('Cookie', [jwt])
           .set(csrfHeaderName, csrf)
           .send(body))
@@ -200,7 +200,7 @@ describe('SignUpValidator', function() {
       };
 
       return (request(app)
-          .put('/auth/sign-up')
+          .post('/auth/sign-up')
           .set('Cookie', [jwt])
           .set(csrfHeaderName, csrf)
           .send(body))
@@ -222,7 +222,7 @@ describe('SignUpValidator', function() {
     };
 
     return request(app)
-        .put('/auth/sign-up')
+        .post('/auth/sign-up')
         .set('Cookie', [jwt])
         .set(csrfHeaderName, csrf)
         .send(body)

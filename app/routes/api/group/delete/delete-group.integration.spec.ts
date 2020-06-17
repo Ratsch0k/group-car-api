@@ -38,7 +38,7 @@ describe('DeleteGroup', function() {
 
     // Sign up to access api and set new jwt
     await agent
-        .put('/auth/sign-up')
+        .post('/auth/sign-up')
         .set(csrfHeaderName, csrf)
         .send(signUpBody)
         .expect(201)
