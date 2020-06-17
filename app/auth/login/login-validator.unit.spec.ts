@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {loginValidationHandler} from './login-validator';
 import {fake, assert} from 'sinon';
 import * as validator from 'express-validator';
 import {Result} from 'express-validator';
 import sinon from 'sinon';
 import {expect} from 'chai';
 import {InvalidRequestError} from '../../errors';
+import {createValidationResultHandler} from
+  '../../util/validation-result-handler';
 
 const sandbox = sinon.createSandbox();
 
@@ -29,6 +30,11 @@ describe('LoginValidator', function() {
     const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(result as any);
 
+    const loginValidationHandler =
+        createValidationResultHandler(
+            {debugScope: 'login:test',
+              requestName: 'test',
+            });
     loginValidationHandler(requestStub as any, responseStub as any, nextFake);
 
     assert.calledOnce(nextFake);
@@ -65,6 +71,12 @@ describe('LoginValidator', function() {
     // Stub validationResult
     const validationResultStub = sandbox.stub(validator, 'validationResult');
     validationResultStub.withArgs(requestStub).returns(result as any);
+
+    const loginValidationHandler =
+        createValidationResultHandler(
+            {debugScope: 'login:test',
+              requestName: 'test',
+            });
 
     expect(() => loginValidationHandler(
       requestStub as any,

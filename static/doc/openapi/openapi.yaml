@@ -174,11 +174,7 @@ paths:
                 type: string
                 format: binary
         404:
-          description: No user with the given id exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RestError'
+          $ref: '#/components/responses/UserNotFoundErrorResponse'
                 
   
   # Group
@@ -239,6 +235,27 @@ paths:
             $ref: '#/components/responses/BadRequestErrorResponse'
           401:
             $ref: '#/components/responses/UnauthorizedErrorResponse'
+          404:
+            $ref: '#/components/responses/GroupNotFoundErrorResponse'
+      delete:
+        summary: Deletes a group
+        tags:
+        - Group
+        description: Delete the group which has the given id if the user which requests the action is the owner of that group
+        parameters: 
+        - $ref: '#/components/parameters/XsrfParameter'
+        - name: groupId
+          in: path
+          schema:
+            type: integer
+          required: true
+        responses:
+          204:
+            description: Successfully deleted the group
+          401:
+            $ref: '#/components/responses/UnauthorizedErrorResponse'
+          404:
+            $ref: '#/components/responses/GroupNotFoundErrorResponse'
 # Components
 components:
 
@@ -392,6 +409,29 @@ components:
           message: An unexpected error occurred.
           detail: {}
           timestamp: '2020-05-03T13:21:35.938Z'
+    EntityNotFoundErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/RestError'
+      - example:
+          status: Entity Not Found Error
+          statusCode: 404
+          message: Entity not found
+          detail: {}
+          timestamp: '2020-05-03T13:21:35.938Z'
+    UserNotFoundErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+      - example:
+          status: A user with id 4 doesn't exist
+          detail:
+            userId: 4
+    GroupNotFoundErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+      - example:
+          status: A group with id 4 doesn't exist
+          detail: 
+            groupId: 4
           
   # Responses
   responses:
@@ -414,6 +454,18 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InternalServerErrorSchema'
+    UserNotFoundErrorResponse:
+      description: A user with the given userId doesn't exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserNotFoundErrorSchema'
+    GroupNotFoundErrorResponse:
+      description: A group with the given groupId doesn't exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupNotFoundErrorSchema'
             
   # Parameter
   parameters:
