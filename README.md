@@ -38,8 +38,8 @@ Every url which is not listed below will route the frontend
 ## How to run
 The server can run in the following configurations:
   - `yarn dev` ts-node is used to run the typescript code. Only http request and database operations are logged
-  - `yarn debug` ts-node is used to run typescript code. Http request, database operations and logging of server code is enabled
-  - `yarn debugAll` ts-node is used to run typescript code. Every type of logging is enabled
+  - `yarn dev:log` ts-node is used to run typescript code. Http request, database operations and logging of server code is enabled
+  - `yarn dev:log:all` ts-node is used to run typescript code. Every type of logging is enabled
   - `yarn prod` Typescript code is compiled into javascript code and saved in the subdirectory `build` the the javascript code is executed (recommended for production)
 
 Configuration can be changed in `app/config` and in the `package.json`.
