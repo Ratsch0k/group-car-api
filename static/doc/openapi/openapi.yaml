@@ -288,14 +288,20 @@ paths:
                 userId:
                   type: integer
       responses:
-        204:
+        201:
           description: 'The user was successully invited'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invite'
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
         404:
           $ref: '#/components/responses/UserNotFoundErrorResponse'
+          
+    
 # Components
 components:
 
@@ -407,6 +413,18 @@ components:
           type: integer
         name:
           type: string
+    
+    # Invite
+    Invite:
+      type: object
+      properties:
+        userId:
+          type: integer
+        groupId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
           
     # Authentication
     LoginObject:
