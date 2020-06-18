@@ -14,3 +14,5 @@ declare namespace Express {
     setJwtToken(payload: object, subject?: string): void;
   }
 }
+
+declare module 'morgan-debug';

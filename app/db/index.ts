@@ -3,7 +3,7 @@ type Options = import('sequelize').Options;
 import config from '@config';
 import debug from 'debug';
 
-const log = debug('group-car:db');
+const log = debug('group-car-db');
 
 /**
  * An extension of the {@link Sequelize} class which also
