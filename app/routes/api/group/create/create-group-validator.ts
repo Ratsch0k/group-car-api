@@ -36,7 +36,7 @@ const createGroupValidationRouter = Router().use(
     createGroupValidator,
     createValidationResultHandler({
       debugScope: 'group-car:group:create',
-      requestName: 'creation of user',
+      requestName: 'creation of group',
     }),
 );
 
