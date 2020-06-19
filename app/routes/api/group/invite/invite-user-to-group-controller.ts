@@ -71,7 +71,7 @@ export const checkGroup: RequestHandler = (req, res, next) => {
 };
 
 /**
- * Check if the user which should be invited exists.
+ * Checks if the user which should be invited exists.
  * @param req   - Request
  * @param res   - Response
  * @param next  - Next
@@ -106,7 +106,7 @@ export const checkAlreadyInvited: RequestHandler = (req, res, next) => {
     } else {
       next();
     }
-  });
+  }).catch(next);
 };
 
 /**
@@ -126,9 +126,17 @@ export const checkAlreadyMember: RequestHandler = (req, res, next) => {
     } else {
       next();
     }
-  });
+  }).catch(next);
 };
 
+/**
+ * Checks if the amount of user who are invited
+ * to the group and the amount of members are below
+ * the maximum amount of members per group.
+ * @param req   - Request
+ * @param res   - Response
+ * @param next  - Next
+ */
 export const checkMaxMembers: RequestHandler = (req, res, next) => {
   const groupId = parseInt(req.params.groupId, 10);
 
@@ -142,7 +150,7 @@ export const checkMaxMembers: RequestHandler = (req, res, next) => {
     } else {
       next(new GroupIsFullError());
     }
-  });
+  }).catch(next);
 };
 
 /**
