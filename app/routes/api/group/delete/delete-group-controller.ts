@@ -3,9 +3,8 @@ import {
   BadRequestError,
   NotMemberOfGroupError,
   GroupNotFoundError,
-} from '@app/errors';
-import {NotOwnerOfGroupError} from '@app/errors/group/NotOwnerOfGroupError';
-import sequelize from '@db';
+  NotOwnerOfGroupError,
+} from '@errors';
 
 type RequestHandler = import('express').RequestHandler;
 

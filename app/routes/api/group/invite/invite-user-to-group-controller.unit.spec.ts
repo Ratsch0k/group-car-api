@@ -551,7 +551,7 @@ describe('InviteUserToGroup', function() {
         sinon.assert.calledOnceWithExactly(inviteCreateStub as any,
             match(invite));
 
-        sinon.assert.calledOnceWithExactly(next);
+        sinon.assert.calledOnceWithExactly(next, error);
 
         done();
       });
