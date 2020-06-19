@@ -1,7 +1,15 @@
-import {expect} from 'chai';
-import {checkInviteToLoggedInUser} from './invite-user-to-group-controller';
-import sinon, { match } from 'sinon';
-import {BadRequestError} from '../../../../errors';
+import {
+  checkInviteToLoggedInUser,
+  checkMembership,
+} from './invite-user-to-group-controller';
+import sinon, {match} from 'sinon';
+import {
+  BadRequestError,
+  NotMemberOfGroupError,
+  NotAdminOfGroupError,
+} from '../../../../errors';
+import {Membership} from '../../../../models';
+import Bluebird from 'bluebird';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 describe('InviteUserToGroup', function() {
@@ -55,7 +63,108 @@ describe('InviteUserToGroup', function() {
   });
 
   describe('checkMembership', function() {
+    it('throws NotMemberOfGroup if user tries to ' +
+        'send invite for a group he/she is not a member of', function(done) {
+      req = {
+        user: {
+          id: 10,
+        },
+        body: {
+          userId: 11,
+        },
+        params: {
+          groupId: 12,
+        },
+      };
 
+      const findOneStub = sinon.stub(Membership, 'findOne')
+          .usingPromise(Bluebird).resolves(null as any);
+
+      next = sinon.stub().callsFake(() => {
+        sinon.assert.calledOnceWithExactly(next,
+            match.instanceOf(NotMemberOfGroupError));
+        sinon.assert.calledOnceWithExactly(findOneStub, match({
+          where: {
+            groupId: req.params.groupId,
+            userId: req.user.id,
+          },
+        }));
+        done();
+      });
+
+      checkMembership(req, res, next);
+    });
+
+    it('throws NotMemberOfGroup if user tries to send ' +
+        'invite for a group he/she is not an admin of', function(done) {
+      req = {
+        user: {
+          id: 10,
+        },
+        body: {
+          userId: 11,
+        },
+        params: {
+          groupId: 12,
+        },
+      };
+
+      const membership = {
+        isAdmin: false,
+      };
+
+      const findOneStub = sinon.stub(Membership, 'findOne')
+          .usingPromise(Bluebird).resolves(membership as any);
+
+      next = sinon.stub().callsFake(() => {
+        sinon.assert.calledOnceWithExactly(next,
+            match.instanceOf(NotAdminOfGroupError));
+        sinon.assert.calledOnceWithExactly(findOneStub, match({
+          where: {
+            groupId: req.params.groupId,
+            userId: req.user.id,
+          },
+        }));
+        done();
+      });
+
+      checkMembership(req, res, next);
+    });
+
+    it('calls next if user who tries to send invite ' +
+        'is member and admin of group', function(done) {
+      req = {
+        user: {
+          id: 10,
+        },
+        body: {
+          userId: 11,
+        },
+        params: {
+          groupId: 12,
+        },
+      };
+
+      const membership = {
+        isAdmin: true,
+      };
+
+      const findOneStub = sinon.stub(Membership, 'findOne')
+          .usingPromise(Bluebird).resolves(membership as any);
+
+      next = sinon.stub().callsFake(() => {
+        sinon.assert.calledOnceWithExactly(next);
+        sinon.assert.calledOnceWithExactly(findOneStub, match({
+          where: {
+            groupId: req.params.groupId,
+            userId: req.user.id,
+          },
+        }));
+        done();
+      });
+
+      checkMembership(req, res, next);
+    });
   });
 
   describe('checkGroup', function() {
@@ -71,6 +180,10 @@ describe('InviteUserToGroup', function() {
   });
 
   describe('checkAlreadyMember', function() {
+
+  });
+
+  describe('checkMaxMembers', function() {
 
   });
 

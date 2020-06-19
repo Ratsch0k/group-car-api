@@ -6,9 +6,11 @@ import {
   BadRequestError,
   AlreadyMemberError,
   AlreadyInvitedError,
+  GroupIsFullError,
 } from '@errors';
 import {Group, Membership, User, Invite} from '@models';
 import {Router} from 'express';
+import config from '@app/config';
 
 type RequestHandler = import('express').RequestHandler;
 
@@ -123,6 +125,22 @@ export const checkAlreadyMember: RequestHandler = (req, res, next) => {
       next(new AlreadyMemberError(userId, groupId));
     } else {
       next();
+    }
+  });
+};
+
+export const checkMaxMembers: RequestHandler = (req, res, next) => {
+  const groupId = parseInt(req.params.groupId, 10);
+
+  Promise.all([
+    Membership.count({where: {groupId}}),
+    Invite.count({where: {groupId}}),
+  ]).then((results) => {
+    const total = results.reduce((prev, cur) => prev + cur);
+    if (total <= config.group.maxMembers) {
+      next();
+    } else {
+      next(new GroupIsFullError());
     }
   });
 };
