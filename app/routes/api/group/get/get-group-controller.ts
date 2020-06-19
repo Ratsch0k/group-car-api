@@ -1,13 +1,20 @@
-import {BadRequestError, GroupNotFoundError} from '@app/errors';
-import {Membership, Group} from '@app/models';
+import {
+  BadRequestError,
+  GroupNotFoundError,
+  UnauthorizedError,
+} from '@errors';
+import {
+  Membership,
+  Group, Invite,
+  GroupSimpleDto,
+  User,
+} from '@models';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
-import {GroupSimpleDto} from '@app/models/group/group-simple-dto';
-import {MembershipUserDto} from '@app/models/membership/membership-user-dto';
 
 type RequestHandler = import('express').RequestHandler;
 
 export const getGroupController: RequestHandler = (req, res, next) => {
-  const groupId = req.params.groupId && parseInt(req.params.groupId, 10);
+  const groupId = parseInt(req.params.groupId, 10);
   const userId = req.user?.id;
 
   if (groupId && userId) {
@@ -15,12 +22,15 @@ export const getGroupController: RequestHandler = (req, res, next) => {
       // Get the group
       return Group.findByPk(groupId).then((group) => ({group, membership}));
     }).then(({group, membership}) => {
-      if (group === null) {
+      return Invite.findOne({where: {groupId, userId}}).then((invite) => ({
+        group, membership, invite,
+      }));
+    }).then(({group, membership, invite}) => {
+      if (membership === null && invite === null) {
+        next(new UnauthorizedError());
+      } else if (group === null) {
         next(new GroupNotFoundError(groupId));
-      } else if (membership === null) {
-        // If the user is not a member of the group, respond
-        // with a part of the group data
-        // Convert the group to the simple dto object
+      } else if (membership === null && invite !== null) {
         res.send(ModelToDtoConverter.convertSequelizeModel<GroupSimpleDto>(
             group, GroupSimpleDto));
         return;
@@ -37,11 +47,17 @@ export const getGroupController: RequestHandler = (req, res, next) => {
                 'userId',
                 'isAdmin',
               ],
-            }).then((memberships) => {
-          const members = ModelToDtoConverter
-              .convertAllSequelizeModels<MembershipUserDto>(
-                  memberships, MembershipUserDto);
-
+              include: [
+                {
+                  model: User,
+                  as: 'User',
+                  attributes: [
+                    'username',
+                    'email',
+                  ],
+                },
+              ],
+            }).then((members) => {
           res.send({...group.get({plain: true}), members});
         });
       }

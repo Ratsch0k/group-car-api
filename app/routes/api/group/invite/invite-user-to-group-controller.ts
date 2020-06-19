@@ -5,11 +5,10 @@ import {
   UserNotFoundError,
   BadRequestError,
   AlreadyMemberError,
-} from '@app/errors';
-import {Group, Membership, User} from '@app/models';
-import {Invite} from '@app/models/invite';
+  AlreadyInvitedError,
+} from '@errors';
+import {Group, Membership, User, Invite} from '@models';
 import {Router} from 'express';
-import {AlreadyInvitedError} from '@errors';
 
 type RequestHandler = import('express').RequestHandler;
 

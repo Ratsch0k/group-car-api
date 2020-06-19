@@ -9,7 +9,8 @@ import {createValidationResultHandler} from '@util/validation-result-handler';
 export const getGroupValidator = [
   param('groupId')
       .exists()
-      .withMessage('groupId is missing'),
+      .withMessage('groupId is missing')
+      .isNumeric().withMessage('groupId has to be a number'),
 ];
 
 /**

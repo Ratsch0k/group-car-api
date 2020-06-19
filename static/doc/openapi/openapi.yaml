@@ -413,6 +413,10 @@ components:
           type: integer
         name:
           type: string
+        ownerId:
+          type: integer
+        description:
+          type: string
     
     # Invite
     Invite:

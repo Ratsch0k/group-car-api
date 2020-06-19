@@ -24,11 +24,7 @@ const deleteGroupController: RequestHandler = (req, res, next) => {
           } else if (group.ownerId !== userId) {
             next(new NotOwnerOfGroupError());
           } else {
-            sequelize.transaction((t) => {
-              return Membership.destroy({where: {groupId}, transaction: t})
-                  .then(() =>
-                    group.destroy({transaction: t}));
-            }).then(() => {
+            return group.destroy().then(() => {
               res.status(204).send();
             }).catch(next);
           }
