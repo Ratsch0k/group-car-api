@@ -24,7 +24,7 @@ import Bluebird from 'bluebird';
 import config from '../../../../config';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-describe('InviteUserToGroup', function() {
+describe('InviteUserToGroupController', function() {
   let req: any;
   let res: any;
   let next: any;

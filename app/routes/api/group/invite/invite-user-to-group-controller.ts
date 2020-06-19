@@ -185,6 +185,7 @@ const inviteUserToGroupController = Router({mergeParams: true}).use(
     checkUser,
     checkAlreadyInvited,
     checkAlreadyMember,
+    checkMaxMembers,
     inviteUser,
 );
 
