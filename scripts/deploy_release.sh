@@ -40,7 +40,7 @@ chmod +x build/group-car.js
 # Test for coverage badge
 yarn coverage
 
-node create-coverage-badge.js -c statements -o 'static'
+node scripts/create-coverage-badge.js -c statements -o 'static'
 
 rm -r static/test
  
