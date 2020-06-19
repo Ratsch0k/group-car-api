@@ -22,7 +22,8 @@
     ],
     "reporter": [
       "text-summary",
-      "html"
+      "html",
+      "json-summary"
     ],
     "report-dir": "./static/test/coverage",
     "all": true

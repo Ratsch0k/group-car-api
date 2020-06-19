@@ -1,5 +1,5 @@
 # Ignore custom ci scripts
-_scripts
+scripts
 
 # Ignore node modules
 node_modules
