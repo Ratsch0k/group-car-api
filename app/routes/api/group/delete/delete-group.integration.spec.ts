@@ -38,7 +38,7 @@ describe('DeleteGroup', function() {
 
     // Sign up to access api and set new jwt
     await agent
-        .put('/auth/sign-up')
+        .post('/auth/sign-up')
         .set(csrfHeaderName, csrf)
         .send(signUpBody)
         .expect(201)
@@ -59,12 +59,6 @@ describe('DeleteGroup', function() {
     await agent.put('/auth/logout').set(csrfHeaderName, csrf).expect(204);
 
     await agent.delete('/api/group/3').expect(401);
-  });
-
-  it('responses with 400 if groupId is missing', function() {
-    return agent.delete('/api/group/')
-        .set(csrfHeaderName, csrf)
-        .then((res) => console.dir(res.body));
   });
 
   it('responses with 400 if groupId is not a number', function() {

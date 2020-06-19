@@ -184,17 +184,8 @@ describe('DeleteGroupController', function() {
     const membershipFindOneStub = sinon.stub(Membership, 'findOne')
         .usingPromise(Bluebird).resolves(membership as any);
 
-    const membershipDestroy = sinon.stub(Membership, 'destroy').resolves();
-
     const groupFindByPkStub: any = sinon.stub(Group, 'findByPk')
         .usingPromise(Bluebird).resolves(group as any);
-
-    // Stub sequelize
-    const fakeT = {};
-    const transactionStub = sinon.stub(sequelize, 'transaction')
-        .callsFake((callback: any) => {
-          return callback(fakeT);
-        });
 
     res = {};
     res.status = sinon.stub().returnsThis();
@@ -207,84 +198,9 @@ describe('DeleteGroupController', function() {
                         },
           }));
       assert.calledOnceWithExactly(groupFindByPkStub, req.params.groupId);
-      assert.calledOnce(transactionStub);
-      assert.calledOnceWithExactly(membershipDestroy, match(
-          {
-            where: {
-              groupId: req.params.groupId,
-            },
-            transaction: fakeT,
-          },
-      ));
-      assert.calledOnceWithExactly(group.destroy, match({transaction: fakeT}));
+      assert.calledOnceWithExactly(group.destroy);
       assert.calledOnceWithExactly(res.status, 204);
       assert.calledOnceWithExactly(res.send);
-      done();
-    });
-
-    deleteGroupController(req, res, next);
-  });
-
-  it('calls next with any error which is thrown while deleting ' +
-      'memberships', function(done) {
-    req = {
-      user: {
-        id: 6,
-      },
-      params: {
-        groupId: 7,
-      },
-    };
-
-    const membership = {};
-
-    const group = {
-      ownerId: req.user.id,
-      destroy: sinon.stub().usingPromise(Bluebird).resolves(),
-    };
-
-    const membershipFindOneStub = sinon.stub(Membership, 'findOne')
-        .usingPromise(Bluebird).resolves(membership as any);
-
-    const testError = new Error('TEST');
-    const membershipDestroy = sinon.stub(Membership, 'destroy')
-        .rejects(testError);
-
-    const groupFindByPkStub: any = sinon.stub(Group, 'findByPk')
-        .usingPromise(Bluebird).resolves(group as any);
-
-    // Stub sequelize
-    const fakeT = {};
-    const transactionStub = sinon.stub(sequelize, 'transaction')
-        .callsFake((callback: any) => {
-          return callback(fakeT);
-        });
-
-    res = {};
-    res.status = sinon.stub().returnsThis();
-    res.send = sinon.stub();
-    next = sinon.stub().callsFake(() => {
-      assert.calledOnceWithExactly(membershipFindOneStub,
-          match({where:
-                            {
-                              groupId: req.params.groupId,
-                              userId: req.user.id,
-                            },
-          }));
-      assert.calledOnceWithExactly(groupFindByPkStub, req.params.groupId);
-      assert.calledOnce(transactionStub);
-      assert.calledOnceWithExactly(membershipDestroy, match(
-          {
-            where: {
-              groupId: req.params.groupId,
-            },
-            transaction: fakeT,
-          },
-      ));
-      assert.notCalled(group.destroy);
-      assert.notCalled(res.status);
-      assert.notCalled(res.send);
-      assert.calledOnceWithExactly(next, testError);
       done();
     });
 
@@ -313,18 +229,8 @@ describe('DeleteGroupController', function() {
     const membershipFindOneStub = sinon.stub(Membership, 'findOne')
         .usingPromise(Bluebird).resolves(membership as any);
 
-    const membershipDestroy = sinon.stub(Membership, 'destroy')
-        .resolves();
-
     const groupFindByPkStub: any = sinon.stub(Group, 'findByPk')
         .usingPromise(Bluebird).resolves(group as any);
-
-    // Stub sequelize
-    const fakeT = {};
-    const transactionStub = sinon.stub(sequelize, 'transaction')
-        .callsFake((callback: any) => {
-          return callback(fakeT);
-        });
 
     res = {};
     res.status = sinon.stub().returnsThis();
@@ -338,16 +244,7 @@ describe('DeleteGroupController', function() {
                         },
           }));
       assert.calledOnceWithExactly(groupFindByPkStub, req.params.groupId);
-      assert.calledOnce(transactionStub);
-      assert.calledOnceWithExactly(membershipDestroy, match(
-          {
-            where: {
-              groupId: req.params.groupId,
-            },
-            transaction: fakeT,
-          },
-      ));
-      assert.calledOnceWithExactly(group.destroy, match({transaction: fakeT}));
+      assert.calledOnceWithExactly(group.destroy);
       assert.notCalled(res.status);
       assert.notCalled(res.send);
       assert.calledOnceWithExactly(next, testError);

@@ -3,9 +3,8 @@ import {
   BadRequestError,
   NotMemberOfGroupError,
   GroupNotFoundError,
-} from '@app/errors';
-import {NotOwnerOfGroupError} from '@app/errors/group/NotOwnerOfGroupError';
-import sequelize from '@db';
+  NotOwnerOfGroupError,
+} from '@errors';
 
 type RequestHandler = import('express').RequestHandler;
 
@@ -24,11 +23,7 @@ const deleteGroupController: RequestHandler = (req, res, next) => {
           } else if (group.ownerId !== userId) {
             next(new NotOwnerOfGroupError());
           } else {
-            sequelize.transaction((t) => {
-              return Membership.destroy({where: {groupId}, transaction: t})
-                  .then(() =>
-                    group.destroy({transaction: t}));
-            }).then(() => {
+            return group.destroy().then(() => {
               res.status(204).send();
             }).catch(next);
           }

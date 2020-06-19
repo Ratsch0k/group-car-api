@@ -9,7 +9,7 @@ import debug from 'debug';
 import http = require('http');
 import db from '@db';
 
-const log = debug('group-car:http:log');
+const log = debug('group-car:http');
 const error = debug('group-car:http:error');
 
 /**

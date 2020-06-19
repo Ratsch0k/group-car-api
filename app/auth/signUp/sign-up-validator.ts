@@ -28,7 +28,7 @@ export const signUpValidator = [
 /**
  * Add the {@link signUpValidationHandler} to the router.
  */
-router.put(
+router.post(
     '/',
     signUpValidator,
     createValidationResultHandler({

@@ -53,6 +53,10 @@ export interface UserConfig {
   pb: PbConfig;
 }
 
+export interface GroupConfig {
+  maxMembers: number;
+}
+
 export interface Config {
   database: DBConfig;
   bcrypt: BcryptConfig;
@@ -62,6 +66,7 @@ export interface Config {
   morgan: MorganConfig;
   user: UserConfig;
   serverType: string;
+  group: GroupConfig;
 }
 
 /**
@@ -142,6 +147,10 @@ const user: UserConfig = {
   },
 };
 
+const group: GroupConfig = {
+  maxMembers: 25,
+};
+
 const config: Config = {
   database,
   bcrypt,
@@ -151,6 +160,7 @@ const config: Config = {
   morgan,
   user,
   serverType,
+  group,
 };
 
 export default config;

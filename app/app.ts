@@ -1,9 +1,9 @@
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import morgan from 'morgan';
 import errorHandler from '@errors';
 import expressJwt from 'express-jwt';
+import morganDebug from 'morgan-debug';
 
 /**
  * Import router
@@ -22,7 +22,7 @@ app.set('trust proxy', true);
 
 // Only log http request if a format string is provided
 if (config.morgan.formatString !== null) {
-  app.use(morgan(config.morgan.formatString));
+  app.use(morganDebug('group-car-http', config.morgan.formatString));
 }
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
