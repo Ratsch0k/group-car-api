@@ -123,7 +123,9 @@ describe('GetGroup', function() {
         .expect(200)
         .then((res) => {
           expect(res.body).to.include({
-            ...group,
+            name: group.name,
+            description: (group as any).description,
+            ownerId: group.ownerId,
           });
           expect(res.body).to.not.have.property('members');
           expect(res.body).to.not.have.property('createdAt');
