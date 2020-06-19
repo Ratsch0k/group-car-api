@@ -40,7 +40,7 @@ chmod +x build/group-car.js
 # Create test report
 yarn coverage
 
-node create-coverage-badge.js -s beta -c statements -l 'https://dev.my-group-car.de/beta/coverage' -o 'static/test/coverage/badge'
+node scripts/create-coverage-badge.js -s beta -c statements -l 'https://dev.my-group-car.de/beta/coverage' -o 'static/test/coverage/badge'
 
 # Delete intermediate directory for report creation
 rm -r mochawesome-report
