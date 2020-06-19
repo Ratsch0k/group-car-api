@@ -40,7 +40,7 @@ describe('InviteUserToGroup', function() {
         user: {
           id: 10,
         },
-        params: {
+        body: {
           userId: 11,
         },
       };
