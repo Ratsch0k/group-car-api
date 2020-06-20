@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/Ratsch0k/group-car-api.svg?token=VoTpURfdRAcYtA5D82Re&branch=master)](https://travis-ci.com/Ratsch0k/group-car-api)
-
+[![Dev Coverage](https://dev.my-group-car.de/test/coverage/badge/badge.svg)](https://dev.my-group-car.de/test/coverage)
 # Group Car Api 
 ## Backend api for the webapp Group Car
 
