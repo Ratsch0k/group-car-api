@@ -36,8 +36,15 @@ const picDim = config.user.pb.dimensions;
  */
 export const signUpRequestController: RequestHandler = (req, res, next) => {
   if (config.user.signUpThroughRequest) {
+    // Check if a user with that username already exists
+    User.findByUsername(req.body.username).then((user) => {
+      if (user === null) {
+        return generatePic(picDim, req.body.username, req.body.offset ?? 0);
+      } else {
+        throw new UsernameAlreadyExistsError(req.body.username);
+      }
+    })
     // Create profile picture
-    generatePic(picDim, req.body.username, req.body.offset ?? 0)
         .then((data: Buffer) => {
           // Store request
           return UserRequest.create({
@@ -46,10 +53,10 @@ export const signUpRequestController: RequestHandler = (req, res, next) => {
             profilePic: data,
             email: req.body.email,
           });
-        }).then(() => {
+        }).then((userRequest) => {
           const transporter = nodemailer.createTransport(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            config.mail.accountRequest?.options as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        config.mail.accountRequest?.options as any);
 
           transporter.use('compile', hbs({
             viewEngine: exhbs.create({
@@ -65,15 +72,15 @@ export const signUpRequestController: RequestHandler = (req, res, next) => {
             subject: `Account creation request for ${req.body.username}`,
             template: 'email',
             context: {
-              id: 42,
-              username: req.body.username,
-              timestamp: new Date(),
+              id: userRequest.id,
+              username: userRequest.username,
+              timestamp: new Date().toLocaleString(),
             },
           } as unknown as Options);
         }).then(() => {
           res.status(202)
               .send({message: 'Request was sent successfully. ' +
-                'You will be notified if the request was accepted'});
+            'You will be notified if the request was accepted'});
         }).catch(next);
   } else {
     next();
