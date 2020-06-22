@@ -11,7 +11,7 @@ type ModelHooks = import('sequelize/types/lib/hooks').ModelHooks;
  * a user wants to sign up but the server only allows
  * sign up with a request process.
  */
-class User extends Model {
+class UserRequest extends Model {
   /**
    * The id of the user.
    *
@@ -62,7 +62,7 @@ class User extends Model {
    * Only returns one instance if multiple exist.
    * @param username - The username of the user to find
    */
-  public static findByUsername(username: string): Promise<User | null> {
+  public static findByUsername(username: string): Promise<UserRequest | null> {
     return this.findOne({where: {username}});
   }
 }
@@ -72,7 +72,7 @@ class User extends Model {
  * @param user    - The user for which to hash the password
  * @param options - Options
  */
-export const hashPasswordOfUser = (user: User): Promise<void> => {
+export const hashPasswordOfUser = (user: UserRequest): Promise<void> => {
   return bcrypt.hash(user.password + '', config.bcrypt.saltRounds)
       .then((hash: string) => {
         user.password = hash;
@@ -93,7 +93,7 @@ const hooks: Partial<ModelHooks> = {
 /**
  * Initialize user model
  */
-User.init(
+UserRequest.init(
     {
       id: {
         allowNull: false,
@@ -139,4 +139,4 @@ User.init(
       hooks,
     });
 
-export default User;
+export default UserRequest;

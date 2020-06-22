@@ -1,5 +1,5 @@
 import debug from 'debug';
-import {User, UserDto, ProfilePic} from '@models';
+import {User, UserDto, ProfilePic, UserRequest} from '@models';
 import ModelToDtoConverter from '@util/model-to-dto-converter';
 import {UsernameAlreadyExistsError} from '@errors';
 import {UniqueConstraintError} from 'sequelize';
@@ -36,31 +36,45 @@ const picDim = config.user.pb.dimensions;
  */
 export const signUpRequestController: RequestHandler = (req, res, next) => {
   if (config.user.signUpThroughRequest) {
-    const transporter = nodemailer.createTransport(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      config.mail.accountRequest?.options as any);
+    // Create profile picture
+    generatePic(picDim, req.body.username, req.body.offset ?? 0)
+        .then((data: Buffer) => {
+          // Store request
+          return UserRequest.create({
+            username: req.body.username,
+            password: req.body.password,
+            profilePic: data,
+            email: req.body.email,
+          });
+        }).then(() => {
+          const transporter = nodemailer.createTransport(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            config.mail.accountRequest?.options as any);
 
-    transporter.use('compile', hbs({
-      viewEngine: exhbs.create({
-        layoutsDir: 'app/views/layouts',
-        partialsDir: 'app/views/partials',
-      }),
-      viewPath: 'app/views',
-    }));
+          transporter.use('compile', hbs({
+            viewEngine: exhbs.create({
+              layoutsDir: 'app/views/layouts',
+              partialsDir: 'app/views/partials',
+            }),
+            viewPath: 'app/views',
+          }));
 
-    transporter.sendMail({
-      from: '"my-group-car.de" <mygroupcar@gmail.com',
-      to: config.mail.accountRequest?.receiver,
-      subject: `Account creation request for ${req.body.username}`,
-      template: 'email',
-      context: {
-        id: 42,
-        username: req.body.username,
-        timestamp: new Date(),
-      },
-    } as unknown as Options).then(() => {
-      res.status(204).send();
-    }).catch(next);
+          return transporter.sendMail({
+            from: '"my-group-car.de" <mygroupcar@gmail.com',
+            to: config.mail.accountRequest?.receiver,
+            subject: `Account creation request for ${req.body.username}`,
+            template: 'email',
+            context: {
+              id: 42,
+              username: req.body.username,
+              timestamp: new Date(),
+            },
+          } as unknown as Options);
+        }).then(() => {
+          res.status(202)
+              .send({message: 'Request was sent successfully. ' +
+                'You will be notified if the request was accepted'});
+        }).catch(next);
   } else {
     next();
   }
