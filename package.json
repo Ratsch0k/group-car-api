@@ -38,7 +38,7 @@
     "eslint:fix": "./node_modules/.bin/eslint . --ext .js,.ts --fix",
     "tsc": "tsc",
     "prod": "tsc & cross-env NODE_ENV=production node -r tsconfig-paths/register ./build/group-car.js",
-    "typedoc": "typedoc",
+    "typedoc": "typedoc --out static/doc/typedoc --mode modules app",
     "test": "cross-env NODE_ENV=test JWT_SECRET=secret mocha \"app/**/*.spec.ts\"",
     "test:unit": "cross-env NODE_ENV=test JWT_SECRET=secret mocha \"app/**/*.unit.spec.ts\"",
     "test:integration": "cross-env NODE_ENV=test JWT_SECRET=secret mocha \"app/**/*.integration.spec.ts\"",
