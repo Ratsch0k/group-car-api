@@ -3,6 +3,7 @@
 const dbConfigs = require('./app/config/database-config');
 const {Sequelize} = require('sequelize');
 const sequelize = require('sequelize');
+const nodemail = require('nodemailer');
 
 const registerUser = async (argv) => {
   if (argv.verbose) console.info(`register user: ${argv.requestId}`);
@@ -31,10 +32,12 @@ const registerUser = async (argv) => {
   );
 
   if (userRequest.length <= 0) {
-    console.err(`No request with id ${requestId} exists`);
+    console.error(`No request with id ${requestId} exists`);
+    process.exit(1);
   } else if (userRequest.length > 1) {
-    console.err(`There are multiple entries for id` +
+    console.error(`There are multiple entries for id` +
     ` ${requestId}. This should not happen`);
+    process.exit(1);
   } else {
     userRequest = userRequest[0];
   }
