@@ -92,6 +92,7 @@ const signUpUserRequestHandler: RequestHandler = (req, res, next) => {
         id: userRequest.id,
         username: userRequest.username,
         timestamp: new Date().toLocaleString(),
+        serverType: process.env.SERVER_TYPE,
       },
     } as unknown as Options);
   }).then(() => {
