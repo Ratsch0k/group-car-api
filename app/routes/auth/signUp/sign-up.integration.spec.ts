@@ -1,8 +1,8 @@
 import request from 'supertest';
-import app from '../../app';
+import app from '../../../app';
 import {expect} from 'chai';
-import {syncPromise} from '../../db';
-import config from '../../config';
+import {syncPromise} from '../../../db';
+import config from '../../../config';
 import jsonwebtoken from 'jsonwebtoken';
 
 describe('SignUpValidator', function() {

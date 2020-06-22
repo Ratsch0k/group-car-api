@@ -2,8 +2,8 @@
 import {createSandbox, match} from 'sinon';
 import tokenController from './token-controller';
 import {expect} from 'chai';
-import {UnauthorizedError} from '../../errors';
-import User from '../../models/user/user';
+import {UnauthorizedError} from '../../../errors';
+import User from '../../../models/user/user';
 import Bluebird from 'bluebird';
 
 const sandbox = createSandbox();

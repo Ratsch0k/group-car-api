@@ -2,9 +2,9 @@
 import sinon, {fake, assert} from 'sinon';
 import * as validator from 'express-validator';
 import {expect} from 'chai';
-import {InvalidRequestError} from '../../errors';
+import {InvalidRequestError} from '../../../errors';
 import {createValidationResultHandler} from
-  '../../util/validation-result-handler';
+  '../../../util/validation-result-handler';
 
 const sandbox = sinon.createSandbox();
 
