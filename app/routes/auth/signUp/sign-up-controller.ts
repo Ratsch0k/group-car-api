@@ -55,7 +55,7 @@ export const signUpSwitchController: RequestHandler = (req, res, next) => {
  * @param res   - Response
  * @param next  - Next
  */
-const signUpUserRequestHandler: RequestHandler = (req, res, next) => {
+export const signUpUserRequestHandler: RequestHandler = (req, res, next) => {
   User.findByUsername(req.body.username).then((user) => {
     if (user === null) {
       return generatePic(picDim, req.body.username, req.body.offset ?? 0);
