@@ -8,11 +8,9 @@ import app from './app';
 import debug from 'debug';
 import http = require('http');
 import db from '@db';
-import internalApp from './internal-app';
 
 const log = debug('group-car:http');
 const error = debug('group-car:http:error');
-const internalLog = debug('group-car-internal');
 
 /**
  * Get port from environment and store in Express.
@@ -36,26 +34,6 @@ const server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
-/*
- * Create the internal http server
- */
-const internalPort = normalizePort(
-    process.env.npm_package_config_internalPort ||
-    process.env.PORT_INTERNAL ||
-    '9090');
-const internalServer = http.createServer(internalApp);
-internalServer.listen(internalPort);
-internalServer.on('error', onError);
-internalServer.on('listening', () => {
-  const addr = internalServer.address();
-  if (addr !== null) {
-    const bind = typeof addr === 'string' ?
-    'pipe ' + addr :
-    'port ' + addr.port;
-    internalLog('Listening on ' + bind);
-  }
-});
 
 /**
  * Normalize a port into a number, string, or false.
