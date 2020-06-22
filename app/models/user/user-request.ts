@@ -135,7 +135,7 @@ UserRequest.init(
     },
     {
       sequelize,
-      modelName: 'user-request',
+      modelName: 'userRequest',
       hooks,
     });
 
