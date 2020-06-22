@@ -188,3 +188,9 @@ static/test/
 
 # Ignore mocha report
 mochawesome-report
+
+# Ignore environment file
+.env
+
+# Ignore ethereal mail credentials
+credentials.csv
