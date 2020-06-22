@@ -180,7 +180,7 @@ const user: UserConfig = {
   pb: {
     dimensions: 128,
   },
-  signUpThroughRequest: true,
+  signUpThroughRequest: environment !== 'test' ? true : false,
 };
 
 const group: GroupConfig = {
