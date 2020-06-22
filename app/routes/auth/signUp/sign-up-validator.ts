@@ -1,5 +1,5 @@
 import * as express from 'express';
-import signUpController from '@app/auth/signUp/sign-up-controller';
+import signUpController from '@app/routes/auth/signUp/sign-up-controller';
 import {createValidationResultHandler} from '@util/validation-result-handler';
 import {body} from 'express-validator';
 const router: express.Router = express.Router();
@@ -21,7 +21,10 @@ export const signUpValidator = [
       .escape(),
   body('email').escape().trim().isEmail()
       .withMessage('Email has to be a valid email address'),
-  body('password').isLength({min: 6, max: 255})
+  body('password')
+      .isString()
+      .withMessage('password has to be a string')
+      .isLength({min: 6, max: 255})
       .withMessage('Password has to be at least 6 characters long'),
 ];
 

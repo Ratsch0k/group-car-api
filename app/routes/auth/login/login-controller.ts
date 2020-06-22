@@ -3,7 +3,7 @@ import ModelToDtoConverter from '@util/model-to-dto-converter';
 import bcrypt from 'bcrypt';
 import debug from 'debug';
 import {InvalidLoginError} from '@errors';
-import {convertUserToJwtPayload} from '@app/auth/jwt/jwt-util';
+import {convertUserToJwtPayload} from '@app/routes/auth/jwt/jwt-util';
 
 type RequestHandler = import('express').RequestHandler;
 type UserType = import('@models').User;
