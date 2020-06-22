@@ -4,7 +4,6 @@
   "private": true,
   "config": {
     "port": "8080",
-    "internalPort": "9090",
     "public": "../group-car/build/"
   },
   "nyc": {
@@ -68,6 +67,7 @@
     "@types/sinon": "^9.0.0",
     "@types/supertest": "^2.0.8",
     "@types/validator": "^13.0.0",
+    "@types/yargs": "^15.0.5",
     "bcrypt": "^4.0.1",
     "canvas": "^2.6.1",
     "cookie-parser": "~1.4.4",
@@ -88,7 +88,8 @@
     "sequelize": "^5.21.6",
     "sinon": "^9.0.2",
     "supports-color": "^7.1.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
