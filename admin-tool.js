@@ -4,6 +4,8 @@ const dbConfigs = require('./app/config/database-config');
 const {Sequelize} = require('sequelize');
 const sequelize = require('sequelize');
 const nodemailer = require('nodemailer');
+const hbs = require('nodemailer-express-handlebars');
+const exhbs = require('express-handlebars');
 
 const registerUser = async (argv) => {
   if (argv.verbose) console.info(`register user: ${argv.requestId}`);
@@ -79,6 +81,51 @@ const registerUser = async (argv) => {
       console.info('Profile picture was inserted successfully');
     }
 
+    if (!argv.noEmail) {
+      if (argv.verbose) console.info('Prepare sending email');
+
+      const options = {
+        service: argv.emailService,
+        host: argv.emailHost,
+        port: argv.emailPort,
+        auth: {
+          user: argv.emailUser,
+          pass: argv.emailPass,
+        },
+      };
+
+      if (argv.verbose) console.dir(options);
+
+      const transporter = nodemailer.createTransport(options);
+
+      if (argv.verbose) console.info('Prepared transporter');
+
+      transporter.use('compile', hbs({
+        viewEngine: exhbs.create({
+          layoutsDir: 'app/views/layouts',
+          partialsDir: 'app/views/partials',
+        }),
+        viewPath: 'app/views',
+      }));
+
+      if (argv.verbose) console.info('Registered view engine');
+
+      if (argv.verbose) console.info(`Sending email to ${userRequest.email}`);
+      await transporter.sendMail({
+        from: '"my-group-car.de" <mygroupcar@gmail.com',
+        to: userRequest.email,
+        subject: `TEST`,
+        template: 'request-email',
+        context: {
+          id: userRequest.id,
+          username: userRequest.username,
+          timestamp: new Date().toLocaleString(),
+          serverType: process.env.SERVER_TYPE,
+        },
+      });
+      if (argv.verbose) console.info('Successfully sent email');
+    }
+
     if (argv.verbose) console.info('Delete user request');
     await database.getQueryInterface().bulkDelete('userRequests',
         {id: userRequest.id}, {transaction});
@@ -99,12 +146,7 @@ const registerUser = async (argv) => {
   console.info(`Successfully registered user with id ${requestId},` +
     ` new assigned id is ${user.id}`);
 
-  if (!argv.withMail) {
-    process.exit(0);
-  }
-
-  if (argv.verbose) console.info('Prepare sending email');
-  process.exit(1);
+  process.exit(0);
 };
 
 const listUsers = async (argv) => {
@@ -191,10 +233,46 @@ require('yargs')
               },
           );
           yargs.option(
-              'withEmail', {
+              'noEmail', {
                 type: 'boolean',
                 describe: 'Whether or not the user should receive ' +
                 'an email if he/she was successfully registered',
+              },
+          );
+          yargs.option(
+              'emailUser', {
+                type: 'string',
+                describe: 'The username of the email account ' +
+                  'to use for sending the email',
+                default: process.env.MAIL_ACCOUNT_REQUEST_USER,
+              },
+          );
+          yargs.option(
+              'emailPass', {
+                type: 'string',
+                describe: 'The pass to use for authenticating the emailUser',
+                default: process.env.MAIL_ACCOUNT_REQUEST_PASS,
+              },
+          );
+          yargs.option(
+              'emailService', {
+                type: 'string',
+                describe: 'The name of the email service',
+                default: 'gmail',
+              },
+          );
+          yargs.option(
+              'emailPort', {
+                type: 'number',
+                describe: 'The smtp port to use',
+                default: process.env.MAIL_ACCOUNT_REQUEST_PORT,
+              },
+          );
+          yargs.option(
+              'emailHost', {
+                type: 'string',
+                describe: 'The hostname of the email provider',
+                default: process.env.MAIL_ACCOUNT_REQUEST_HOST,
               },
           );
         },
