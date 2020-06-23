@@ -113,14 +113,17 @@ const registerUser = async (argv) => {
       if (argv.verbose) console.info(`Sending email to ${userRequest.email}`);
       await transporter.sendMail({
         from: '"my-group-car.de" <mygroupcar@gmail.com',
-        to: userRequest.email,
-        subject: `TEST`,
-        template: 'request-email',
+        to: user.email,
+        subject: `Your user account was approved`,
+        template: 'approved-request-email',
         context: {
-          id: userRequest.id,
-          username: userRequest.username,
-          timestamp: new Date().toLocaleString(),
-          serverType: process.env.SERVER_TYPE,
+          layout: 'approve-main',
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          website: argv.website,
+          profilePicData: Buffer.from(userRequest.profilePic)
+              .toString('base64'),
         },
       });
       if (argv.verbose) console.info('Successfully sent email');
@@ -307,5 +310,10 @@ require('yargs')
       type: 'string',
       describe: 'The environment in which the tool should operate',
       default: 'development',
-    })
-    .argv;
+    }).option(
+        'website', {
+          type: 'string',
+          describe: 'The website for which the tool should operate',
+          default: 'my-group-car.de',
+        },
+    ).argv;
