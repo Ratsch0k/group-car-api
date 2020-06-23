@@ -3,7 +3,7 @@
 const dbConfigs = require('./app/config/database-config');
 const {Sequelize} = require('sequelize');
 const sequelize = require('sequelize');
-const nodemail = require('nodemailer');
+const nodemailer = require('nodemailer');
 
 const registerUser = async (argv) => {
   if (argv.verbose) console.info(`register user: ${argv.requestId}`);
@@ -124,7 +124,7 @@ const listUsers = async (argv) => {
     console.error(err);
     process.exit(1);
   }
-  if (argv.verbose) console.log('Successfully connected to database');
+  if (argv.verbose) console.info('Successfully connected to database');
 
   const users = await database.query(
       'SELECT id, username, email FROM "userRequests"',
@@ -134,7 +134,7 @@ const listUsers = async (argv) => {
   console.info(`Found ${users.length} user requests\n`);
 
   const longestNumber = users.map((user) => String(user.id).length)
-      .reduce((prev, curr) => prev > curr ? prev : curr);
+      .reduce((prev, curr) => prev > curr ? prev : curr, 0);
   // Print
   users.forEach((user) => {
     const currentIdLength = String(user.id).length;
@@ -146,6 +146,38 @@ const listUsers = async (argv) => {
   });
 
   await database.close();
+  process.exit(0);
+};
+
+const removeRequest = async ({verbose, requestId, environment}) => {
+  if (verbose) console.info(`remove ${requestId}`);
+
+  const dbConfig = dbConfigs[environment];
+
+  if (verbose) console.dir(dbConfig);
+  const database = new Sequelize(dbConfig.database,
+      dbConfig.username,
+      dbConfig.password || '',
+      dbConfig);
+
+  try {
+    await database.authenticate();
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+  if (verbose) console.info('Successfully connected to database');
+
+  try {
+    await database.getQueryInterface().bulkDelete('userRequests', [{
+      id: requestId,
+    }]);
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+
+
   process.exit(0);
 };
 
@@ -165,11 +197,28 @@ require('yargs')
                 'an email if he/she was successfully registered',
               },
           );
-        }, registerUser)
+        },
+        registerUser,
+    )
     .command(
         'user-request:list',
         'List all user-requests',
-        {}, listUsers)
+        {},
+        listUsers,
+    )
+    .command(
+        'user-request:remove [requestId]',
+        'Remove a user request',
+        (yargs) => {
+          yargs.positional(
+              'requestId',
+              {
+                describe: 'The id of the user creation request',
+              },
+          );
+        },
+        removeRequest,
+    )
     .option('verbose', {
       alias: 'v',
       type: 'boolean',
