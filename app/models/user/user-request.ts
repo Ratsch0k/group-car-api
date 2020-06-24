@@ -104,7 +104,6 @@ UserRequest.init(
       username: {
         type: DataTypes.STRING(25),
         allowNull: false,
-        unique: true,
         validate: {
           notEmpty: true,
           min: 4,
