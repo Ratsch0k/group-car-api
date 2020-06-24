@@ -4,7 +4,7 @@ const dbConfigs = require('./app/config/database-config');
 const {Sequelize} = require('sequelize');
 const sequelize = require('sequelize');
 const nodemailer = require('nodemailer');
-const hbs = require('nodemailer-express-handlebars');
+const hbs = require('nodemailer-express-handlebars-plaintext-inline-ccs');
 const exhbs = require('express-handlebars');
 
 const registerUser = async (argv) => {
@@ -105,6 +105,10 @@ const registerUser = async (argv) => {
           layoutsDir: 'app/views/layouts',
           partialsDir: 'app/views/partials',
         }),
+        templatesDir: 'app/views',
+        plaintextOptions: {
+          uppercaseHeadings: false,
+        },
         viewPath: 'app/views',
       }));
 

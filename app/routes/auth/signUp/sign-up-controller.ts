@@ -8,7 +8,7 @@ import generatePic from '@util/generate-profile-pic';
 import config from '@config';
 import {Router} from 'express';
 import nodemailer from 'nodemailer';
-import hbs from 'nodemailer-express-handlebars';
+import hbs from 'nodemailer-express-handlebars-plaintext-inline-ccs';
 import exhbs from 'express-handlebars';
 
 type RequestHandler = import('express').RequestHandler;
@@ -80,6 +80,10 @@ export const signUpUserRequestHandler: RequestHandler = (req, res, next) => {
         layoutsDir: 'app/views/layouts',
         partialsDir: 'app/views/partials',
       }),
+      templatesDir: 'app/views',
+      plaintextOptions: {
+        uppercaseHeadings: false,
+      },
       viewPath: 'app/views',
     }));
 
