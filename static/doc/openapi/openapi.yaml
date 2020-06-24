@@ -453,7 +453,7 @@ components:
       example:
         email: demo@mai.com
         username: demo
-        password: 123456
+        password: '123456'
         
     # Error
     RestError:

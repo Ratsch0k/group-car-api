@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as User from '../../models/user/user';
-import signUpController from './sign-up-controller';
+import * as User from '../../../models/user/user';
+import {signUpController} from './sign-up-controller';
 import {fake, assert, match, createSandbox} from 'sinon';
 import Bluebird from 'bluebird';
-import UserDto from '../../models/user/user-dto';
+import UserDto from '../../../models/user/user-dto';
 import {expect} from 'chai';
 import {UniqueConstraintError} from 'sequelize';
 import UsernameAlreadyExistsError from
-  '../../errors/user/username-already-exists-error';
-import * as generatePic from '../../util/generate-profile-pic';
-import * as ProfilePic from '../../models/profilePicture/profile-pic';
-import config from '../../config';
+  '../../../errors/user/username-already-exists-error';
+import * as generatePic from '../../../util/generate-profile-pic';
+import * as ProfilePic from '../../../models/profilePicture/profile-pic';
+import config from '../../../config';
 
 const sandbox = createSandbox();
 

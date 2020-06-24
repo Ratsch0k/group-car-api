@@ -1,9 +1,9 @@
 import request from 'supertest';
-import app from '../../app';
-import db, {syncPromise} from '../../db';
+import app from '../../../app';
+import db, {syncPromise} from '../../../db';
 import {expect} from 'chai';
-import config from '../../config';
-import User from '../../models/user/user';
+import config from '../../../config';
+import User from '../../../models/user/user';
 import jsonwebtoken from 'jsonwebtoken';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName;

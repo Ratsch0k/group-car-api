@@ -78,6 +78,7 @@
     "scripts",
     "static",
     "app/**/*.spec.ts",
-    "static/coverage"
+    "static/coverage",
+    "admin-tool.js"
   ]
 }

@@ -9,9 +9,9 @@ import morganDebug from 'morgan-debug';
  * Import router
  */
 import config from '@config';
-import authRouter from '@app/auth';
-import jwtCsrf from './auth/jwt/jwt-csrf';
-import {preLoginJwtValidator} from './auth/jwt/jwt-util';
+import authRouter from '@app/routes/auth';
+import jwtCsrf from './routes/auth/jwt/jwt-csrf';
+import {preLoginJwtValidator} from './routes/auth/jwt/jwt-util';
 import apiRouter from './routes/api';
 import {userRouter} from './routes/user';
 

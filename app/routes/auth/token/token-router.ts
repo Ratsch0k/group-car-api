@@ -1,6 +1,6 @@
 import * as express from 'express';
 import tokenController from './token-controller';
-import {preLoginJwtValidator} from '@app/auth/jwt/jwt-util';
+import {preLoginJwtValidator} from '@app/routes/auth/jwt/jwt-util';
 import debug from 'debug';
 import config from '@config';
 import expressJwt from 'express-jwt';

@@ -1,5 +1,0 @@
-{
-  "inputFiles": ["./app"],
-  "mode": "modules",
-  "out": "static/doc/typedoc"
-}

@@ -51,10 +51,27 @@ export interface PbConfig {
 
 export interface UserConfig {
   pb: PbConfig;
+  signUpThroughRequest: boolean;
 }
 
 export interface GroupConfig {
   maxMembers: number;
+}
+
+export interface MailConfig {
+  accountRequest: {
+    type?: string;
+    options: {
+      service?: string;
+      host?: string;
+      port?: string;
+      auth?: {
+        user?: string;
+        pass?: string;
+      };
+    }
+    receiver?: string;
+  }
 }
 
 export interface Config {
@@ -67,6 +84,7 @@ export interface Config {
   user: UserConfig;
   serverType: string;
   group: GroupConfig;
+  mail: MailConfig;
 }
 
 /**
@@ -111,7 +129,7 @@ if (serverType === 'development') {
   withFlush = true;
 }
 
-/**
+/*
  * Set the path for serving static files depending on
  * which environment variable is provided.
  * Priority:
@@ -136,6 +154,23 @@ const staticPathConfig: StaticPathConfig = {
   path: pathToStatic,
 };
 
+// Get the mail config from environment variables
+const mail: MailConfig = {
+  accountRequest: {
+    type: process.env.MAIL_ACCOUNT_REQUEST_TYPE,
+    receiver: process.env.MAIL_ACCOUNT_REQUEST_RECEIVER,
+    options: {
+      service: process.env.MAIL_ACCOUNT_REQUEST_SERVICE,
+      host: process.env.MAIL_ACCOUNT_REQUEST_HOST,
+      port: process.env.MAIL_ACCOUNT_REQUEST_PORT,
+      auth: {
+        user: process.env.MAIL_ACCOUNT_REQUEST_USER,
+        pass: process.env.MAIL_ACCOUNT_REQUEST_PASS,
+      },
+    },
+  },
+};
+
 const database: DBConfig = {
   sequelize,
   withFlush,
@@ -145,6 +180,7 @@ const user: UserConfig = {
   pb: {
     dimensions: 128,
   },
+  signUpThroughRequest: environment !== 'test' ? true : false,
 };
 
 const group: GroupConfig = {
@@ -161,6 +197,7 @@ const config: Config = {
   user,
   serverType,
   group,
+  mail,
 };
 
 export default config;

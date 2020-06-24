@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {stub, fake, assert, match, createSandbox} from 'sinon';
-import {User, UserDto} from '../../models/user';
+import {User, UserDto} from '../../../models/user';
 import bcrypt from 'bcrypt';
 
 import loginController from './login-controller';
