@@ -180,7 +180,11 @@ const user: UserConfig = {
   pb: {
     dimensions: 128,
   },
-  signUpThroughRequest: environment !== 'test' ? true : false,
+  signUpThroughRequest: environment === 'test' ?
+    false :
+    process.env.DISABLE_SIGN_UP_THROUGH_REQUEST === undefined ?
+    true :
+    !Boolean(process.env.DISABLE_SIGN_UP_THROUGH_REQUEST),
 };
 
 const group: GroupConfig = {

@@ -1,8 +1,38 @@
 import {Invite, UserDto, Group} from '@models';
 import {UnauthorizedError, InviteNotFoundError} from '@app/errors';
 import {Membership} from '../membership';
+import {Includeable} from 'sequelize/types';
+import {User} from '../user';
 
 export type InviteId = {userId: number, groupId: number};
+
+/**
+ * Options of find queries
+ */
+export interface FindOptions {
+  /**
+   * Whether or not the group data should be returned instead of the groupId
+   */
+  withGroupData: boolean;
+  /**
+   * Whether or not the user data should be returned instead of the userId
+   */
+  withUserData: boolean;
+  /**
+   * Whether or not the invitedBy field
+   * should include the user data instead of the id
+   */
+  withInvitedByData: boolean;
+}
+
+/**
+ * Default find options
+ */
+const defaultFindOptions: FindOptions = {
+  withGroupData: false,
+  withUserData: false,
+  withInvitedByData: false,
+};
 
 /**
  * Repository for invites.
@@ -21,7 +51,16 @@ export class InviteRepository {
   public static async findById(
       currentUser: UserDto,
       id: InviteId,
+      options?: FindOptions,
   ): Promise<Invite> {
+    const confOptions: FindOptions = {
+      ...defaultFindOptions,
+      ...options,
+    };
+
+    // Prepare the include array
+    const {include, attributes} = this.buildFindQueryOptions(confOptions);
+
     // Check if logged in user has userId of invite
     const memberships = await Membership.findAll({
       where: {
@@ -42,6 +81,8 @@ export class InviteRepository {
         userId: id.userId,
         groupId: id.groupId,
       },
+      include,
+      attributes,
     });
 
     if (invite === null) {
@@ -58,16 +99,77 @@ export class InviteRepository {
    */
   public static async findAllForUser(
       currentUser: Express.User,
-      withGroupData = false,
+      options?: Partial<FindOptions>,
   ): Promise<Invite[]> {
+    const confOptions: FindOptions = {
+      ...defaultFindOptions,
+      ...options,
+    };
+
+    // Prepare the include array
+    const {include, attributes} = this.buildFindQueryOptions(confOptions);
+
     return Invite.findAll({
       where: {
         userId: currentUser.id,
       },
-      include: withGroupData ? [{
+      include,
+      attributes,
+    });
+  }
+
+  /**
+   * Builds the array of models to include
+   * in the query from {@link FindOptions}.
+   * @param options - The options which define the to included models.
+   */
+  private static buildFindQueryOptions(
+      options: FindOptions,
+  ): {include: Includeable[] | undefined, attributes: {exclude: string[]}} {
+    const include: Includeable[] = [];
+    const attributes = {
+      exclude: [] as string[],
+    };
+
+    if (options.withGroupData) {
+      include.push({
         model: Group,
         as: 'Group',
-      }] : undefined,
-    });
+        attributes: [
+          'id',
+          'name',
+          'description',
+          'ownerId',
+        ],
+      });
+      attributes.exclude.push('groupId');
+    }
+    if (options.withUserData) {
+      include.push({
+        model: User,
+        as: 'User',
+        attributes: [
+          'id',
+          'username',
+        ],
+      });
+      attributes.exclude.push('userId');
+    }
+    if (options.withInvitedByData) {
+      include.push({
+        model: User,
+        as: 'InviteSender',
+        attributes: [
+          'id',
+          'username',
+        ],
+      });
+      attributes.exclude.push('invitedBy');
+    }
+
+    return {
+      include: include.length <= 0 ? undefined : include,
+      attributes,
+    };
   }
 }

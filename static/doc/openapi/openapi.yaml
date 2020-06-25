@@ -187,9 +187,12 @@ paths:
           content:
             aplication/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/InviteWithGroupData'
+                type: object
+                properties:
+                  invites:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InviteWithGroupInvetedByData'
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
   
@@ -355,6 +358,13 @@ components:
         updatedAt:
           type: string
           format: date-time
+    UserSimple:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
           
     # Group
     GroupRequest:
@@ -445,13 +455,17 @@ components:
         createdAt:
           type: string
           format: date-time
-    InviteWithGroupData:
+        invitedBy:
+          type: integer
+    InviteWithGroupInvetedByData:
       type: object
       properties:
         userId:
           type: integer
         group:
           $ref: '#/components/schemas/GroupSimple'
+        invitedBy:
+          $ref: '#/components/schemas/UserSimple'
         createdAt:
           type: string
           format: date-time
