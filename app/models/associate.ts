@@ -1,6 +1,6 @@
 import {Group} from './group';
 import {User} from './user';
-import {ProfilePic} from './profilePicture';
+import {ProfilePic} from './profile-picture';
 import {Membership} from './membership';
 import {Invite} from './invite';
 

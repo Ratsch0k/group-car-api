@@ -42,6 +42,7 @@ app.use(
     expressJwt({
       secret: config.jwt.secret,
       getToken: config.jwt.getToken,
+      requestProperty: 'auth',
     }),
     preLoginJwtValidator,
     apiRouter,

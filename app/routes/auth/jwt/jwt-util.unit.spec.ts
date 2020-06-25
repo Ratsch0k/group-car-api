@@ -205,7 +205,7 @@ describe('jwt-util', function() {
   describe('preLoginJwtValidator', function() {
     it('calls next if jwt not pre-login jwt', function(done) {
       const request: any = sandbox.stub();
-      request.user = {
+      request.auth = {
         loggedIn: true,
         id: 42,
       };
@@ -215,7 +215,7 @@ describe('jwt-util', function() {
 
       const next: any = sandbox.stub().callsFake(() => {
         sandbox.assert.calledOnce(userFindStub);
-        (sandbox.assert.calledWith as any)(userFindStub, request.user.id);
+        (sandbox.assert.calledWith as any)(userFindStub, request.auth.id);
         sandbox.assert.calledOnce(next);
         done();
       });
@@ -251,7 +251,7 @@ describe('jwt-util', function() {
     it('throws UnauthorizedError if no ' +
       'user with the user id exists', function(done) {
       const request: any = sandbox.stub();
-      request.user = {
+      request.auth = {
         loggedIn: true,
         id: 42,
       };
@@ -261,7 +261,7 @@ describe('jwt-util', function() {
 
       const next: any = sandbox.stub().callsFake(() => {
         sandbox.assert.calledOnce(userFindStub);
-        (sandbox.assert.calledWith as any)(userFindStub, request.user.id);
+        (sandbox.assert.calledWith as any)(userFindStub, request.auth.id);
         sandbox.assert.calledOnce(next);
         sandbox.assert.calledWith(next, match.instanceOf(UnauthorizedError));
         done();
