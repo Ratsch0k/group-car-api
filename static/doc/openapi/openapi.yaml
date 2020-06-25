@@ -175,7 +175,23 @@ paths:
                 format: binary
         404:
           $ref: '#/components/responses/UserNotFoundErrorResponse'
-                
+  /api/user/invite:
+    get:
+      summary: Get invites of logged in user
+      tags:
+        - User
+      description: Gets all invites of the currently logged in user
+      responses:
+        200:
+          description: All invites of the user
+          content:
+            aplication/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InviteWithGroupData'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
   
   # Group
   /api/group:
@@ -426,6 +442,16 @@ components:
           type: integer
         groupId:
           type: integer
+        createdAt:
+          type: string
+          format: date-time
+    InviteWithGroupData:
+      type: object
+      properties:
+        userId:
+          type: integer
+        group:
+          $ref: '#/components/schemas/GroupSimple'
         createdAt:
           type: string
           format: date-time
