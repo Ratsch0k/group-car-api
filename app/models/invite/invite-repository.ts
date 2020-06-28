@@ -62,18 +62,17 @@ export class InviteRepository {
     const {include, attributes} = this.buildFindQueryOptions(confOptions);
 
     // Get memberships of user
-    const memberships = await Membership.findAll({
+    const membership = await Membership.findOne({
       where: {
         userId: currentUser.id,
+        groupId: id.groupId,
       },
     });
     if (
       // Current user is not user of invite
       currentUser.id !== id.userId &&
-      // Current user has no membership, therefore is not member of group
-      (memberships.length <= 0 ||
-      // Current user is no member of group
-      !memberships.some((membership) => membership.groupId === id.groupId))) {
+      // Current user has no membership with group
+      membership === null) {
       throw new UnauthorizedError('Not authorized to request this invite');
     }
     const invite = await Invite.findOne({
@@ -125,7 +124,10 @@ export class InviteRepository {
    */
   private static buildFindQueryOptions(
       options: FindOptions,
-  ): {include: Includeable[] | undefined, attributes: {exclude: string[]}} {
+  ): {
+    include: Includeable[] | undefined,
+    attributes: {exclude: string[]} | undefined
+  } {
     const include: Includeable[] = [];
     const attributes = {
       exclude: [] as string[],
@@ -169,7 +171,7 @@ export class InviteRepository {
 
     return {
       include: include.length <= 0 ? undefined : include,
-      attributes,
+      attributes: attributes.exclude.length > 0 ? attributes : undefined,
     };
   }
 }
