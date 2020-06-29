@@ -4,8 +4,8 @@ import sinon, {match} from 'sinon';
 import {InviteRepository} from './invite-repository';
 import {UnauthorizedError, InviteNotFoundError} from '../../errors';
 import {expect} from 'chai';
-import Invite from './invite';
 import Bluebird from 'bluebird';
+import {Group, User, Invite} from '../../models';
 
 describe('InviteRepository', function() {
   afterEach(function() {
@@ -70,7 +70,7 @@ describe('InviteRepository', function() {
       expect(response).to.equal(invite);
     });
 
-    it('returns invite if user member of group ' +
+    it('returns invite if user is member of group ' +
     'of the invite', async function() {
       const membership = {
         userId: 2,
@@ -168,6 +168,136 @@ describe('InviteRepository', function() {
   });
 
   describe('findAllForUser', function() {
+    it('returns list of invites of the user', async function() {
+      const user = {
+        id: 1,
+      };
 
+      const expectedInvites = [
+        {
+          groupId: 1,
+          userId: user.id,
+        },
+        {
+          groupId: 2,
+          userId: user.id,
+        },
+        {
+          groupId: 3,
+          userId: user.id,
+        },
+        {
+          groupId: 4,
+          userId: user.id,
+        },
+      ];
+
+      const inviteFindAllStub = sinon.stub(Invite, 'findAll')
+          .resolves(expectedInvites as any);
+
+      const actualInvites = await InviteRepository.findAllForUser(user as any);
+
+      expect(actualInvites).to.equal(expectedInvites);
+      sinon.assert.calledOnceWithExactly(inviteFindAllStub, match({
+        where: {
+          userId: user.id,
+        },
+      }));
+    });
+  });
+
+  describe('buildFindQueryOptions', function() {
+    it('sets correct include, exclude for no option', function() {
+      const expected = {
+        include: undefined,
+        attributes: undefined,
+      };
+
+      const actual = InviteRepository.buildFindQueryOptions();
+
+      expect(actual).to.eql(expected);
+    });
+
+    it('sets correct include, exclude for options withGroupData', function() {
+      const expected = {
+        include: [{
+          model: Group,
+          as: 'Group',
+          attributes: [
+            'id',
+            'name',
+            'description',
+          ],
+          include: [{
+            model: User,
+            as: 'Owner',
+            attributes: [
+              'id',
+              'username',
+            ],
+          }],
+        }],
+        attributes: {
+          exclude: [
+            'groupId',
+          ],
+        },
+      };
+
+      const actual = InviteRepository.buildFindQueryOptions({
+        withGroupData: true,
+      });
+
+      expect(actual).to.eql(expected);
+    });
+
+    it('sets correct include, exclude for options withUserData', function() {
+      const expected = {
+        include: [{
+          model: User,
+          as: 'User',
+          attributes: [
+            'id',
+            'username',
+          ],
+        }],
+        attributes: {
+          exclude: [
+            'userId',
+          ],
+        },
+      };
+
+      const actual = InviteRepository.buildFindQueryOptions({
+        withUserData: true,
+      });
+
+      expect(actual).to.eql(expected);
+    });
+
+    it('sets correct include, exclude for options ' +
+    'withInvitedByData', function() {
+      const expected = {
+        include: [{
+          model: User,
+          as: 'InviteSender',
+          attributes: [
+            'id',
+            'username',
+          ],
+        }],
+        attributes: {
+          exclude: [
+            'invitedBy',
+          ],
+        },
+      };
+
+      const actual = InviteRepository.buildFindQueryOptions({
+        withInvitedByData: true,
+      });
+
+      expect(actual).to.eql(expected);
+    });
   });
 });

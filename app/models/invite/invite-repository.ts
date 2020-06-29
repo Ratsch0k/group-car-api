@@ -1,8 +1,7 @@
-import {Invite, UserDto, Group} from '@models';
+import {Invite, UserDto, Group, User} from '@models';
 import {UnauthorizedError, InviteNotFoundError} from '@app/errors';
 import {Membership} from '../membership';
 import {Includeable} from 'sequelize/types';
-import {User} from '../user';
 
 export type InviteId = {userId: number, groupId: number};
 
@@ -53,13 +52,8 @@ export class InviteRepository {
       id: InviteId,
       options?: FindOptions,
   ): Promise<Invite> {
-    const confOptions: FindOptions = {
-      ...defaultFindOptions,
-      ...options,
-    };
-
     // Prepare the include array
-    const {include, attributes} = this.buildFindQueryOptions(confOptions);
+    const {include, attributes} = this.buildFindQueryOptions(options);
 
     // Get memberships of user
     const membership = await Membership.findOne({
@@ -100,13 +94,8 @@ export class InviteRepository {
       currentUser: Express.User,
       options?: Partial<FindOptions>,
   ): Promise<Invite[]> {
-    const confOptions: FindOptions = {
-      ...defaultFindOptions,
-      ...options,
-    };
-
     // Prepare the include array
-    const {include, attributes} = this.buildFindQueryOptions(confOptions);
+    const {include, attributes} = this.buildFindQueryOptions(options);
 
     return Invite.findAll({
       where: {
@@ -122,18 +111,23 @@ export class InviteRepository {
    * in the query from {@link FindOptions}.
    * @param options - The options which define the to included models.
    */
-  private static buildFindQueryOptions(
-      options: FindOptions,
+  public static buildFindQueryOptions(
+      options?: Partial<FindOptions>,
   ): {
     include: Includeable[] | undefined,
     attributes: {exclude: string[]} | undefined
   } {
+    const confOptions: FindOptions = {
+      ...defaultFindOptions,
+      ...options,
+    };
+
     const include: Includeable[] = [];
     const attributes = {
       exclude: [] as string[],
     };
 
-    if (options.withGroupData) {
+    if (confOptions.withGroupData) {
       include.push({
         model: Group,
         as: 'Group',
@@ -141,12 +135,19 @@ export class InviteRepository {
           'id',
           'name',
           'description',
-          'ownerId',
         ],
+        include: [{
+          model: User,
+          as: 'Owner',
+          attributes: [
+            'id',
+            'username',
+          ],
+        }],
       });
       attributes.exclude.push('groupId');
     }
-    if (options.withUserData) {
+    if (confOptions.withUserData) {
       include.push({
         model: User,
         as: 'User',
@@ -157,7 +158,7 @@ export class InviteRepository {
       });
       attributes.exclude.push('userId');
     }
-    if (options.withInvitedByData) {
+    if (confOptions.withInvitedByData) {
       include.push({
         model: User,
         as: 'InviteSender',
