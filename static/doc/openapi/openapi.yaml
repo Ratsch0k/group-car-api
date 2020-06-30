@@ -192,7 +192,7 @@ paths:
                   invites:
                     type: array
                     items:
-                      $ref: '#/components/schemas/InviteWithGroupInvetedByData'
+                      $ref: '#/components/schemas/InviteWithGroupInvitedByData'
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
   
@@ -443,6 +443,13 @@ components:
           type: integer
         description:
           type: string
+    GroupSimpleWithOwner:
+      allOf:
+      - $ref: '#/components/schemas/GroupSimple'
+      - type: object
+        properties:
+          Owner:
+            $ref: '#/components/schemas/UserSimple'
     
     # Invite
     Invite:
@@ -457,14 +464,14 @@ components:
           format: date-time
         invitedBy:
           type: integer
-    InviteWithGroupInvetedByData:
+    InviteWithGroupInvitedByData:
       type: object
       properties:
         userId:
           type: integer
-        group:
-          $ref: '#/components/schemas/GroupSimple'
-        invitedBy:
+        Group:
+          $ref: '#/components/schemas/GroupSimpleWithOwner'
+        InviteSender:
           $ref: '#/components/schemas/UserSimple'
         createdAt:
           type: string
