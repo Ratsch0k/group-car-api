@@ -9,10 +9,8 @@ import {
   GroupIsFullError,
 } from '@errors';
 import {Group, Membership, User, Invite} from '@models';
-import {Router} from 'express';
+import {Router, RequestHandler} from 'express';
 import config from '@app/config';
-
-type RequestHandler = import('express').RequestHandler;
 
 /**
  * Checks if the user tries to invite himself/herself.

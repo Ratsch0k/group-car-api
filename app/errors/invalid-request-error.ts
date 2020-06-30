@@ -1,5 +1,5 @@
 import BadRequestError from './bad-request-error';
-type Result = import('express-validator').Result;
+import {Result} from 'express-validator';
 
 /**
  * The error if a request has invalid attributes.

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-type Model = import('sequelize/types').Model;
+
+import {Model} from 'sequelize/types';
 
 /**
  * Utility class for converting model objects into the dto representation.

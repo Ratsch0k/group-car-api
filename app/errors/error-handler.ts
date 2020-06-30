@@ -1,4 +1,4 @@
-type ErrorRequestHandler = import('express').ErrorRequestHandler;
+import {ErrorRequestHandler} from 'express';
 import RestError from './rest-error';
 import InternalError from './internal-error';
 import config from '@config';
@@ -7,7 +7,7 @@ import UnauthorizedRestError from './unauthorized-error';
 import ForbiddenError from './forbidden-error';
 import BadRequestError from './bad-request-error';
 
-type UnauthorizedError = import('express-jwt').UnauthorizedError;
+import {UnauthorizedError} from 'express-jwt';
 
 const log = debug('group-car:error-handler:log');
 const error = debug('group-car:error-handler:error');

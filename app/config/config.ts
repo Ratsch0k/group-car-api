@@ -2,11 +2,11 @@ import path from 'path';
 import debug from 'debug';
 import jwt from './jwt-config';
 import dbConfig from './database-config';
+import {JWTConfig} from './jwt-config';
+import {Config as SequelizeConfig} from 'sequelize/types';
 
 const log = debug('group-car:config');
 
-type JWTConfig = import('./jwt-config').JWTConfig;
-type SequelizeConfig = import('sequelize/types').Config;
 /**
  * Get node environment.
  *

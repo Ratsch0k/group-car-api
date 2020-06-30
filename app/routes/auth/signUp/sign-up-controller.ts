@@ -6,13 +6,11 @@ import {UniqueConstraintError} from 'sequelize';
 import {convertUserToJwtPayload} from '@app/routes/auth/jwt/jwt-util';
 import generatePic from '@util/generate-profile-pic';
 import config from '@config';
-import {Router} from 'express';
+import {Router, RequestHandler} from 'express';
 import nodemailer from 'nodemailer';
 import hbs from 'nodemailer-express-handlebars-plaintext-inline-ccs';
 import exhbs from 'express-handlebars';
-
-type RequestHandler = import('express').RequestHandler;
-type Options = import('nodemailer').SendMailOptions;
+import {Options} from 'nodemailer/lib/sendmail-transport';
 
 /**
  * Log method for normal debug logging

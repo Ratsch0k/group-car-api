@@ -5,9 +5,17 @@ import {
   GroupNotFoundError,
   NotOwnerOfGroupError,
 } from '@errors';
+import {RequestHandler} from 'express';
 
-type RequestHandler = import('express').RequestHandler;
-
+/**
+ * Controller for deleting a group.
+ *
+ * Only deletes a group if the currently logged in user
+ * is the owner of that group.
+ * @param req   - Request
+ * @param res   - Response
+ * @param next  - Next
+ */
 const deleteGroupController: RequestHandler = (req, res, next) => {
   const userId = req.user?.id;
   const groupId = req.params.groupId && parseInt(req.params.groupId, 10);

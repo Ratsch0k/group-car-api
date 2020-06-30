@@ -1,10 +1,8 @@
-import {hashPasswordOfUser} from './user';
+import User, {hashPasswordOfUser} from './user';
 import bcrypt from 'bcrypt';
 import {match, assert, createSandbox} from 'sinon';
 import {expect} from 'chai';
 import * as config from '../../config';
-
-type User = import('./user').default;
 
 const sandbox = createSandbox();
 
