@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import getAllInvitesRouter from './get-all';
-import inviteIdRouter from './inviteId';
+import inviteIdRouter from './groupId';
 
 const inviteRouter = Router();
 
@@ -10,7 +10,7 @@ inviteRouter.get(
 );
 
 inviteRouter.use(
-    '/:inviteId',
+    '/:groupId',
     inviteIdRouter,
 );
 
