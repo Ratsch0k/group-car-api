@@ -2,8 +2,7 @@ import config from '@config';
 import jwt from 'jsonwebtoken';
 import {User} from '@models';
 import {UnauthorizedError} from '@errors';
-
-type RequestHandler = import('express').RequestHandler;
+import {RequestHandler} from 'express';
 
 /**
  * Generates a jwt token with the given payload.
@@ -65,19 +64,22 @@ export function convertUserToJwtPayload(user: User): UserJwtPayload {
 
 /**
  * Request handler which throws an `UnauthorizedError` if
- * the provided jwt token (which is expected to be in `req.user`)
+ * the provided jwt token (which is expected to be in `req.auth`)
  * was created before the user logged in or after it.
  * @param req  - Http request
  * @param res  - Http response
  * @param next - Next handler
  */
 export const preLoginJwtValidator: RequestHandler = (req, res, next) => {
-  if (!req.user || !req.user.loggedIn) {
+  if (!req.auth || !req.auth.loggedIn || !req.auth.id) {
     throw new UnauthorizedError();
   } else {
     // Check if a user with the user id exists
-    User.findByPk(req.user.id).then((user) => {
-      if (user) {
+    User.findByPk(req.auth.id).then((user) => {
+      if (user !== null &&
+          (user.deletedAt === null ||
+            user.deletedAt >= new Date())) {
+        req.user = user;
         next();
       } else {
         next(new UnauthorizedError());

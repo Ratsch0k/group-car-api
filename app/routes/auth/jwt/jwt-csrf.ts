@@ -4,11 +4,7 @@ import Tokens from 'csrf';
 import {generateToken, cookieOptions} from './jwt-util';
 import jsonwebtoken from 'jsonwebtoken';
 import debug from 'debug';
-import {NextFunction} from 'express';
-
-type RequestHandler = import('express').RequestHandler;
-type Request = import('express').Request;
-type Response = import('express').Response;
+import {NextFunction, RequestHandler, Request, Response} from 'express';
 
 const log = debug('group-car:jwt');
 const error = debug('group-car:jwt:error');

@@ -1,7 +1,6 @@
 import generatePic from '@util/generate-profile-pic';
 import config from '@config';
-
-type RequestHandler = import('express').RequestHandler;
+import {RequestHandler} from 'express';
 
 const generateProfilePicController: RequestHandler = (req, res, next) => {
   // Extract request data from request

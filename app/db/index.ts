@@ -1,5 +1,5 @@
 import {Sequelize} from 'sequelize';
-type Options = import('sequelize').Options;
+import {Options} from 'sequelize';
 import config from '@config';
 import debug from 'debug';
 

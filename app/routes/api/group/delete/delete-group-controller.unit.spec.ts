@@ -10,7 +10,6 @@ import {
 } from '../../../../errors';
 import {Membership, Group} from '../../../../models';
 import Bluebird from 'bluebird';
-import sequelize from '../../../../db';
 
 describe('DeleteGroupController', function() {
   let req: any;

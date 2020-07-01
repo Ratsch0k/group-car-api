@@ -9,7 +9,7 @@ import {UniqueConstraintError} from 'sequelize';
 import UsernameAlreadyExistsError from
   '../../../errors/user/username-already-exists-error';
 import * as generatePic from '../../../util/generate-profile-pic';
-import * as ProfilePic from '../../../models/profilePicture/profile-pic';
+import * as ProfilePic from '../../../models/profile-picture/profile-pic';
 import config from '../../../config';
 
 const sandbox = createSandbox();

@@ -1,9 +1,7 @@
 import debug from 'debug';
 import {validationResult} from 'express-validator';
 import {InvalidRequestError} from '@app/errors';
-
-type RequestHandler = import('express').RequestHandler;
-type Request = import('express').Request;
+import {RequestHandler, Request} from 'express';
 
 export interface Options {
   /**

@@ -5,9 +5,7 @@ import {
   NotAdminOfGroupError,
   GroupNotFoundError,
 } from '@app/errors';
-import {Router} from 'express';
-
-type RequestHandler = import('express').RequestHandler;
+import {Router, RequestHandler} from 'express';
 
 /**
  * Checks if the request is correct and fulfills constraints before sending it

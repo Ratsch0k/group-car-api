@@ -43,6 +43,7 @@
         "DB_PASSWORD": "group-car-dev",
         "DB_NAME": "group-car-dev",
         "DB_HOSTNAME": "127.0.0.1",
+        "DISABLE_SIGN_UP_THROUGH_REQUEST": "true"
       },
       "runtimeArgs": [
         "-r", 
