@@ -2,6 +2,7 @@
 import sinon, {assert, match} from 'sinon';
 import {InviteRepository} from '../../../../../models/invite/invite-repository';
 import {getAllInvitesController} from './get-all-invites-controller';
+import {NotLoggedInError} from '../../../../../errors';
 
 describe('GetAllInvitesController', function() {
   let req: any;
@@ -83,6 +84,20 @@ describe('GetAllInvitesController', function() {
       );
 
       assert.calledOnceWithExactly(next, error);
+      assert.notCalled(res.send);
+      done();
+    });
+
+    getAllInvitesController(req, res, next);
+  });
+
+  it('calls next with NotLoggedInError if user ' +
+  'is missing on request', function(done) {
+    req = {};
+    res = {};
+    res.send = sinon.stub();
+    next = sinon.stub().callsFake(() => {
+      assert.calledOnceWithExactly(next, match.instanceOf(NotLoggedInError));
       assert.notCalled(res.send);
       done();
     });
