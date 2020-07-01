@@ -43,6 +43,7 @@ app.use(
       secret: config.jwt.secret,
       getToken: config.jwt.getToken,
       requestProperty: 'auth',
+      algorithms: ['HS512'],
     }),
     preLoginJwtValidator,
     apiRouter,

@@ -20,6 +20,7 @@ router.put('/',
     expressJwt({
       secret: config.jwt.secret,
       getToken: config.jwt.getToken,
+      algorithms: ['HS512'],
     }),
     preLoginJwtValidator,
     tokenLogger,
