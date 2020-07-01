@@ -154,17 +154,17 @@ paths:
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
   /api/user/{userId}/profile-pic:
+    parameters: 
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
     get:
       summary: Get the profile picture
       tags:
       - User
       description: Get the profile picture of the user with the given id
-      parameters: 
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: number
       responses:
         200:
           description: The profile picture as jpeg
@@ -195,7 +195,33 @@ paths:
                       $ref: '#/components/schemas/InviteWithGroupInvitedByData'
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
-  
+  /api/user/invite/{groupId}/join:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      summary: Joins the group
+      tags:
+        - User
+      description: Joins the group with the given id by accepting an invite for it
+      responses:
+        204:
+          description: The invite was accepted and the user is a new member of the group.
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          description: "Either the invite itself doesn't exist or the group which the user tries to join doesn't"
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GroupNotFoundErrorSchema'
+                - $ref: '#/components/schemas/InviteNotFoundSchema'  
   # Group
   /api/group:
     post:
@@ -572,7 +598,14 @@ components:
           status: A group with id 4 doesn't exist
           detail: 
             groupId: 4
-          
+    InviteNotFoundSchema:
+      allOf:
+      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+      - example:
+          status: An invite for the group doesn't exist
+          detail: 
+            groupId: 4
+            userId: 2
   # Responses
   responses:
     # Error
