@@ -1,13 +1,25 @@
 declare namespace Express {
+  export type User = {
+    username: string;
+    id: number;
+    isBetaUser: boolean;
+    createdAt: Date;
+    deletedAt: Date;
+    updatedAt: Date;
+  }
+
+  export type Auth = {
+    username?: string;
+    id?: number;
+    isBetaUser?: boolean;
+    loggedIn: boolean;
+  }
+
   export interface Request {
     getCsrfToken(): string;
     getSecret(): string;
-    user?: {
-      username?: string;
-      id?: number;
-      isBetaUser?: boolean;
-      loggedIn: boolean;
-    };
+    user?: User;
+    auth: Auth;
   }
 
   export interface Response {

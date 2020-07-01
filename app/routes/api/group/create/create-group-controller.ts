@@ -1,6 +1,5 @@
 import {Group} from '@app/models';
-
-type RequestHandler = import('express').RequestHandler;
+import {RequestHandler} from 'express';
 
 /**
  * Controller for handling create group request.

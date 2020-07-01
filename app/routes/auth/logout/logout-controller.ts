@@ -1,4 +1,4 @@
-type RequestHandler = import('express').RequestHandler;
+import {RequestHandler} from 'express';
 
 /**
  * A simple controller which removes the jwt cookie for the client.

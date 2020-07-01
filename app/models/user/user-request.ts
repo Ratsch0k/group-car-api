@@ -3,8 +3,7 @@ import {default as sequelize} from '@db';
 import bcrypt from 'bcrypt';
 import config from '@config';
 import {PasswordNotHashableError} from '@errors';
-
-type ModelHooks = import('sequelize/types/lib/hooks').ModelHooks;
+import {ModelHooks} from 'sequelize/types/lib/hooks';
 
 /**
  * This model represents the temporary user which is created when

@@ -2,8 +2,7 @@ import debug from 'debug';
 import {User, UserDto} from '@models';
 import {UnauthorizedError} from '@errors';
 import ModelToDtoConverter from '@util/model-to-dto-converter';
-
-type RequestHandler = import('express').RequestHandler;
+import {RequestHandler} from 'express';
 
 /**
  * Log method for normal debug logging

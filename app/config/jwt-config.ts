@@ -1,4 +1,4 @@
-type Request = import('express').Request;
+import {Request} from 'express';
 
 export interface JWTOptions {
   algorithm: 'HS512' | 'HS384' | 'HS256';

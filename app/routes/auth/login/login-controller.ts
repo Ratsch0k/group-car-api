@@ -4,9 +4,7 @@ import bcrypt from 'bcrypt';
 import debug from 'debug';
 import {InvalidLoginError} from '@errors';
 import {convertUserToJwtPayload} from '@app/routes/auth/jwt/jwt-util';
-
-type RequestHandler = import('express').RequestHandler;
-type UserType = import('@models').User;
+import {RequestHandler} from 'express';
 
 const log = debug('group-car:login:controller:log');
 const error = debug('group-car:login:controller:error');
@@ -19,7 +17,7 @@ const error = debug('group-car:login:controller:error');
  */
 const loginController: RequestHandler = (req, res, next) => {
   User.findByUsername(req.body.username)
-      .then((user: UserType | null) => {
+      .then((user: User | null) => {
         if (user === null) {
           error('User "%s" doesn\'t exist', req.body.username);
           throw new InvalidLoginError();

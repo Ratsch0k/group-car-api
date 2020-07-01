@@ -10,8 +10,7 @@ import {
   User,
 } from '@models';
 import ModelToDtoConverter from '@app/util/model-to-dto-converter';
-
-type RequestHandler = import('express').RequestHandler;
+import {RequestHandler} from 'express';
 
 /**
  * Depending on who the requesting user is, respond with the group data.

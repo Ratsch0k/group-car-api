@@ -3,8 +3,7 @@ import {default as sequelize} from '@db';
 import {Membership} from '../membership';
 import {InternalError} from '@app/errors';
 import debug from 'debug';
-
-type ModelHooks = import('sequelize/types/lib/hooks').ModelHooks;
+import {ModelHooks} from 'sequelize/types/lib/hooks';
 
 const error = debug('group-car:group:error');
 const log = debug('group-car:group');
