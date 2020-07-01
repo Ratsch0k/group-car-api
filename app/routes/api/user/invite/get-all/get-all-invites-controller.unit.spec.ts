@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sinon, {assert, match} from 'sinon';
-import {InviteRepository} from '../../../../../models';
+import {InviteRepository} from '../../../../../models/invite/invite-repository';
 import {getAllInvitesController} from './get-all-invites-controller';
 
 describe('GetAllInvitesController', function() {

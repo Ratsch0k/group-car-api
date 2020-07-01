@@ -39,7 +39,7 @@ describe('GetAllInvites', function() {
 
   describe('if logged in', function() {
     it('responses with empty list if user has no invites', function() {
-      agent.get('/api/user/invite')
+      return agent.get('/api/user/invite')
           .expect(200)
           .then((response) => {
             expect(response.body).to.eql({
