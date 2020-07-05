@@ -1,14 +1,15 @@
 import {RequestHandler} from 'express';
-import {InviteRepository} from '@app/models/invite/invite-repository';
-import {NotLoggedInError} from '@app/errors/not-logged-in-error';
+import {NotLoggedInError} from '@errors';
+import {InviteService} from '@models';
 
 /**
  * Controller for getting all invites of the currently logged in user.
  * @param req   - Request
  * @param res   - Response
- * @param next  - Next
+ * @param _next  - Next
  */
-export const getAllInvitesController: RequestHandler = (req, res, next) => {
+export const getAllInvitesController: RequestHandler =
+async (req, res, next) => {
   /*
    * Check if user is set on request.
    * This should never be the case as this route is protected by
@@ -16,13 +17,9 @@ export const getAllInvitesController: RequestHandler = (req, res, next) => {
    * request handler.
    */
   if (req.user === undefined) {
-    next(new NotLoggedInError());
+    throw new NotLoggedInError();
   } else {
-    InviteRepository.findAllForUser(
-        req.user, {
-          withGroupData: true,
-          withInvitedByData: true,
-        }).then((list) => res.send({invites: list}))
-        .catch(next);
+    const list = await InviteService.findAllForUser(req.user, req.user.id);
+    res.send({invites: list});
   }
 };

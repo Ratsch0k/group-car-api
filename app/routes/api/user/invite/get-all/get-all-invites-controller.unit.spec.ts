@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sinon, {assert, match} from 'sinon';
-import {InviteRepository} from '../../../../../models/invite/invite-repository';
 import {getAllInvitesController} from './get-all-invites-controller';
 import {NotLoggedInError} from '../../../../../errors';
+import {InviteService} from '../../../../../models';
+import chai, {expect} from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('GetAllInvitesController', function() {
   let req: any;
@@ -14,7 +18,7 @@ describe('GetAllInvitesController', function() {
   });
 
   it('calls InviteRepository with correct parameters ' +
-  'and sends response', function(done) {
+  'and sends response', async function() {
     req = {
       user: {
         id: 4,
@@ -36,30 +40,27 @@ describe('GetAllInvitesController', function() {
       },
     ];
 
-    const inviteRepFindAllForUserStub = sinon.stub(InviteRepository,
+    const inviteServiceFindAllForUserStub = sinon.stub(InviteService,
         'findAllForUser').resolves(invites as any);
 
     res = {};
-    res.send = sinon.stub().callsFake(() => {
-      assert.calledOnceWithExactly(
-          inviteRepFindAllForUserStub,
-          req.user,
-          match({
-            withGroupData: true,
-            withInvitedByData: true,
-          }),
-      );
+    res.send = sinon.stub();
 
-      assert.calledOnceWithExactly(res.send, match({
-        invites,
-      }));
-      done();
-    });
+    await getAllInvitesController(req, res, next);
 
-    getAllInvitesController(req, res, next);
+    assert.calledOnceWithExactly(
+        inviteServiceFindAllForUserStub,
+        req.user,
+        req.user.id,
+    );
+
+    assert.calledOnceWithExactly(res.send, match({
+      invites,
+    }));
   });
 
-  it('forwards error to next if InviteRepository throws one', function(done) {
+  it('forwards error to next if InviteRepository ' +
+  'throws one', function() {
     req = {
       user: {
         id: 4,
@@ -68,40 +69,33 @@ describe('GetAllInvitesController', function() {
 
     const error = new Error('TEST');
 
-    const inviteRepFindAllForUserStub = sinon.stub(InviteRepository,
+    const inviteServiceFindAllForUserStub = sinon.stub(InviteService,
         'findAllForUser').rejects(error);
 
     res = {};
     res.send = sinon.stub();
-    next = sinon.stub().callsFake(() => {
-      assert.calledOnceWithExactly(
-          inviteRepFindAllForUserStub,
-          req.user,
-          match({
-            withGroupData: true,
-            withInvitedByData: true,
-          }),
-      );
+    next = sinon.stub();
 
-      assert.calledOnceWithExactly(next, error);
-      assert.notCalled(res.send);
-      done();
-    });
+    expect(getAllInvitesController(req, res, next))
+        .to.eventually.be.rejectedWith(error);
 
-    getAllInvitesController(req, res, next);
+    assert.calledOnceWithExactly(
+        inviteServiceFindAllForUserStub,
+        req.user,
+        req.user.id,
+    );
+
+    assert.notCalled(res.send);
   });
 
   it('calls next with NotLoggedInError if user ' +
-  'is missing on request', function(done) {
+  'is missing on request', function() {
     req = {};
     res = {};
     res.send = sinon.stub();
-    next = sinon.stub().callsFake(() => {
-      assert.calledOnceWithExactly(next, match.instanceOf(NotLoggedInError));
-      assert.notCalled(res.send);
-      done();
-    });
+    next = sinon.stub();
 
-    getAllInvitesController(req, res, next);
+    expect(getAllInvitesController(req, res, next))
+        .to.eventually.be.rejectedWith(NotLoggedInError);
   });
 });

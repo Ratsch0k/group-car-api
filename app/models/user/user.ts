@@ -71,6 +71,12 @@ class User extends Model {
   public static findByUsername(username: string): Promise<User | null> {
     return this.findOne({where: {username}});
   }
+
+  /**
+   * List of attributes which should be used if a user
+   * reference is eagerly loaded.
+   */
+  public static simpleAttributes = ['id', 'username'];
 }
 
 /**

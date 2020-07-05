@@ -48,13 +48,19 @@ class Group extends Model {
    * Date when the group was last updated.
    */
   public readonly updatedAt!: Date;
+
+  /**
+   * List of attributes which should be used if group reference is eagerly
+   * loaded.
+   */
+  public static simpleAttributes = ['id', 'name', 'description'];
 }
 
 /**
- * Creates a new membership for the owner/creater of the group for that
+ * Creates a new membership for the owner/creator of the group for that
  * group.
  *
- * Gives the owner/creater admin permissions.
+ * Gives the owner/creator admin permissions.
  * @param group - The newly created group
  */
 export const createMembershipForOwner = (

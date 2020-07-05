@@ -185,7 +185,7 @@ paths:
         200:
           description: All invites of the user
           content:
-            aplication/json:
+            application/json:
               schema:
                 type: object
                 properties:
@@ -202,6 +202,7 @@ paths:
         required: true
         schema:
           type: integer
+      - $ref: '#/components/parameters/XsrfParameter'
     post:
       summary: Joins the group
       tags:
