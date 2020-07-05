@@ -1,6 +1,15 @@
 import {getIdFromModelOrId} from '@app/util/get-id-from-user';
 import Membership from './membership';
 import {RepositoryQueryOptions} from 'typings';
+import {UnauthorizedError} from '@app/errors';
+
+/**
+ * If of a membership.
+ */
+export interface MembershipId {
+  userId: number;
+  groupId: number;
+}
 
 /**
  * Repository for {@link Membership}.
@@ -14,6 +23,8 @@ export class MembershipRepository {
    * permission.
    * @param user    - The user for which the membership should be created
    * @param groupId - The group for which the membership should be
+   * @param isAdmin - Whether or not the user is an admin of the group
+   * @param options - Options for the query
    */
   public static async create(
       user: Express.User | number,
@@ -27,6 +38,31 @@ export class MembershipRepository {
       userId,
       groupId,
       isAdmin,
+    }, {
+      transaction: options?.transaction,
+    });
+  }
+
+  /**
+   * Finds a membership by it's id.
+   * @param user    - The user which requests this query
+   * @param id      - The id of the membership
+   * @param options - Options for the query
+   */
+  public static async findById(
+      user: Express.User | number,
+      id: MembershipId,
+      options?: RepositoryQueryOptions,
+  ): Promise<Membership> {
+    const userId = getIdFromModelOrId(user);
+
+    if (userId !== id.userId) {
+      throw new UnauthorizedError('Not authorized to request this membership');
+    }
+
+    return Membership.create({
+      userId: id.userId,
+      groupId: id.groupId,
     }, {
       transaction: options?.transaction,
     });

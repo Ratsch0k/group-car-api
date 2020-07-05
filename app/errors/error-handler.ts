@@ -41,7 +41,11 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
       res.status(500).send(new InternalError());
     } else {
       error(err.stack);
-      res.status(500).send(new InternalError(err.message, err.stack));
+      res.status(500).send(new InternalError(
+          err.message,
+          undefined,
+          err.stack,
+      ));
     }
   }
 };

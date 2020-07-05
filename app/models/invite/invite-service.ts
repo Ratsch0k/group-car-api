@@ -2,9 +2,11 @@ import {InviteId, Invite} from '@models';
 import {InviteRepository} from './invite-repository';
 import db from '@db';
 import {MembershipRepository} from '../membership/membership-repository';
-import {Membership} from '@models';
 import {UnauthorizedError} from '@errors';
 import debug from 'debug';
+import {
+  CouldNotAssignToGroupError,
+} from '@app/errors/user/could-not-assign-to-group-error';
 
 /**
  * Service for invites.
@@ -57,6 +59,7 @@ export class InviteService {
       this.logE(`Could not assign user ${currentUser.id} ` +
         `to group ${groupId}`, error);
       await transaction.rollback();
+      throw new CouldNotAssignToGroupError(inviteId.userId, inviteId.groupId);
     }
     await transaction.commit();
   }
@@ -74,12 +77,13 @@ export class InviteService {
       id: InviteId,
   ): Promise<Invite> {
     // Get memberships of user
-    const membership = await Membership.findOne({
-      where: {
-        userId: currentUser.id,
-        groupId: id.groupId,
-      },
-    });
+    const membership = await MembershipRepository.findById(
+        currentUser,
+        {
+          userId: currentUser.id,
+          groupId: id.groupId,
+        },
+    );
     if (
     // Current user is not user of invite
       currentUser.id !== id.userId &&
@@ -100,7 +104,7 @@ export class InviteService {
    * @param userId      - The id of the user of whom the
    *                      list of invites should be returned
    */
-  public static findAllForUser(
+  public static async findAllForUser(
       currentUser: Express.User,
       userId: number,
   ): Promise<Invite[]> {

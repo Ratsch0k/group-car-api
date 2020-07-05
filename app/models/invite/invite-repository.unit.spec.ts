@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import sinon, {match} from 'sinon';
-import {InviteRepository} from './invite-repository';
+import sinon, {match, assert} from 'sinon';
+import {InviteRepository, InviteId} from './invite-repository';
 import {InviteNotFoundError} from '../../errors';
 import {expect} from 'chai';
 import Bluebird from 'bluebird';
@@ -94,6 +94,85 @@ describe('InviteRepository', function() {
         where: {
           userId,
         },
+      }));
+    });
+  });
+
+  describe('deleteById', function() {
+    it('deletes the invite with the specified id', function() {
+      const id: InviteId = {
+        userId: 5,
+        groupId: 7,
+      };
+
+      const inviteDestroyStub = sinon.stub(Invite, 'destroy').resolves(3);
+
+      expect(InviteRepository.deleteById(id)).to.eventually.eql(3);
+
+      assert.calledOnceWithExactly(inviteDestroyStub, match({
+        where: id,
+        transaction: undefined,
+      }));
+    });
+
+    it('deletes with transaction if specified', function() {
+      const id: InviteId = {
+        userId: 5,
+        groupId: 7,
+      };
+
+      const inviteDestroyStub = sinon.stub(Invite, 'destroy').resolves(3);
+
+      const transactionFake: any = {};
+      expect(InviteRepository.deleteById(
+          id,
+          {transaction: transactionFake},
+      ))
+          .to.eventually.eql(3);
+
+      assert.calledOnceWithExactly(inviteDestroyStub, match({
+        where: id,
+        transaction: transactionFake,
+      }));
+    });
+  });
+
+  describe('existsById', function() {
+    it('returns true if an invite with the specified id exists', function() {
+      const id = {
+        userId: 10,
+        groupId: 14,
+      };
+
+      const invite = {
+        userId: id.userId,
+        groupId: id.groupId,
+        invitedBy: 5,
+      };
+
+      const inviteFindOne = sinon.stub(Invite, 'findOne')
+          .resolves(invite as any);
+
+      expect(InviteRepository.existsById(id)).to.eventually.be.true;
+
+      assert.calledOnceWithExactly(inviteFindOne, match({
+        where: id,
+      }));
+    });
+
+    it('returns false if no invite with the specified id exists', function() {
+      const id = {
+        userId: 10,
+        groupId: 14,
+      };
+
+      const inviteFindOne = sinon.stub(Invite, 'findOne')
+          .resolves(null as any);
+
+      expect(InviteRepository.existsById(id)).to.eventually.be.false;
+
+      assert.calledOnceWithExactly(inviteFindOne, match({
+        where: id,
       }));
     });
   });
