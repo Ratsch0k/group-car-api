@@ -2,6 +2,13 @@ import {RequestHandler} from 'express';
 import {InviteService} from '@app/models/invite/invite-service';
 import {BadRequestError} from '@errors';
 
+/**
+ * Controller for handling request to let
+ * the currently logged in user join a group.
+ * @param req   - Request
+ * @param res   - Response
+ * @param next  - Next
+ */
 export const joinGroupController: RequestHandler = async (req, res, next) => {
   const groupId = parseInt(req.params.groupId, 10);
 
