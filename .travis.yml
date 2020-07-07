@@ -49,10 +49,6 @@ jobs:
       - NODE_ENV=test
       name: "Integration Tests"
 
-    # Jobs for generating documentation
-    - stage: "Generate typedoc"
-      script: yarn typedoc
-
       # Deploy jobs
     - stage: "Deploy Development"
       script: bash scripts/deploy_dev.sh
@@ -68,12 +64,15 @@ stages:
   - "Static Analysis"
   - "Build"
   - "Test"
-  - "Generate typedoc"
+  - name: "Compare version and tag for develop deploy"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
   - name: "Deploy Development"
-    if: NOT tag IS present AND type = push AND fork = false AND branch = develop
+    if: tag IS present AND tag~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
+  - name: "Compare version and tag for beta deploy"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-beta(.\d+)*$/
   - name: "Deploy Beta"
-    if: NOT tag IS present AND type = push AND fork = false AND branch = master
-  - name: "Compare version and tag"
+    if: tag IS present AND tag~= /^v\d+.\d+.\d+-beta(.\d+)*$/
+  - name: "Compare version and tag for release"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
   - name: "Deploy Release"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
