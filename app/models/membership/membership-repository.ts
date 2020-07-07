@@ -2,6 +2,7 @@ import {getIdFromModelOrId} from '@app/util/get-id-from-user';
 import Membership from './membership';
 import {RepositoryQueryOptions} from 'typings';
 import {UnauthorizedError} from '@app/errors';
+import {MembershipNotFoundError} from '@errors';
 
 /**
  * If of a membership.
@@ -60,11 +61,18 @@ export class MembershipRepository {
       throw new UnauthorizedError('Not authorized to request this membership');
     }
 
-    return Membership.create({
-      userId: id.userId,
-      groupId: id.groupId,
-    }, {
+    const membership = await Membership.findOne({
+      where: {
+        userId: id.userId,
+        groupId: id.groupId,
+      },
       transaction: options?.transaction,
     });
+
+    if (membership === null) {
+      throw new MembershipNotFoundError(id);
+    } else {
+      return membership;
+    }
   }
 }
