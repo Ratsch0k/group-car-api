@@ -30,49 +30,49 @@ before_script:
 jobs: 
   include:
     # Jobs for static analysis
-    #- stage: "Static Analysis"
-    #  name: "Eslint"
-    #  script: yarn eslint
-    #- script: yarn audit
-    #  name: "Audit"
+    - stage: "Static Analysis"
+      name: "Eslint"
+      script: yarn eslint
+    - script: yarn audit
+      name: "Audit"
 
-    # Building job
-    #- stage: "Build"
-    #  script: yarn tsc
+     Building job
+    - stage: "Build"
+      script: yarn tsc
 
-    # Testing jobs
-    #- stage: "Test"
-    #  name: "Unit Tests"
-    #  script: yarn test:unit
-    #- script: yarn test:integration
-    #  env:
-    #  - NODE_ENV=test
-    #  name: "Integration Tests"
+     Testing jobs
+    - stage: "Test"
+      name: "Unit Tests"
+      script: yarn test:unit
+    - script: yarn test:integration
+      env:
+      - NODE_ENV=test
+      name: "Integration Tests"
 
       # Deploy jobs
     - stage: "Deploy Development"
       script: bash scripts/deploy_dev.sh
-    #- stage: "Deploy Beta"
-    #  script: bash scripts/deploy_beta.sh
-    #- stage: "Compare version and tag"
-    #  script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
-    #- stage: "Deploy Release"
-    #  script: bash scripts/deploy_release.sh
+    - stage: "Deploy Beta"
+      script: bash scripts/deploy_beta.sh
+    - stage: "Compare version and tag"
+      script: if [[ $TRAVIS_TAG =~ $( cat ./package.json | jq '.version' | cut -d'"' -f2 )$ ]]; then exit 0; else exit 1; fi
+    - stage: "Deploy Release"
+      script: bash scripts/deploy_release.sh
 
 # Define stages
 stages:
-  #- "Static Analysis"
-  #- "Build"
-  #- "Test"
-  #- name: "Compare version and tag"
-  #  if: tag IS present AND tag ~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
-  - "Deploy Development"
-  #  if: tag IS present AND tag ~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
-  #- name: "Compare version and tag"
-  #  if: tag IS present AND tag ~= /^v\d+.\d+.\d+-beta(.\d+)*$/
-  #- name: "Deploy Beta"
-  #  if: tag IS present AND tag ~= /^v\d+.\d+.\d+-beta(.\d+)*$/
-  #- name: "Compare version and tag"
-  #  if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
-  #- name: "Deploy Release"
-  #  if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
+  - "Static Analysis"
+  - "Build"
+  - "Test"
+  - name: "Compare version and tag"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
+  - name: "Deploy Development"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
+  - name: "Compare version and tag"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-beta(.\d+)*$/
+  - name: "Deploy Beta"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-beta(.\d+)*$/
+  - name: "Compare version and tag"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
+  - name: "Deploy Release"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
