@@ -67,11 +67,11 @@ stages:
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
   - name: "Deploy Development"
-    if: tag IS present AND tag~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+-beta(.\d+)*$/
   - name: "Deploy Beta"
-    if: tag IS present AND tag~= /^v\d+.\d+.\d+-beta(.\d+)*$/
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-beta(.\d+)*$/
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
   - name: "Deploy Release"
