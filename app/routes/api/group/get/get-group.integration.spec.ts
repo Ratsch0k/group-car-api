@@ -145,10 +145,9 @@ describe('GetGroup', function() {
     const expectedMemberList: any = [{
       User: {
         username: user.username,
-        email: user.email,
+        id: user.id,
       },
       isAdmin: true,
-      userId: user.id,
     }];
 
     for (let i = 0; i < 5; i++) {
@@ -161,9 +160,8 @@ describe('GetGroup', function() {
       expectedMemberList.push({
         User: {
           username: member.username,
-          email: member.email,
+          id: member.id,
         },
-        userId: member.id,
         isAdmin: i % 2 === 0,
       });
 

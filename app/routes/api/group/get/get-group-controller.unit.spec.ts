@@ -247,27 +247,24 @@ describe('GetGroupController', function() {
 
     const allGroupMembers = [
       {
-        userId: req.user.id,
         isAdmin: true,
         User: {
           username: 'TEST',
-          email: 'TEST@mail.com',
+          id: req.user.id,
         },
       },
       {
-        userId: req.user.id + 1,
         isAdmin: true,
         User: {
           username: 'TEST1',
-          email: 'TEST1@mail.com',
+          id: req.user.id + 1,
         },
       },
       {
-        userId: req.user.id + 2,
         isAdmin: false,
         User: {
           username: 'TEST2',
-          email: 'TEST2@mail.com',
+          id: req.user.id + 2,
         },
       },
     ];
@@ -305,7 +302,6 @@ describe('GetGroupController', function() {
           groupId: req.params.groupId,
         },
         attributes: [
-          'userId',
           'isAdmin',
         ],
         include: [
@@ -314,7 +310,7 @@ describe('GetGroupController', function() {
             as: 'User',
             attributes: [
               'username',
-              'email',
+              'id',
             ],
           },
         ],

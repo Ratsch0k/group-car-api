@@ -10,7 +10,8 @@ export class InviteNotFoundError extends NotFoundError {
    * @param inviteId  - Id of the non existing invite
    */
   constructor(inviteId: InviteId) {
-    super(`Invite with for user ${inviteId.userId} and ` +
+    super(`Invite for user ${inviteId.userId} and ` +
     `group ${inviteId.groupId} doesn't exist`, {inviteId});
   }
 }
+

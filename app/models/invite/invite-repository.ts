@@ -1,14 +1,16 @@
-import {Invite, UserDto, Group, User} from '@models';
-import {UnauthorizedError, InviteNotFoundError} from '@app/errors';
-import {Membership} from '../membership';
-import {Includeable} from 'sequelize/types';
+import {Invite, Group, User} from '@models';
+import {InviteNotFoundError} from '@errors';
+import {RepositoryQueryOptions} from 'typings';
+import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 
 export type InviteId = {userId: number, groupId: number};
 
 /**
  * Options of find queries
  */
-export interface FindOptions {
+export interface FindOptions extends RepositoryQueryOptions {
+  [key: string]: unknown;
+
   /**
    * Whether or not the group data should be returned instead of the groupId
    */
@@ -41,34 +43,18 @@ const defaultFindOptions: FindOptions = {
  */
 export class InviteRepository {
   /**
-   * Returns the invite with the given id, if the user is either
-   * the one the invitation is meant for or if the user is
-   * a member of the group for which the invitation is.
-   * @param user  - The currently logged in user of the request
-   * @param id    - The id of the invite, consists of user and group id
+   * Returns the invite with the given id.
+   * If no invite exists will throw {@link InviteNotFoundError}.
+   * @param id          - The id of the invite, consists of user and group id
+   * @param options     - FindOptions define what should be eagerly loaded
    */
   public static async findById(
-      currentUser: UserDto,
       id: InviteId,
-      options?: FindOptions,
+      options?: Partial<FindOptions>,
   ): Promise<Invite> {
     // Prepare the include array
-    const {include, attributes} = this.buildFindQueryOptions(options);
+    const {include, attributes} = this.buildOptions(options);
 
-    // Get memberships of user
-    const membership = await Membership.findOne({
-      where: {
-        userId: currentUser.id,
-        groupId: id.groupId,
-      },
-    });
-    if (
-      // Current user is not user of invite
-      currentUser.id !== id.userId &&
-      // Current user has no membership with group
-      membership === null) {
-      throw new UnauthorizedError('Not authorized to request this invite');
-    }
     const invite = await Invite.findOne({
       where: {
         userId: id.userId,
@@ -76,6 +62,7 @@ export class InviteRepository {
       },
       include,
       attributes,
+      transaction: options?.transaction,
     });
 
     if (invite === null) {
@@ -87,23 +74,61 @@ export class InviteRepository {
 
   /**
    * Returns a list of all invites the user has.
-   * @param currentUser     - The currently logged in user
-   * @param withGroupData   - Whether or not to include group data
+   * @param user          - The currently logged in user
+   * @param options       - FindOptions define what should be eagerly loaded
    */
   public static async findAllForUser(
-      currentUser: Express.User,
+      userId: number,
       options?: Partial<FindOptions>,
   ): Promise<Invite[]> {
     // Prepare the include array
-    const {include, attributes} = this.buildFindQueryOptions(options);
+    const {include, attributes} = this.buildOptions(options);
 
     return Invite.findAll({
       where: {
-        userId: currentUser.id,
+        userId,
       },
       include,
       attributes,
+      transaction: options?.transaction,
     });
+  }
+
+  /**
+   * Deletes an invite which is for the given user and group.
+   * @param user    - The currently logged in user. Is owner of invite
+   * @param groupId - The id of the group for which the invite is
+   * @returns Promise of number of deleted rows
+   */
+  public static async deleteById(
+      id: InviteId,
+      options?: RepositoryQueryOptions,
+  ): Promise<number> {
+    return Invite.destroy({
+      where: {
+        userId: id.userId,
+        groupId: id.groupId,
+      },
+      transaction: options?.transaction,
+    });
+  }
+
+  /**
+   * Returns whether or not an invite with the given user and group id exists.
+   * @param user    - User of the invite
+   * @param groupId - Group id of the invite
+   * @param options - Query options
+   */
+  public static async existsById(
+      id: InviteId,
+      options?: RepositoryQueryOptions,
+  ): Promise<boolean> {
+    try {
+      await this.findById(id, options);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   /**
@@ -111,68 +136,41 @@ export class InviteRepository {
    * in the query from {@link FindOptions}.
    * @param options - The options which define the to included models.
    */
-  public static buildFindQueryOptions(
-      options?: Partial<FindOptions>,
-  ): {
-    include: Includeable[] | undefined,
-    attributes: {exclude: string[]} | undefined
-  } {
-    const confOptions: FindOptions = {
-      ...defaultFindOptions,
-      ...options,
-    };
-
-    const include: Includeable[] = [];
-    const attributes = {
-      exclude: [] as string[],
-    };
-
-    if (confOptions.withGroupData) {
-      include.push({
-        model: Group,
-        as: 'Group',
-        attributes: [
-          'id',
-          'name',
-          'description',
-        ],
-        include: [{
-          model: User,
-          as: 'Owner',
-          attributes: [
-            'id',
-            'username',
-          ],
-        }],
-      });
-      attributes.exclude.push('groupId');
-    }
-    if (confOptions.withUserData) {
-      include.push({
-        model: User,
-        as: 'User',
-        attributes: [
-          'id',
-          'username',
-        ],
-      });
-      attributes.exclude.push('userId');
-    }
-    if (confOptions.withInvitedByData) {
-      include.push({
-        model: User,
-        as: 'InviteSender',
-        attributes: [
-          'id',
-          'username',
-        ],
-      });
-      attributes.exclude.push('invitedBy');
-    }
-
-    return {
-      include: include.length <= 0 ? undefined : include,
-      attributes: attributes.exclude.length > 0 ? attributes : undefined,
-    };
-  }
+  public static buildOptions = buildFindQueryOptionsMethod(
+      [
+        {
+          key: 'withGroupData',
+          include: [{
+            model: Group,
+            as: 'Group',
+            attributes: Group.simpleAttributes,
+            include: [{
+              model: User,
+              as: 'Owner',
+              attributes: User.simpleAttributes,
+            }],
+          }],
+          exclude: ['groupId'],
+        },
+        {
+          key: 'withUserData',
+          include: [{
+            model: User,
+            as: 'InviteSender',
+            attributes: User.simpleAttributes,
+          }],
+          exclude: ['userId'],
+        },
+        {
+          key: 'withInvitedByData',
+          include: [{
+            model: User,
+            as: 'InviteSender',
+            attributes: User.simpleAttributes,
+          }],
+          exclude: ['invitedBy'],
+        },
+      ],
+      defaultFindOptions,
+  );
 }
