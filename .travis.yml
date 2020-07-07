@@ -36,11 +36,11 @@ jobs:
     - script: yarn audit
       name: "Audit"
 
-     Building job
+     # Building job
     - stage: "Build"
       script: yarn tsc
 
-     Testing jobs
+     # Testing jobs
     - stage: "Test"
       name: "Unit Tests"
       script: yarn test:unit
