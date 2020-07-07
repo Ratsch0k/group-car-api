@@ -441,8 +441,8 @@ components:
       - userId
       - isAdmin
       properties:
-        userId:
-          type: integer
+        User:
+          $ref: '#/components/schemas/UserSimple'
         isAdmin:
           type: boolean
     GroupWithMembers:
