@@ -49,7 +49,7 @@ rm -r mochawesome-report
 rm -r node_modules
  
 # Copy files to server to the correct path
-#rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER@$SERVER_IP:$SERVER_PATH_DEV
+rsync --recursive --times --compress --delete --quiet ./ $SERVER_USER@$SERVER_IP:$SERVER_PATH_DEV
 
  
 # Execute remote install script on server
