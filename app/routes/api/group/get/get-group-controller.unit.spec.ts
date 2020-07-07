@@ -250,7 +250,6 @@ describe('GetGroupController', function() {
         isAdmin: true,
         User: {
           username: 'TEST',
-          email: 'TEST@mail.com',
           id: req.user.id,
         },
       },
@@ -258,7 +257,6 @@ describe('GetGroupController', function() {
         isAdmin: true,
         User: {
           username: 'TEST1',
-          email: 'TEST1@mail.com',
           id: req.user.id + 1,
         },
       },
@@ -266,7 +264,6 @@ describe('GetGroupController', function() {
         isAdmin: false,
         User: {
           username: 'TEST2',
-          email: 'TEST2@mail.com',
           id: req.user.id + 2,
         },
       },
@@ -313,7 +310,6 @@ describe('GetGroupController', function() {
             as: 'User',
             attributes: [
               'username',
-              'email',
               'id',
             ],
           },

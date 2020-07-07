@@ -62,7 +62,6 @@ export const getGroupController: RequestHandler = (req, res, next) => {
                   as: 'User',
                   attributes: [
                     'username',
-                    'email',
                     'id',
                   ],
                 },

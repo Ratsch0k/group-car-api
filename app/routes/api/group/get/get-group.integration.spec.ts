@@ -145,7 +145,6 @@ describe('GetGroup', function() {
     const expectedMemberList: any = [{
       User: {
         username: user.username,
-        email: user.email,
         id: user.id,
       },
       isAdmin: true,
@@ -161,7 +160,6 @@ describe('GetGroup', function() {
       expectedMemberList.push({
         User: {
           username: member.username,
-          email: member.email,
           id: member.id,
         },
         isAdmin: i % 2 === 0,

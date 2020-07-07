@@ -113,7 +113,6 @@ describe('JoinGroup', function() {
       expect(userPovGroup.members).to.be.a('array');
       expect(userPovGroup.members).to.deep.include({
         User: {
-          email: user.email,
           username: user.username,
           id: user.id,
         },
