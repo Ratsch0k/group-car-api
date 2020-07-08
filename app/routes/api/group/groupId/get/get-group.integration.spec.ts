@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import config from '../../../../config';
-import db, {syncPromise} from '../../../../db';
-import app from '../../../../app';
+import config from '../../../../../config';
+import db, {syncPromise} from '../../../../../db';
+import app from '../../../../../app';
 import request from 'supertest';
 import {expect} from 'chai';
-import {Invite, Group, User, Membership} from '../../../../models';
+import {Invite, Group, User, Membership} from '../../../../../models';
 import Bluebird from 'bluebird';
 import sinon from 'sinon';
 

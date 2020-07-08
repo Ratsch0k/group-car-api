@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import config from '../../../../config';
+import config from '../../../../../config';
 import request from 'supertest';
-import app from '../../../../app';
-import db, {syncPromise} from '../../../../db';
+import app from '../../../../../app';
+import db, {syncPromise} from '../../../../../db';
 import {expect} from 'chai';
-import {Group, Membership, User} from '../../../../models';
+import {Group, Membership, User} from '../../../../../models';
 import sinon from 'sinon';
 import Bluebird from 'bluebird';
 

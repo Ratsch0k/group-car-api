@@ -1,12 +1,13 @@
 import {param} from 'express-validator';
 import {Router} from 'express';
-import {createValidationResultHandler} from '@util/validation-result-handler';
-
+import {
+  createValidationResultHandler,
+} from '@app/util/validation-result-handler';
 
 /**
  * The validation chain for the create group request.
  */
-export const getGroupValidator = [
+export const groupIdValidator = [
   param('groupId')
       .exists()
       .withMessage('groupId is missing')
@@ -16,13 +17,13 @@ export const getGroupValidator = [
 /**
  * Router for connecting the validator chain and the validation handler
  */
-const getGroupValidationRouter = Router({mergeParams: true}).use(
+const groupIdValidationRouter = Router({mergeParams: true}).use(
     '/',
-    getGroupValidator,
+    groupIdValidator,
     createValidationResultHandler({
       debugScope: 'group-car:group:get',
       requestName: (req) => `get group ${req.params.groupId}`,
     }),
 );
 
-export default getGroupValidationRouter;
+export default groupIdValidationRouter;

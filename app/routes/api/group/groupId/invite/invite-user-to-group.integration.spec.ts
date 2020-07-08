@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {TestUtils} from '../../../../util/test-utils.spec';
-import db, {syncPromise} from '../../../../db';
+import {TestUtils} from '../../../../../util/test-utils.spec';
+import db, {syncPromise} from '../../../../../db';
 import {expect} from 'chai';
-import {User, Group, Membership, Invite} from '../../../../models';
+import {User, Group, Membership, Invite} from '../../../../../models';
 import {
   NotMemberOfGroupError,
   NotAdminOfGroupError,
@@ -11,9 +11,9 @@ import {
   GroupIsFullError,
   AlreadyInvitedError,
   AlreadyMemberError,
-} from '../../../../errors';
+} from '../../../../../errors';
 import request from 'supertest';
-import config from '../../../../config';
+import config from '../../../../../config';
 import Bluebird from 'bluebird';
 import sinon from 'sinon';
 

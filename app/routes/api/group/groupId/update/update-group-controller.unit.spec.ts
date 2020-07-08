@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sinon, {match} from 'sinon';
-import {Membership, Group} from '../../../../models';
+import {Membership, Group} from '../../../../../models';
 import {expect} from 'chai';
 import {
   updateGroupRequestChecker,
@@ -11,7 +11,7 @@ import {
   NotMemberOfGroupError,
   NotAdminOfGroupError,
   GroupNotFoundError,
-} from '../../../../errors';
+} from '../../../../../errors';
 import Bluebird from 'bluebird';
 
 const sandbox = sinon.createSandbox();

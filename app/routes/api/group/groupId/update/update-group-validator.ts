@@ -1,4 +1,4 @@
-import {body, param} from 'express-validator';
+import {body} from 'express-validator';
 import {Router} from 'express';
 import {createValidationResultHandler} from '@util/validation-result-handler';
 
@@ -25,10 +25,6 @@ export const updateGroupValidator = [
       .exists()
       .withMessage('OwnerId can\'t be changed by this request. ' +
         'Use the transfer ownership request'),
-  param('groupId')
-      .exists()
-      .withMessage('groupId is missing')
-      .toInt(10),
 ];
 
 /**

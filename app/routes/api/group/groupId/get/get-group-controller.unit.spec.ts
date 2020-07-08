@@ -6,8 +6,8 @@ import {
   BadRequestError,
   UnauthorizedError,
   GroupNotFoundError,
-} from '../../../../errors';
-import {Membership, Group, Invite, User} from '../../../../models';
+} from '../../../../../errors';
+import {Membership, Group, Invite, User} from '../../../../../models';
 import Bluebird from 'bluebird';
 
 describe('GetGroupController', function() {

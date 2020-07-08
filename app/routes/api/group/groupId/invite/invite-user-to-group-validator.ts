@@ -1,11 +1,8 @@
-import {param, body} from 'express-validator';
+import {body} from 'express-validator';
 import {Router} from 'express';
 import {createValidationResultHandler} from '@util/validation-result-handler';
 
 export const inviteUserToGroupValidator = [
-  param('groupId')
-      .exists().withMessage('groupId is missing')
-      .isNumeric().withMessage('groupId has to be a number'),
   body('userId')
       .exists().withMessage('userId is missing')
       .isNumeric().withMessage('userId has to be a number'),

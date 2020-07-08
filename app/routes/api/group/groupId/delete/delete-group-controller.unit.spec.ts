@@ -7,8 +7,8 @@ import {
   NotMemberOfGroupError,
   GroupNotFoundError,
   NotOwnerOfGroupError,
-} from '../../../../errors';
-import {Membership, Group} from '../../../../models';
+} from '../../../../../errors';
+import {Membership, Group} from '../../../../../models';
 import Bluebird from 'bluebird';
 
 describe('DeleteGroupController', function() {

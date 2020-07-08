@@ -18,10 +18,10 @@ import {
   AlreadyInvitedError,
   AlreadyMemberError,
   GroupIsFullError,
-} from '../../../../errors';
-import {Membership, Group, User, Invite} from '../../../../models';
+} from '../../../../../errors';
+import {Membership, Group, User, Invite} from '../../../../../models';
 import Bluebird from 'bluebird';
-import config from '../../../../config';
+import config from '../../../../../config';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 describe('InviteUserToGroupController', function() {
