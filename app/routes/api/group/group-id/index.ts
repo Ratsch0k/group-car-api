@@ -11,7 +11,7 @@ groupGroupIdRouter.use(groupIdValidationRouter);
 groupGroupIdRouter.put('/', updateGroupRouter);
 groupGroupIdRouter.delete('/', deleteGroupRouter);
 groupGroupIdRouter.get('/', getGroupRouter);
-groupGroupIdRouter.post('/invite', inviteUserToGroupRouter);
+groupGroupIdRouter.use('/invite', inviteUserToGroupRouter);
 
 export default groupGroupIdRouter;
 

@@ -75,4 +75,24 @@ export class MembershipRepository {
       return membership;
     }
   }
+
+  /**
+   * Removes every membership of the specified user from the specified group.
+   * @param userId  - Id of the user to delete from group
+   * @param groupId - Id of the group from which the user should be removed
+   * @param options - Additional options for query
+   */
+  public static async removeUserFromGroup(
+      userId: number,
+      groupId: number,
+      options?: RepositoryQueryOptions,
+  ): Promise<number> {
+    return Membership.destroy({
+      where: {
+        userId,
+        groupId,
+      },
+      ...options,
+    });
+  }
 }

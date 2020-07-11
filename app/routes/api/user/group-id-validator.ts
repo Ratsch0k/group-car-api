@@ -4,7 +4,7 @@ import {
   createValidationResultHandler,
 } from '@app/util/validation-result-handler';
 
-export const groupIdParamsValidator = [
+export const groupIdValidator = [
   param('groupId')
       .exists()
       .withMessage('groupId is missing')
@@ -12,13 +12,13 @@ export const groupIdParamsValidator = [
       .withMessage('groupId has to be a number'),
 ];
 
-const groupIdParamsValidatorRouter = Router({mergeParams: true}).use(
+const groupIdValidatorRouter = Router({mergeParams: true}).use(
     '/',
-    groupIdParamsValidator,
+    groupIdValidator,
     createValidationResultHandler({
       debugScope: 'group-car:invite',
-      requestName: (req) => `access invite for group ${req.params.groupId}`,
+      requestName: (req) => `check groupId ${req.params.groupId}`,
     }),
 );
 
-export default groupIdParamsValidatorRouter;
+export default groupIdValidatorRouter;

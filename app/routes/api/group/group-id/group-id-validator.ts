@@ -22,7 +22,7 @@ const groupIdValidationRouter = Router({mergeParams: true}).use(
     groupIdValidator,
     createValidationResultHandler({
       debugScope: 'group-car:group:get',
-      requestName: (req) => `get group ${req.params.groupId}`,
+      requestName: (req) => `check groupId ${req.params.groupId}`,
     }),
 );
 

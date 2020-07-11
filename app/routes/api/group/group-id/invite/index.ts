@@ -3,7 +3,7 @@ import inviteUserToGroupValidationRouter from
   './invite-user-to-group-validator';
 import inviteUserToGroupController from './invite-user-to-group-controller';
 
-const inviteUserToGroupRouter = Router({mergeParams: true}).use(
+const inviteUserToGroupRouter = Router({mergeParams: true}).post(
     '/',
     inviteUserToGroupValidationRouter,
     inviteUserToGroupController,

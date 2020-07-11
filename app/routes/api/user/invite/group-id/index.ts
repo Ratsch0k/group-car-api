@@ -1,12 +1,11 @@
 import {Router} from 'express';
 import joinGroupRouter from './join';
-import groupIdParamsValidatorRouter from './groupId-validator';
+import groupIdValidationRouter from '../../group-id-validator';
 
 const inviteIdRouter = Router({mergeParams: true});
 
 inviteIdRouter.use(
-    '/*',
-    groupIdParamsValidatorRouter,
+    groupIdValidationRouter,
 );
 
 inviteIdRouter.post(

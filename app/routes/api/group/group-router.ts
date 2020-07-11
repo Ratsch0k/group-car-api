@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import createGroupRouter from './create';
-import groupGroupIdRouter from './groupId';
+import groupGroupIdRouter from './group-id';
 
 /**
  * Router for the group route

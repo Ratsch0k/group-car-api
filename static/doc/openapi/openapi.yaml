@@ -514,7 +514,7 @@ components:
           type: string
       example:
         username: demo
-        password: 123456
+        password: '123456'
     SignUpObject:
       type: object
       properties:
