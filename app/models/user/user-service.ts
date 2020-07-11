@@ -1,5 +1,3 @@
-import {getIdFromModelOrId} from '@app/util/get-id-from-user';
-import {NotLoggedInError} from '@app/errors';
 import {MembershipRepository} from '../membership';
 
 /**
@@ -17,12 +15,6 @@ export class UserService {
       currentUser: Express.User,
       groupId: number,
   ): Promise<number> {
-    const userId = getIdFromModelOrId(currentUser);
-
-    if (userId === undefined) {
-      throw new NotLoggedInError();
-    }
-
     return MembershipRepository.removeUserFromGroup(currentUser.id, groupId);
   }
 }

@@ -139,4 +139,8 @@ describe('MembershipRepository', function() {
           }));
     });
   });
+
+  describe('removeUserFromGroup', function() {
+    it('calls Membership.destroy with correct parameters');
+  });
 });
