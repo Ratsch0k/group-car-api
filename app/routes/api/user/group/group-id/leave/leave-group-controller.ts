@@ -1,5 +1,5 @@
 import {RequestHandler} from 'express';
-import {BadRequestError} from '@app/errors';
+import {BadRequestError, NotMemberOfGroupError, InternalError} from '@errors';
 import {UserService} from '@app/models/user/user-service';
 
 /**
@@ -14,8 +14,14 @@ export const leaveGroupController: RequestHandler = async (req, res, next) => {
   const user = req.user;
 
   if (groupId !== NaN && user !== undefined) {
-    await UserService.leaveGroup(user, groupId);
-    res.status(204).send();
+    const removedMemberships = await UserService.leaveGroup(user, groupId);
+    if (removedMemberships === 1) {
+      res.status(204).send();
+    } else if (removedMemberships === 0) {
+      throw new NotMemberOfGroupError();
+    } else {
+      throw new InternalError();
+    }
   } else {
     throw new BadRequestError();
   }

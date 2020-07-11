@@ -10,17 +10,19 @@ export class UserService {
    * Removes the user from the specified group.
    * @param currentUser - The currently logged in user
    * @param groupId     - The group which the user wants to leave
+   * @returns The amount of memberships which got destroyed.
+   *  Should be either 0 (user was not a member) or 1.
    */
   public static async leaveGroup(
       currentUser: Express.User,
       groupId: number,
-  ): Promise<void> {
+  ): Promise<number> {
     const userId = getIdFromModelOrId(currentUser);
 
     if (userId === undefined) {
       throw new NotLoggedInError();
     }
 
-    await MembershipRepository.removeUserFromGroup(currentUser.id, groupId);
+    return MembershipRepository.removeUserFromGroup(currentUser.id, groupId);
   }
 }

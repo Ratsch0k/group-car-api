@@ -81,6 +81,7 @@ export class MembershipRepository {
    * @param userId  - Id of the user to delete from group
    * @param groupId - Id of the group from which the user should be removed
    * @param options - Additional options for query
+   * @returns The amount of memberships which got destroyed
    */
   public static async removeUserFromGroup(
       userId: number,
