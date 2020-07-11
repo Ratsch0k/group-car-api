@@ -222,7 +222,29 @@ paths:
               schema:
                 oneOf:
                 - $ref: '#/components/schemas/GroupNotFoundErrorSchema'
-                - $ref: '#/components/schemas/InviteNotFoundSchema'  
+                - $ref: '#/components/schemas/InviteNotFoundSchema'
+  /api/user/group/{groupId}/leave:
+    parameters:
+      - $ref: '#/components/parameters/XsrfParameter'
+    post:
+      summary: Leaves the specified group
+      tags:
+        - User
+      parameters: 
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      description: Removes the currently logged in user from the specified group.
+      responses:
+        204:
+          description: The user left the group successfully.
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  
   # Group
   /api/group:
     post:
