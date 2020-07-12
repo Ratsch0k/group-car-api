@@ -1,5 +1,4 @@
-import {MembershipRepository} from '../membership';
-import {GroupService} from '../group';
+import {GroupService, MembershipRepository} from '@models';
 import {OwnerCannotLeaveError} from '@errors';
 
 /**

@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
 import sinon from 'sinon';
-import {UserService} from './user-service';
-import {MembershipRepository} from '../membership';
+import {UserService, MembershipRepository, GroupService} from '../index';
 
 describe('UserService', function() {
   afterEach(function() {
@@ -21,10 +20,17 @@ describe('UserService', function() {
       const removeStub = sinon.stub(MembershipRepository, 'removeUserFromGroup')
           .resolves(groupId as any);
 
+      const group = {
+        ownerId: 56,
+      };
+      const findByIdStub = sinon.stub(GroupService, 'findById')
+          .resolves(group as any);
+
       await expect(UserService.leaveGroup(currentUser, groupId))
           .to.eventually.eql(groupId);
 
       sinon.assert.calledOnceWithExactly(removeStub, currentUser.id, groupId);
+      sinon.assert.calledOnceWithExactly(findByIdStub, currentUser, groupId);
     });
   });
 });

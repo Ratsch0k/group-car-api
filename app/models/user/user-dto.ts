@@ -1,7 +1,7 @@
 /**
  * The data transfer object for {@link User}
  */
-class UserDto {
+export class UserDto {
   /**
    * Creates an instance of this class.
    * @param username   -  Username
@@ -70,5 +70,3 @@ class UserDto {
    */
   public deletedAt: Date;
 }
-
-export default UserDto;

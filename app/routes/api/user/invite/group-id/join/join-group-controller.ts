@@ -1,5 +1,5 @@
 import {RequestHandler} from 'express';
-import {InviteService} from '@app/models/invite/invite-service';
+import {InviteService} from '@models';
 import {BadRequestError} from '@errors';
 
 /**

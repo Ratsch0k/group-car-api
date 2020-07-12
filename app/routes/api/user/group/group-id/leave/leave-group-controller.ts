@@ -1,6 +1,6 @@
 import {RequestHandler} from 'express';
 import {BadRequestError, NotMemberOfGroupError, InternalError} from '@errors';
-import {UserService} from '@app/models/user/user-service';
+import {UserService} from '@models';
 
 /**
  * Handles request, that currently logged in user wants to

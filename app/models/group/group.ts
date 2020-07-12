@@ -10,11 +10,10 @@ import {
   HasManyCreateAssociationMixin,
 } from 'sequelize';
 import {default as sequelize} from '@db';
-import {Membership} from '../membership';
 import {InternalError} from '@app/errors';
 import debug from 'debug';
 import {ModelHooks} from 'sequelize/types/lib/hooks';
-import {User} from '../user/user';
+import {User, Membership} from '@models';
 
 const error = debug('group-car:group:error');
 const log = debug('group-car:group');

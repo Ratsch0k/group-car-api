@@ -6,7 +6,7 @@ import sequelize from '@db';
  *
  * With an invite a user can join a group.
  */
-class Invite extends Model {
+export class Invite extends Model {
   /**
    * The id of the user.
    */

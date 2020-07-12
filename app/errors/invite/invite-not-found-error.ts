@@ -1,5 +1,5 @@
 import NotFoundError from '../not-found-error';
-import {InviteId} from '@app/models/invite/invite-repository';
+import {InviteId} from '@models';
 
 /**
  * This error is thrown if a requested invite doesn't exist.

@@ -1,7 +1,10 @@
-import {InviteId, Invite} from '@models';
-import {InviteRepository} from './invite-repository';
+import {
+  InviteId,
+  Invite,
+  InviteRepository,
+  MembershipRepository,
+} from '@models';
 import db from '@db';
-import {MembershipRepository} from '../membership/membership-repository';
 import {UnauthorizedError} from '@errors';
 import debug from 'debug';
 import {

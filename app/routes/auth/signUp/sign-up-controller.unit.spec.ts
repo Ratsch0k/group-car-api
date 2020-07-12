@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as User from '../../../models/user/user';
 import {signUpController} from './sign-up-controller';
 import {fake, assert, match, createSandbox} from 'sinon';
 import Bluebird from 'bluebird';
-import UserDto from '../../../models/user/user-dto';
+import {UserDto, ProfilePic, User} from '../../../models';
 import {expect} from 'chai';
 import {UniqueConstraintError} from 'sequelize';
 import UsernameAlreadyExistsError from
   '../../../errors/user/username-already-exists-error';
 import * as generatePic from '../../../util/generate-profile-pic';
-import * as ProfilePic from '../../../models/profile-picture/profile-pic';
 import config from '../../../config';
 
 const sandbox = createSandbox();
@@ -38,7 +36,7 @@ describe('SignUpController', function() {
     };
 
     // Mock profile pic create function
-    const picCreateStub = sandbox.stub(ProfilePic.default, 'create');
+    const picCreateStub = sandbox.stub(ProfilePic, 'create');
     picCreateStub.usingPromise(Bluebird).resolves();
 
     // Mock profile pic generation
@@ -47,7 +45,7 @@ describe('SignUpController', function() {
         .resolves(fakeData as any);
 
     // Creates stubs
-    const createStub = sandbox.stub(User.default, 'create');
+    const createStub = sandbox.stub(User, 'create');
     createStub.usingPromise(Bluebird.Promise).resolves(user as any);
     const requestStub: any = sandbox.stub();
     requestStub.body = user;
@@ -91,7 +89,7 @@ describe('SignUpController', function() {
     };
 
     // Create stubs
-    const createStub = sandbox.stub(User.default, 'create');
+    const createStub = sandbox.stub(User, 'create');
     createStub.usingPromise(Bluebird.Promise)
         .rejects(new UniqueConstraintError());
     const requestStub: any = sandbox.stub();
@@ -122,7 +120,7 @@ describe('SignUpController', function() {
     const error = new Error('CUSTOM ERROR');
 
     // Create stubs
-    const createStub = sandbox.stub(User.default, 'create');
+    const createStub = sandbox.stub(User, 'create');
     createStub.usingPromise(Bluebird.Promise)
         .rejects(error);
     const requestStub: any = sandbox.stub();

@@ -1,9 +1,7 @@
 import {getIdFromModelOrId} from '@app/util/get-id-from-user';
-import Membership from './membership';
 import {RepositoryQueryOptions} from 'typings';
-import {UnauthorizedError} from '@app/errors';
-import {MembershipNotFoundError} from '@errors';
-import {User} from '../user';
+import {MembershipNotFoundError, UnauthorizedError} from '@errors';
+import {User, Membership} from '@models';
 
 /**
  * If of a membership.

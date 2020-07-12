@@ -1,7 +1,9 @@
-import Group from './group';
-import {GroupRepository} from './group-repository';
-import {InviteService} from '../invite';
-import {MembershipRepository} from '../membership';
+import {
+  Group,
+  GroupRepository,
+  MembershipRepository,
+  InviteService,
+} from '@models';
 import {UnauthorizedError} from '@app/errors';
 
 /**

@@ -1,9 +1,7 @@
 import {RepositoryQueryOptions} from 'typings';
-import Group from './group';
 import {GroupNotFoundError} from '@app/errors';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
-import {User} from '../user';
-import {MembershipRepository} from '../membership';
+import {Group, User, MembershipRepository} from '@models';
 
 /**
  * Specific options for group queries.

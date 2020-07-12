@@ -1,6 +1,6 @@
 import {Model, DataTypes, HasOneGetAssociationMixin} from 'sequelize';
 import {default as sequelize} from '@db';
-import {User} from '../user/user';
+import {User} from '@models';
 
 /**
  * Model class for memberships.
@@ -12,7 +12,7 @@ import {User} from '../user/user';
  * A membership also defines if the user
  * is an admin of the group.
  */
-class Membership extends Model {
+export class Membership extends Model {
   /**
    * Id the the user.
    */

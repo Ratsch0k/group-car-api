@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {createMembershipForOwner} from './group';
-import {Membership} from '../membership';
+import {createMembershipForOwner, Membership} from '../index';
 import sinon, {match} from 'sinon';
 import Bluebird from 'bluebird';
 import {expect} from 'chai';

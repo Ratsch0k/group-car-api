@@ -8,7 +8,7 @@ import {default as sequelize} from '@db';
  * The data is in a separate table to avoid loading the data
  * every time the user data is loaded.
  */
-class ProfilePic extends Model {
+export class ProfilePic extends Model {
   /**
    * Binary data of the profile picture.
    */
