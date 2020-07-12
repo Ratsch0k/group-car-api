@@ -10,7 +10,7 @@ import {ModelHooks} from 'sequelize/types/lib/hooks';
  *
  * Represents a column of the table 'users' in the database
  */
-class User extends Model {
+export class User extends Model {
   /**
    * The id of the user.
    *

@@ -1,18 +1,29 @@
-import {Model, DataTypes} from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  HasOneGetAssociationMixin,
+  HasOneSetAssociationMixin,
+  HasManySetAssociationsMixin,
+  HasManyAddAssociationMixin,
+  HasManyGetAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  HasManyCreateAssociationMixin,
+} from 'sequelize';
 import {default as sequelize} from '@db';
 import {Membership} from '../membership';
 import {InternalError} from '@app/errors';
 import debug from 'debug';
 import {ModelHooks} from 'sequelize/types/lib/hooks';
+import {User} from '../user/user';
 
 const error = debug('group-car:group:error');
 const log = debug('group-car:group');
 
 /**
- * Model class for groups.
+ * Model for groups.
  */
-class Group extends Model {
-  /**
+export class Group extends Model {
+/**
    * Id of the group.
    *
    * Primary key.
@@ -54,6 +65,53 @@ class Group extends Model {
    * loaded.
    */
   public static simpleAttributes = ['id', 'name', 'description'];
+
+  /**
+   * Gets the owner.
+   */
+  public getOwner!: HasOneGetAssociationMixin<User>;
+
+  /**
+   * Sets the owner.
+   */
+  public setOwner!: HasOneSetAssociationMixin<User, number>;
+
+  /**
+   * Set users.
+   */
+  public setUsers!: HasManySetAssociationsMixin<User, number>;
+
+  /**
+   * Get users.
+   */
+  public getUsers!: HasManyGetAssociationsMixin<User>;
+
+  /**
+   * Add user to list.
+   */
+  public addUser!: HasManyAddAssociationMixin<User, number>;
+
+  /**
+   * Add users.
+   */
+  public addUsers!: HasManyAddAssociationMixin<User[], number>;
+
+  /**
+   * Get amount of users.
+   */
+  public countUsers!: HasManyCountAssociationsMixin;
+
+  /**
+   * Create new user for list.
+   */
+  public createUser!: HasManyCreateAssociationMixin<User>;
+
+  /**
+   * List of members of group.
+   *
+   * Only exists if included in query.
+   */
+  public readonly members?: User[];
 }
 
 /**

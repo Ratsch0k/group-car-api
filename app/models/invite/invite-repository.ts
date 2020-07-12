@@ -1,4 +1,6 @@
-import {Invite, Group, User} from '@models';
+import {Invite} from '@models';
+import {Group} from '@models/group/group';
+import {User} from '@models/user/user';
 import {InviteNotFoundError} from '@errors';
 import {RepositoryQueryOptions} from 'typings';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';

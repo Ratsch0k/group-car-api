@@ -12,7 +12,7 @@ describe('UserService', function() {
   describe('leaveGroup', function() {
     it('calls and returns result of ' +
     'MembershipRepository.removeUserFromGroup', async function() {
-      const currentUser = {
+      const currentUser: any = {
         id: 4,
       };
 

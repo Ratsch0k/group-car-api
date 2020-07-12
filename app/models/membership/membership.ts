@@ -1,5 +1,6 @@
-import {Model, DataTypes} from 'sequelize';
+import {Model, DataTypes, HasOneGetAssociationMixin} from 'sequelize';
 import {default as sequelize} from '@db';
+import {User} from '../user/user';
 
 /**
  * Model class for memberships.
@@ -36,6 +37,18 @@ class Membership extends Model {
    * Date when the membership was last updated.
    */
   public readonly updatedAt!: Date;
+
+  /**
+   * Gets the user.
+   */
+  public getUser!: HasOneGetAssociationMixin<User>;
+
+  /**
+   * User of membership.
+   *
+   * Exists only if explicitly included in query.
+   */
+  public User?: User;
 }
 
 Membership.init(

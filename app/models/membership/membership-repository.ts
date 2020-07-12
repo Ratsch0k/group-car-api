@@ -3,6 +3,7 @@ import Membership from './membership';
 import {RepositoryQueryOptions} from 'typings';
 import {UnauthorizedError} from '@app/errors';
 import {MembershipNotFoundError} from '@errors';
+import {User} from '../user';
 
 /**
  * If of a membership.
@@ -74,6 +75,31 @@ export class MembershipRepository {
     } else {
       return membership;
     }
+  }
+
+  /**
+   * Returns a list of all users which are members of the specified group.
+   * @param groupId - The group for which to check
+   * @param options - Query options
+   * @returns Promise of a list of members
+   */
+  public static async findUsersOfGroup(
+      groupId: number,
+      options?: RepositoryQueryOptions,
+  ): Promise<User[]> {
+    const memberships = await Membership.findAll({
+      where: {
+        groupId,
+      },
+      include: [{
+        model: User,
+        as: 'User',
+        attributes: User.simpleAttributes,
+      }],
+      ...options,
+    });
+
+    return memberships.map((member) => member.User as User);
   }
 
   /**

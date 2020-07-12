@@ -1,4 +1,6 @@
 import {MembershipRepository} from '../membership';
+import {GroupService} from '../group';
+import {OwnerCannotLeaveError} from '@errors';
 
 /**
  * Service for complex user actions.
@@ -15,6 +17,12 @@ export class UserService {
       currentUser: Express.User,
       groupId: number,
   ): Promise<number> {
-    return MembershipRepository.removeUserFromGroup(currentUser.id, groupId);
+    const group = await GroupService.findById(currentUser, groupId);
+
+    if (group.ownerId !== currentUser.id) {
+      return MembershipRepository.removeUserFromGroup(currentUser.id, groupId);
+    } else {
+      throw new OwnerCannotLeaveError();
+    }
   }
 }
