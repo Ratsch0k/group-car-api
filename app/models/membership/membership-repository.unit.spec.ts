@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
 import {UnauthorizedError, MembershipNotFoundError} from '../../errors';
-import {MembershipRepository} from './membership-repository';
-import Membership from './membership';
 import sinon, {assert, match} from 'sinon';
+import {User, Membership, MembershipRepository} from '../../models';
 
 describe('MembershipRepository', function() {
   afterEach(function() {
@@ -163,6 +162,50 @@ describe('MembershipRepository', function() {
             ...options,
           }),
       );
+    });
+  });
+
+  describe('findUsersOfGroup', function() {
+    it('returns list of members for specified group', async function() {
+      const groupId = 12;
+
+      const members = [
+        {
+          groupId,
+          User: {
+            id: 1,
+            username: 'USER-1',
+          },
+        },
+        {
+          groupId,
+          User: {
+            id: 2,
+            username: 'USER-2',
+          },
+        },
+      ];
+
+      const findAllStub = sinon.stub(Membership, 'findAll')
+          .resolves(members as any);
+
+      const actual = await MembershipRepository.findUsersOfGroup(groupId);
+
+      expect(actual).to.have.members([
+        members[0].User,
+        members[1].User,
+      ]);
+
+      assert.calledOnceWithExactly(findAllStub, match({
+        where: {
+          groupId,
+        },
+        include: [{
+          model: User,
+          as: 'User',
+          attributes: User.simpleAttributes,
+        }],
+      }));
     });
   });
 });
