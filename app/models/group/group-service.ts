@@ -28,7 +28,10 @@ export class GroupService {
     // First, check if user is member (gets more information)
     try {
       await MembershipRepository.findById(currentUser, modelId);
-      return GroupRepository.findById(id);
+      return GroupRepository.findById(id, {
+        withMembers: true,
+        withOwnerData: true,
+      });
     } catch (_) {}
 
     // Second, check if the user has invite (only checked if not a user)
@@ -37,7 +40,7 @@ export class GroupService {
           currentUser,
           modelId,
       );
-      return GroupRepository.findById(id, {simple: true});
+      return GroupRepository.findById(id, {simple: true, withOwnerData: true});
     } catch (_) {}
 
     // If neither is the case, user is not authorized

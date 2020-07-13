@@ -6,7 +6,6 @@ import app from '../../../../../app';
 import request from 'supertest';
 import {expect} from 'chai';
 import {Invite, Group, User, Membership} from '../../../../../models';
-import Bluebird from 'bluebird';
 import sinon from 'sinon';
 
 describe('GetGroup', function() {
@@ -76,28 +75,6 @@ describe('GetGroup', function() {
     return agent.get('/api/group/1').send().expect(401);
   });
 
-  it('responses with GroupNotFoundError if authorized to access group ' +
-      'which doesn\'t exist', async function() {
-    const group = await Group.create({
-      name: 'TEST',
-      description: 'TEST',
-      ownerId: user.id,
-    });
-
-    await Invite.create({
-      groupId: group.id,
-      userId: user.id,
-    });
-
-    // Stub Group.findByPk to simulate that Group doesn't exist
-    const groupFindByPkStub = sinon.stub(Group, 'findByPk')
-        .usingPromise(Bluebird).resolves(null as any);
-
-    await agent.get(`/api/group/${group.id}`).send().expect(404);
-
-    sinon.assert.calledOnceWithExactly(groupFindByPkStub as any, group.id);
-  });
-
   it('responses with simple version of group if user ' +
       'is no member but has invite', async function() {
     const owner = await User.create({
@@ -125,8 +102,8 @@ describe('GetGroup', function() {
           expect(res.body).to.include({
             name: group.name,
             description: (group as any).description,
-            ownerId: group.ownerId,
           });
+          expect(res.body).to.haveOwnProperty('ownerId');
           expect(res.body).to.not.have.property('members');
           expect(res.body).to.not.have.property('createdAt');
           expect(res.body).to.not.have.property('updatedAt');
@@ -181,8 +158,8 @@ describe('GetGroup', function() {
             id: group.id,
             name: group.name,
             description: (group as any).description,
-            ownerId: group.ownerId,
           });
+          expect(res.body).to.haveOwnProperty('Owner');
           expect(res.body.members).to.eql(expectedMemberList);
         });
   });

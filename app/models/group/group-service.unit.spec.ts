@@ -36,7 +36,7 @@ describe('GroupService', function() {
       assert.notCalled(groupFindById);
     });
 
-    it('returns group if user is member', async function() {
+    it('returns group if user is member with members list', async function() {
       const user: any = {
         id: 6,
       };
@@ -56,7 +56,7 @@ describe('GroupService', function() {
           membershipFindById, user, match({userId: user.id, groupId}));
       assert.notCalled(inviteFindById);
       assert.calledOnceWithExactly(
-          groupFindById, groupId);
+          groupFindById, groupId, match({withMembers: true}));
     });
 
     it('returns simple group if user has invite for group', async function() {

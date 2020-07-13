@@ -81,7 +81,7 @@ export class GroupRepository {
     if (options?.withMembers) {
       const members = await MembershipRepository.findUsersOfGroup(id);
       return {
-        ...group,
+        ...group.get({plain: true}),
         members,
       } as Group;
     } else {

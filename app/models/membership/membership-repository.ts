@@ -84,7 +84,7 @@ export class MembershipRepository {
   public static async findUsersOfGroup(
       groupId: number,
       options?: RepositoryQueryOptions,
-  ): Promise<User[]> {
+  ): Promise<Membership[]> {
     const memberships = await Membership.findAll({
       where: {
         groupId,
@@ -94,10 +94,11 @@ export class MembershipRepository {
         as: 'User',
         attributes: User.simpleAttributes,
       }],
+      attributes: ['isAdmin'],
       ...options,
     });
 
-    return memberships.map((member) => member.User as User);
+    return memberships;
   }
 
   /**

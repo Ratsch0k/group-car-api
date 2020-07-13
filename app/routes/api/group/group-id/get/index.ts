@@ -1,11 +1,12 @@
 import {Router} from 'express';
-export * from './get-group-controller';
 
 import {getGroupController} from './get-group-controller';
+import {asyncWrapper} from '@app/util/async-wrapper';
 
 const getGroupRouter = Router({mergeParams: true}).get(
     '/',
-    getGroupController,
+    asyncWrapper(getGroupController),
 );
 
 export default getGroupRouter;
+export * from './get-group-controller';

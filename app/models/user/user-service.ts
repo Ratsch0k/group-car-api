@@ -18,7 +18,7 @@ export class UserService {
   ): Promise<number> {
     const group = await GroupService.findById(currentUser, groupId);
 
-    if (group.ownerId !== currentUser.id) {
+    if (group.Owner?.id !== currentUser.id) {
       return MembershipRepository.removeUserFromGroup(currentUser.id, groupId);
     } else {
       throw new OwnerCannotLeaveError();

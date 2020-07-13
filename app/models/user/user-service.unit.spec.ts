@@ -22,7 +22,9 @@ describe('UserService', function() {
           .resolves(groupId as any);
 
       const group = {
-        ownerId: 56,
+        Owner: {
+          id: 56,
+        },
       };
       const findByIdStub = sinon.stub(GroupService, 'findById')
           .resolves(group as any);
@@ -46,7 +48,9 @@ describe('UserService', function() {
           .resolves(groupId as any);
 
       const group = {
-        ownerId: currentUser.id,
+        Owner: {
+          id: currentUser.id,
+        },
       };
       const findByIdStub = sinon.stub(GroupService, 'findById')
           .resolves(group as any);

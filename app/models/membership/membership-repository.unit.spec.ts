@@ -176,6 +176,7 @@ describe('MembershipRepository', function() {
             id: 1,
             username: 'USER-1',
           },
+          isAdmin: false,
         },
         {
           groupId,
@@ -183,6 +184,7 @@ describe('MembershipRepository', function() {
             id: 2,
             username: 'USER-2',
           },
+          isAdmin: true,
         },
       ];
 
@@ -191,10 +193,7 @@ describe('MembershipRepository', function() {
 
       const actual = await MembershipRepository.findUsersOfGroup(groupId);
 
-      expect(actual).to.have.members([
-        members[0].User,
-        members[1].User,
-      ]);
+      expect(actual).to.have.members(members);
 
       assert.calledOnceWithExactly(findAllStub, match({
         where: {

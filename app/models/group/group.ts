@@ -13,7 +13,7 @@ import {default as sequelize} from '@db';
 import {InternalError} from '@app/errors';
 import debug from 'debug';
 import {ModelHooks} from 'sequelize/types/lib/hooks';
-import {User, Membership} from '@models';
+import {User, Membership, UserDto} from '@models';
 
 const error = debug('group-car:group:error');
 const log = debug('group-car:group');
@@ -63,7 +63,7 @@ export class Group extends Model {
    * List of attributes which should be used if group reference is eagerly
    * loaded.
    */
-  public static simpleAttributes = ['id', 'name', 'description'];
+  public static simpleAttributes = ['id', 'name', 'description', 'ownerId'];
 
   /**
    * Gets the owner.
@@ -110,7 +110,14 @@ export class Group extends Model {
    *
    * Only exists if included in query.
    */
-  public readonly members?: User[];
+  public readonly members?: Membership[];
+
+  /**
+   * User data of the owner.
+   *
+   * Only exists if explicitly included in query.
+   */
+  public readonly Owner?: UserDto;
 }
 
 /**

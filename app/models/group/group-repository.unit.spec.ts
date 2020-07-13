@@ -31,6 +31,7 @@ describe('GroupRepository', function() {
     it('includes members if withMembers set in options', async function() {
       const group: any = {
         id: 5,
+        get: sinon.stub().returnsThis(),
       };
       const groupFindByPkStub = sinon.stub(Group, 'findByPk')
           .resolves(group as any);
