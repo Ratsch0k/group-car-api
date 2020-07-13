@@ -141,6 +141,28 @@ describe('MembershipRepository', function() {
   });
 
   describe('removeUserFromGroup', function() {
-    it('calls Membership.destroy with correct parameters');
+    it('calls Membership.destroy with correct parameters', async function() {
+      const userId = 10;
+      const groupId = 11;
+      const options: any = {
+        transaction: 15,
+      };
+
+      const membershipDestroyStub = sinon.stub(Membership, 'destroy')
+          .resolves();
+
+      await MembershipRepository.removeUserFromGroup(userId, groupId, options);
+
+      sinon.assert.calledOnceWithExactly(
+          membershipDestroyStub,
+          match({
+            where: {
+              groupId,
+              userId,
+            },
+            ...options,
+          }),
+      );
+    });
   });
 });

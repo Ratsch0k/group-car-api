@@ -13,7 +13,7 @@ export const leaveGroupController: RequestHandler = async (req, res, next) => {
   const groupId = parseInt(req.params.groupId);
   const user = req.user;
 
-  if (groupId !== NaN && user !== undefined) {
+  if (!isNaN(groupId) && user !== undefined) {
     const removedMemberships = await UserService.leaveGroup(user, groupId);
     if (removedMemberships === 1) {
       res.status(204).send();
