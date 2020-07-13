@@ -25,27 +25,22 @@ export class GroupService {
       userId: currentUser.id,
       groupId: id,
     };
-    // Check if user has permission to access group
-    let hasInvite = false;
-    let isMember = false;
+    // First, check if user is member (gets more information)
+    try {
+      await MembershipRepository.findById(currentUser, modelId);
+      return GroupRepository.findById(id);
+    } catch (_) {}
+
+    // Second, check if the user has invite (only checked if not a user)
     try {
       await InviteService.findById(
           currentUser,
           modelId,
       );
-      hasInvite = true;
+      return GroupRepository.findById(id, {simple: true});
     } catch (_) {}
 
-
-    try {
-      await MembershipRepository.findById(currentUser, modelId);
-      isMember = true;
-    } catch (_) {}
-
-    if (hasInvite || isMember) {
-      return GroupRepository.findById(id);
-    } else {
-      throw new UnauthorizedError();
-    }
+    // If neither is the case, user is not authorized
+    throw new UnauthorizedError();
   }
 }

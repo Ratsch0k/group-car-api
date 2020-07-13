@@ -28,7 +28,7 @@ describe('GroupRepository', function() {
       assert.calledOnceWithExactly(groupFindByPkStub as any, 5, match.any);
     });
 
-    it('includes members if withOwnerData set in options', async function() {
+    it('includes members if withMembers set in options', async function() {
       const group: any = {
         id: 5,
       };

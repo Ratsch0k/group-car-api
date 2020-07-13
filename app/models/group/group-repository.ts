@@ -14,8 +14,16 @@ interface GroupQueryOptions extends RepositoryQueryOptions {
 
   /**
    * Whether or not all members should be included in an array.
+   *
+   * If `simple` is set, this option will do nothing as the members list
+   * doesn't exist on a simple group object.
    */
   withMembers: boolean;
+
+  /**
+   * Wether or not the group should only contain attributes of a simple group.
+   */
+  simple: boolean;
 }
 
 /**
@@ -24,6 +32,7 @@ interface GroupQueryOptions extends RepositoryQueryOptions {
 const defaultOptions: GroupQueryOptions = {
   withOwnerData: false,
   withMembers: false,
+  simple: false,
 };
 
 /**
@@ -43,7 +52,17 @@ export class GroupRepository {
       throw new TypeError('Id has to be a number');
     }
 
-    const {include, attributes} = this.queryBuildOptions(options);
+    // Depending on the options, either build include
+    // and attributes or simply use the simple attributes
+    let include;
+    let attributes;
+    if (!options?.simple) {
+      const buildOptions = this.queryBuildOptions(options);
+      include = buildOptions.include;
+      attributes = buildOptions.attributes;
+    } else {
+      attributes = Group.simpleAttributes;
+    }
 
     const group = await Group.findByPk(
         id,
@@ -59,7 +78,7 @@ export class GroupRepository {
     }
 
     // Check if members should be included
-    if (options?.withOwnerData) {
+    if (options?.withMembers) {
       const members = await MembershipRepository.findUsersOfGroup(id);
       return {
         ...group,
