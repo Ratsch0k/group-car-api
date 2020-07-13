@@ -37,7 +37,7 @@ export class GroupRepository {
    */
   public static async findById(
       id: number,
-      options?: GroupQueryOptions,
+      options?: Partial<GroupQueryOptions>,
   ): Promise<Group> {
     if (typeof id !== 'number') {
       throw new TypeError('Id has to be a number');
