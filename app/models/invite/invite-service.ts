@@ -80,13 +80,17 @@ export class InviteService {
       id: InviteId,
   ): Promise<Invite> {
     // Get memberships of user
-    const membership = await MembershipRepository.findById(
-        currentUser,
-        {
-          userId: currentUser.id,
-          groupId: id.groupId,
-        },
-    );
+    let membership = null;
+    try {
+      membership = await MembershipRepository.findById(
+          currentUser,
+          {
+            userId: currentUser.id,
+            groupId: id.groupId,
+          },
+      );
+    } catch (_) {}
+
     if (
     // Current user is not user of invite
       currentUser.id !== id.userId &&
