@@ -1,4 +1,4 @@
-import {User} from '../user';
+import {User} from '@models';
 
 /**
  * A dto object of the {@link Membership} which only

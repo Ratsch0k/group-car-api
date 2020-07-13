@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import getAllInvitesRouter from './get-all';
-import inviteIdRouter from './groupId';
+import inviteIdRouter from './group-id';
 
 const inviteRouter = Router();
 

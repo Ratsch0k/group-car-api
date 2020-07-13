@@ -1,8 +1,7 @@
 import {getIdFromModelOrId} from '@app/util/get-id-from-user';
-import Membership from './membership';
 import {RepositoryQueryOptions} from 'typings';
-import {UnauthorizedError} from '@app/errors';
-import {MembershipNotFoundError} from '@errors';
+import {MembershipNotFoundError, UnauthorizedError} from '@errors';
+import {User, Membership} from '@models';
 
 /**
  * If of a membership.
@@ -74,5 +73,52 @@ export class MembershipRepository {
     } else {
       return membership;
     }
+  }
+
+  /**
+   * Returns a list of all users which are members of the specified group.
+   * @param groupId - The group for which to check
+   * @param options - Query options
+   * @returns Promise of a list of members
+   */
+  public static async findUsersOfGroup(
+      groupId: number,
+      options?: RepositoryQueryOptions,
+  ): Promise<Membership[]> {
+    const memberships = await Membership.findAll({
+      where: {
+        groupId,
+      },
+      include: [{
+        model: User,
+        as: 'User',
+        attributes: User.simpleAttributes,
+      }],
+      attributes: ['isAdmin'],
+      ...options,
+    });
+
+    return memberships;
+  }
+
+  /**
+   * Removes every membership of the specified user from the specified group.
+   * @param userId  - Id of the user to delete from group
+   * @param groupId - Id of the group from which the user should be removed
+   * @param options - Additional options for query
+   * @returns The amount of memberships which got destroyed
+   */
+  public static async removeUserFromGroup(
+      userId: number,
+      groupId: number,
+      options?: RepositoryQueryOptions,
+  ): Promise<number> {
+    return Membership.destroy({
+      where: {
+        userId,
+        groupId,
+      },
+      ...options,
+    });
   }
 }

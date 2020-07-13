@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
 import {UnauthorizedError, MembershipNotFoundError} from '../../errors';
-import {MembershipRepository} from './membership-repository';
-import Membership from './membership';
 import sinon, {assert, match} from 'sinon';
+import {User, Membership, MembershipRepository} from '../../models';
 
 describe('MembershipRepository', function() {
   afterEach(function() {
@@ -137,6 +136,75 @@ describe('MembershipRepository', function() {
           match({
             transaction: fakeTransaction,
           }));
+    });
+  });
+
+  describe('removeUserFromGroup', function() {
+    it('calls Membership.destroy with correct parameters', async function() {
+      const userId = 10;
+      const groupId = 11;
+      const options: any = {
+        transaction: 15,
+      };
+
+      const membershipDestroyStub = sinon.stub(Membership, 'destroy')
+          .resolves();
+
+      await MembershipRepository.removeUserFromGroup(userId, groupId, options);
+
+      sinon.assert.calledOnceWithExactly(
+          membershipDestroyStub,
+          match({
+            where: {
+              groupId,
+              userId,
+            },
+            ...options,
+          }),
+      );
+    });
+  });
+
+  describe('findUsersOfGroup', function() {
+    it('returns list of members for specified group', async function() {
+      const groupId = 12;
+
+      const members = [
+        {
+          groupId,
+          User: {
+            id: 1,
+            username: 'USER-1',
+          },
+          isAdmin: false,
+        },
+        {
+          groupId,
+          User: {
+            id: 2,
+            username: 'USER-2',
+          },
+          isAdmin: true,
+        },
+      ];
+
+      const findAllStub = sinon.stub(Membership, 'findAll')
+          .resolves(members as any);
+
+      const actual = await MembershipRepository.findUsersOfGroup(groupId);
+
+      expect(actual).to.have.members(members);
+
+      assert.calledOnceWithExactly(findAllStub, match({
+        where: {
+          groupId,
+        },
+        include: [{
+          model: User,
+          as: 'User',
+          attributes: User.simpleAttributes,
+        }],
+      }));
     });
   });
 });

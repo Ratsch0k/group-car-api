@@ -8,3 +8,5 @@ router.use('/', userController);
 router.use('/invite', inviteRouter);
 
 export default router;
+export * from './group-id-validator';
+export {default as groupIdValidator} from './group-id-validator';

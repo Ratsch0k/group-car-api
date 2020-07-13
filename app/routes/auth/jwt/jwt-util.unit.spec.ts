@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import User from '../../../models/user/user';
+import {User} from '../../../models';
 import sinon, {match} from 'sinon';
 import jwt from 'jsonwebtoken';
 import config from '../../../config';

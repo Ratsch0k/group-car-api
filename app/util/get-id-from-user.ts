@@ -4,6 +4,10 @@
  * @returns The id of the model
  */
 export const getIdFromModelOrId =
-(modelOrId: {id: number} | number): number => {
-  return typeof modelOrId === 'number' ? modelOrId : modelOrId.id;
+(modelOrId: {id: number} | number): number | undefined => {
+  return typeof modelOrId === 'number' ?
+    modelOrId :
+    typeof modelOrId === 'object' ?
+    modelOrId.id :
+    undefined;
 };

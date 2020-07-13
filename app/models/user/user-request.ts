@@ -10,7 +10,7 @@ import {ModelHooks} from 'sequelize/types/lib/hooks';
  * a user wants to sign up but the server only allows
  * sign up with a request process.
  */
-class UserRequest extends Model {
+export class UserRequest extends Model {
   /**
    * The id of the user.
    *
@@ -71,7 +71,7 @@ class UserRequest extends Model {
  * @param user    - The user for which to hash the password
  * @param options - Options
  */
-export const hashPasswordOfUser = (user: UserRequest): Promise<void> => {
+export const hashPasswordOfUserRequest = (user: UserRequest): Promise<void> => {
   return bcrypt.hash(user.password + '', config.bcrypt.saltRounds)
       .then((hash: string) => {
         user.password = hash;
@@ -86,7 +86,7 @@ export const hashPasswordOfUser = (user: UserRequest): Promise<void> => {
  * Will be used when initializing the model.
  */
 const hooks: Partial<ModelHooks> = {
-  beforeSave: hashPasswordOfUser,
+  beforeSave: hashPasswordOfUserRequest,
 };
 
 /**
@@ -136,5 +136,3 @@ UserRequest.init(
       modelName: 'userRequest',
       hooks,
     });
-
-export default UserRequest;

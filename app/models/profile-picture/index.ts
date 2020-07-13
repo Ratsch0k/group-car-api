@@ -1,1 +1,1 @@
-export {default as ProfilePic} from './profile-pic';
+export * from './profile-pic';

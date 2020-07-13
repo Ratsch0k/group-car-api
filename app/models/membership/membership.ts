@@ -1,5 +1,6 @@
-import {Model, DataTypes} from 'sequelize';
+import {Model, DataTypes, HasOneGetAssociationMixin} from 'sequelize';
 import {default as sequelize} from '@db';
+import {User} from '@models';
 
 /**
  * Model class for memberships.
@@ -11,7 +12,7 @@ import {default as sequelize} from '@db';
  * A membership also defines if the user
  * is an admin of the group.
  */
-class Membership extends Model {
+export class Membership extends Model {
   /**
    * Id the the user.
    */
@@ -36,6 +37,18 @@ class Membership extends Model {
    * Date when the membership was last updated.
    */
   public readonly updatedAt!: Date;
+
+  /**
+   * Gets the user.
+   */
+  public getUser!: HasOneGetAssociationMixin<User>;
+
+  /**
+   * User of membership.
+   *
+   * Exists only if explicitly included in query.
+   */
+  public User?: User;
 }
 
 Membership.init(
