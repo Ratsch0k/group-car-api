@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {UserService} from '../../../../../../models';
+import {UserService} from '../../../../../models';
 import sinon, {assert} from 'sinon';
 import {expect} from 'chai';
 import {leaveGroupController} from './leave-group-controller';
@@ -7,7 +7,7 @@ import {
   BadRequestError,
   NotMemberOfGroupError,
   InternalError,
-} from '../../../../../../errors';
+} from '../../../../../errors';
 
 describe('LeaveGroupController', function() {
   let req: any;

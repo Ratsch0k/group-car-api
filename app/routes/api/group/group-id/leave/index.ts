@@ -2,7 +2,7 @@ import {Router} from 'express';
 import {leaveGroupController} from './leave-group-controller';
 import {asyncWrapper} from '@app/util/async-wrapper';
 
-const leaveGroupRouter = Router();
+const leaveGroupRouter = Router({mergeParams: true});
 
 leaveGroupRouter.post(
     '/',
