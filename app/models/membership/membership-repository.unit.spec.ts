@@ -10,32 +10,8 @@ describe('MembershipRepository', function() {
   });
 
   describe('findById', function() {
-    it('throws UnauthorizedError if current ' +
-    'user has not specified id', async function() {
-      const user: any = {
-        id: 3,
-      };
-
-      const id = {
-        userId: 5,
-        groupId: 71,
-      };
-
-      const membershipFindOneStub = sinon.stub(Membership, 'findOne');
-
-      await expect(MembershipRepository.findById(user, id))
-          .to.eventually.be.rejectedWith(UnauthorizedError);
-
-
-      assert.notCalled(membershipFindOneStub);
-    });
-
     it('throws MembershipNotFoundError if ' +
     'membership doesn\'t exist', async function() {
-      const user: any = {
-        id: 3,
-      };
-
       const id = {
         userId: 3,
         groupId: 71,
@@ -44,7 +20,7 @@ describe('MembershipRepository', function() {
       const membershipFindOneStub = sinon.stub(Membership, 'findOne')
           .resolves(null as any);
 
-      await expect(MembershipRepository.findById(user, id))
+      await expect(MembershipRepository.findById(id))
           .to.eventually.be.rejectedWith(MembershipNotFoundError);
 
 
