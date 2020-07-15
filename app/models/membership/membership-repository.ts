@@ -2,6 +2,10 @@ import {getIdFromModelOrId} from '@app/util/get-id-from-user';
 import {RepositoryQueryOptions} from 'typings';
 import {MembershipNotFoundError} from '@errors';
 import {User, Membership} from '@models';
+import debug from 'debug';
+
+const log = debug('group-car:membership:repository');
+const error = debug('group-car:membership:repository:error');
 
 /**
  * If of a membership.
@@ -52,6 +56,8 @@ export class MembershipRepository {
       id: MembershipId,
       options?: RepositoryQueryOptions,
   ): Promise<Membership> {
+    log('Find membership %o', id);
+
     const membership = await Membership.findOne({
       where: {
         userId: id.userId,
@@ -61,6 +67,7 @@ export class MembershipRepository {
     });
 
     if (membership === null) {
+      error('Membership %o doesn\'t exist');
       throw new MembershipNotFoundError(id);
     } else {
       return membership;
