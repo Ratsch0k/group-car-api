@@ -40,6 +40,7 @@ export class MembershipService {
   ): Promise<Membership> {
     const userId = currentUser.id;
 
+    // Check if parameter has correct type
     if (typeof userId !== 'number') {
       throw new TypeError('Id of current user has to be a number');
     }
@@ -49,24 +50,28 @@ export class MembershipService {
     if (userId !== id.userId) {
       log('User %d: not user of membership. ' +
       'Check if member of group', currentUser.id);
-      // Check if user is member of that group
-      const userMembership = await Membership.findOne({
-        where: {
-          userId: userId,
-          groupId: id.groupId,
-        },
-        transaction: options?.transaction,
-      });
 
-      if (userMembership === null) {
-        error('User %d: not member of group %d. Can\'t access membership %o',
-            currentUser.id,
-            id.groupId,
-            id);
-        throw new UnauthorizedError();
+      // Check if user is member of that group
+      try {
+        await MembershipRepository.findById(
+            {
+              userId: userId,
+              groupId: id.groupId,
+            },
+            options,
+        );
+        log('User %d: is member of group referenced in membership',
+            currentUser.id);
+      } catch (err) {
+        if (err instanceof MembershipNotFoundError) {
+          error('User %d: not member of group referenced ' +
+          'in membership $o', currentUser.id, id);
+          throw new NotMemberOfGroupError();
+        } else {
+          error('Unexpected error', err);
+          throw err;
+        }
       }
-      log('User %d: is member of group referenced in membership',
-          currentUser.id);
     }
 
     log('User %d: can access membership %o', currentUser.id, id);
@@ -91,27 +96,21 @@ export class MembershipService {
       id: MembershipId,
       isAdmin: boolean,
   ): Promise<Membership> {
+    // Check if parameter has correct type
+    if (typeof currentUser.id !== 'number') {
+      throw new TypeError('Id of current user has to be a number');
+    }
+
     log('User %d: change admin of membership %o', currentUser.id, id);
 
     // Check if current user is an admin of the group
-    let currentMembership;
-    try {
-      currentMembership = await this.findById(
-          currentUser, {
-            userId: currentUser.id,
-            groupId: id.groupId,
-          },
-      );
-      log('User %d: member of group %d', currentUser.id, id.groupId);
-    } catch (err) {
-      if (err instanceof MembershipNotFoundError) {
-        error('User %d: not member of group %d', currentUser.id, id.groupId);
-        throw new NotMemberOfGroupError();
-      } else {
-        error('Unknown error', err);
-        throw err;
-      }
-    }
+    const currentMembership = await this.findById(
+        currentUser, {
+          userId: currentUser.id,
+          groupId: id.groupId,
+        },
+    );
+    log('User %d: member of group %d', currentUser.id, id.groupId);
 
     if (!currentMembership.isAdmin) {
       error('User %d: not admin of group %d. ' +
