@@ -1,6 +1,6 @@
 import {getIdFromModelOrId} from '@app/util/get-id-from-user';
 import {RepositoryQueryOptions} from 'typings';
-import {MembershipNotFoundError, UnauthorizedError} from '@errors';
+import {MembershipNotFoundError} from '@errors';
 import {User, Membership} from '@models';
 
 /**
@@ -45,38 +45,13 @@ export class MembershipRepository {
 
   /**
    * Finds a membership by it's id.
-   *
-   * Throws UnauthorizedError if the current user is not
-   * the user of the specified membership id and is not
-   * a member of the group.
-   * @param user    - The user which requests this query
    * @param id      - The id of the membership
    * @param options - Options for the query
    */
   public static async findById(
-      user: Express.User | number,
       id: MembershipId,
       options?: RepositoryQueryOptions,
   ): Promise<Membership> {
-    const userId = getIdFromModelOrId(user);
-
-    if (userId !== id.userId && userId) {
-      // Check if user is member of that group
-      const userMembership = await Membership.findOne({
-        where: {
-          userId: userId,
-          groupId: id.groupId,
-        },
-        transaction: options?.transaction,
-      });
-
-      if (userMembership === null) {
-        throw new UnauthorizedError();
-      }
-    } else {
-      throw new UnauthorizedError('Not authorized to request this membership');
-    }
-
     const membership = await Membership.findOne({
       where: {
         userId: id.userId,
@@ -137,5 +112,22 @@ export class MembershipRepository {
       },
       ...options,
     });
+  }
+
+  /**
+   * Changes the isAdmin field of the membership with the
+   * specified id to the specified value.
+   * @param id      - Id of the membership
+   * @param isAdmin - New value of the isAdmin field
+   */
+  public static async changeAdminPermission(
+      id: MembershipId,
+      isAdmin: boolean,
+  ): Promise<Membership> {
+    // Get membership of user
+    const membership = await this.findById(id);
+
+    // Update membership to admin
+    return membership.update({isAdmin});
   }
 }

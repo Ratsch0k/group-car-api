@@ -1,6 +1,6 @@
 import {RequestHandler} from 'express';
-import {GroupService} from '@models';
 import {BadRequestError} from '@app/errors';
+import {MembershipService} from '@app/models/membership/membership-service';
 
 /**
  * Controller for handling granting a user of a group admin permissions.
@@ -18,10 +18,9 @@ export const grantUserAdminController: RequestHandler = async (
   const userId = parseInt(req.params.userId, 10);
 
   if (currentUser !== undefined && !isNaN(groupId) && !isNaN(userId)) {
-    await GroupService.changeAdminPermissionOfUser(
+    await MembershipService.changeAdminPermission(
         currentUser,
-        groupId,
-        userId,
+        {groupId, userId},
         true,
     );
     res.status(204).send();
