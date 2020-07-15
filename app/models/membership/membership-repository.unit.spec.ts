@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
-import {UnauthorizedError, MembershipNotFoundError} from '../../errors';
+import {MembershipNotFoundError} from '../../errors';
 import sinon, {assert, match} from 'sinon';
 import {User, Membership, MembershipRepository} from '../../models';
 

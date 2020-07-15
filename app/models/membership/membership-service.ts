@@ -9,6 +9,8 @@ import {
   UnauthorizedError,
   MembershipNotFoundError,
   CannotChangeOwnerMembershipError,
+  NotAdminOfGroupError,
+  NotMemberOfGroupError,
 } from '@errors';
 import debug from 'debug';
 
@@ -42,10 +44,10 @@ export class MembershipService {
       throw new TypeError('Id of current user has to be a number');
     }
 
-    log(`Find membership with %o for user %d`, id, currentUser.id);
+    log(`User %d: Find membership with %o`, currentUser.id, id);
 
     if (userId !== id.userId) {
-      log('User %d is not user of membership. ' +
+      log('User %d: not user of membership. ' +
       'Check if member of group', currentUser.id);
       // Check if user is member of that group
       const userMembership = await Membership.findOne({
@@ -57,17 +59,17 @@ export class MembershipService {
       });
 
       if (userMembership === null) {
-        error('User %d is not member of group %d. Can\'t access membership %o',
+        error('User %d: not member of group %d. Can\'t access membership %o',
             currentUser.id,
             id.groupId,
             id);
         throw new UnauthorizedError();
       }
-      log('User %d is member of group referenced in membership',
+      log('User %d: is member of group referenced in membership',
           currentUser.id);
     }
 
-    log('User %d can access membership %o', currentUser.id, id);
+    log('User %d: can access membership %o', currentUser.id, id);
 
     // Call the repository method
     return MembershipRepository.findById(id, options);
@@ -89,6 +91,8 @@ export class MembershipService {
       id: MembershipId,
       isAdmin: boolean,
   ): Promise<Membership> {
+    log('User %d: change admin of membership %o', currentUser.id, id);
+
     // Check if current user is an admin of the group
     let currentMembership;
     try {
@@ -98,25 +102,33 @@ export class MembershipService {
             groupId: id.groupId,
           },
       );
+      log('User %d: member of group %d', currentUser.id, id.groupId);
     } catch (err) {
       if (err instanceof MembershipNotFoundError) {
-        throw new UnauthorizedError();
+        error('User %d: not member of group %d', currentUser.id, id.groupId);
+        throw new NotMemberOfGroupError();
       } else {
+        error('Unknown error', err);
         throw err;
       }
     }
 
     if (!currentMembership.isAdmin) {
-      throw new UnauthorizedError();
+      error('User %d: not admin of group %d. ' +
+      'Can\'t give or take admin', currentUser.id, id.groupId);
+      throw new NotAdminOfGroupError();
     }
 
     // Check if user is owner of group
     const group = await GroupService.findById(currentUser, id.groupId);
 
     if (group.ownerId === id.userId) {
+      error('User %d: can\'t change admin of ' +
+      'owner of group %d', currentUser.id, id.groupId);
       throw new CannotChangeOwnerMembershipError();
     }
 
+    log('User %d: forward to repository');
     return MembershipRepository.changeAdminPermission(id, isAdmin);
   }
 }
