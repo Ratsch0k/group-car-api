@@ -58,10 +58,6 @@ describe('MembershipRepository', function() {
 
     it('returns correct membership and uses ' +
     'transaction if specified', async function() {
-      const user: any = {
-        id: 3,
-      };
-
       const id = {
         userId: 3,
         groupId: 71,
@@ -79,7 +75,6 @@ describe('MembershipRepository', function() {
       const fakeTransaction: any = {};
 
       await expect(MembershipRepository.findById(
-          user,
           id,
           {
             transaction: fakeTransaction,
