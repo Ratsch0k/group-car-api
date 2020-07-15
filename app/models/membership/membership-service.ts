@@ -10,6 +10,10 @@ import {
   MembershipNotFoundError,
   CannotChangeOwnerMembershipError,
 } from '@errors';
+import debug from 'debug';
+
+const log = debug('group-car:membership:service');
+const error = debug('group-car:membership:service:error');
 
 /**
  * Service for complex membership operations.
@@ -34,7 +38,15 @@ export class MembershipService {
   ): Promise<Membership> {
     const userId = currentUser.id;
 
-    if (userId !== id.userId && userId) {
+    if (typeof userId !== 'number') {
+      throw new TypeError('Id of current user has to be a number');
+    }
+
+    log(`Find membership with %o for user %d`, id, currentUser.id);
+
+    if (userId !== id.userId) {
+      log('User %d is not user of membership. ' +
+      'Check if member of group', currentUser.id);
       // Check if user is member of that group
       const userMembership = await Membership.findOne({
         where: {
@@ -45,11 +57,17 @@ export class MembershipService {
       });
 
       if (userMembership === null) {
+        error('User %d is not member of group %d. Can\'t access membership %o',
+            currentUser.id,
+            id.groupId,
+            id);
         throw new UnauthorizedError();
       }
-    } else {
-      throw new UnauthorizedError('Not authorized to request this membership');
+      log('User %d is member of group referenced in membership',
+          currentUser.id);
     }
+
+    log('User %d can access membership %o', currentUser.id, id);
 
     // Call the repository method
     return MembershipRepository.findById(id, options);

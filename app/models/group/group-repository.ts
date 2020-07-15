@@ -2,6 +2,10 @@ import {RepositoryQueryOptions} from 'typings';
 import {GroupNotFoundError} from '@app/errors';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 import {Group, User, MembershipRepository} from '@models';
+import debug from 'debug';
+
+const log = debug('group-car:group:repository');
+const error = debug('group-car:group:repository:error');
 
 /**
  * Specific options for group queries.
@@ -52,6 +56,8 @@ export class GroupRepository {
       throw new TypeError('Id has to be a number');
     }
 
+    log(`Find group with id ${id}`);
+
     // Depending on the options, either build include
     // and attributes or simply use the simple attributes
     let include;
@@ -74,11 +80,13 @@ export class GroupRepository {
     );
 
     if (group === null) {
+      error(`Group with id ${id} doesn't exist`);
       throw new GroupNotFoundError(id);
     }
 
     // Check if members should be included
     if (options?.withMembers) {
+      log('Get members of group');
       const members = await MembershipRepository.findUsersOfGroup(id);
       return {
         ...group.get({plain: true}),
