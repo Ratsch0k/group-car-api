@@ -104,13 +104,24 @@ export class MembershipService {
     log('User %d: change admin of membership %o', currentUser.id, id);
 
     // Check if current user is an admin of the group
-    const currentMembership = await this.findById(
-        currentUser, {
-          userId: currentUser.id,
-          groupId: id.groupId,
-        },
-    );
-    log('User %d: member of group %d', currentUser.id, id.groupId);
+    let currentMembership;
+    try {
+      currentMembership = await this.findById(
+          currentUser, {
+            userId: currentUser.id,
+            groupId: id.groupId,
+          },
+      );
+      log('User %d: member of group %d', currentUser.id, id.groupId);
+    } catch (err) {
+      if (err instanceof MembershipNotFoundError) {
+        error('User %d: not member of group %d', currentUser.id, id.groupId);
+        throw new NotMemberOfGroupError();
+      } else {
+        error('Unknown error', err);
+        throw err;
+      }
+    }
 
     if (!currentMembership.isAdmin) {
       error('User %d: not admin of group %d. ' +

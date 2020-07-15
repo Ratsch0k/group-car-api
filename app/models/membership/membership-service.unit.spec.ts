@@ -161,7 +161,8 @@ describe('MembershipService', function() {
       const membershipRepFindById = sinon.stub(MembershipRepository, 'findById')
           .rejects(new MembershipNotFoundError(id));
 
-      expect(MembershipService.changeAdminPermission(currentUser, id, false))
+      await expect(MembershipService
+          .changeAdminPermission(currentUser, id, false))
           .to.eventually.be.rejectedWith(NotMemberOfGroupError);
 
       assert.calledOnceWithExactly(
