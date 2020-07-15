@@ -368,6 +368,36 @@ paths:
           $ref: '#/components/responses/BadRequestErrorResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/group/{groupId}/admin/grant/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/XsrfParameter'
+    put:
+      summary: Grants a user admin permissions
+      description: Grants the specified user admin permissions.
+      tags:
+        - Group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: The user was granted admin permissions
+        400:
+          description: Either the request is missing parameter, the user is not a member of the group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestErrorSchema'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
     
 # Components
 components:
