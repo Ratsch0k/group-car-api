@@ -45,6 +45,10 @@ export class MembershipRepository {
 
   /**
    * Finds a membership by it's id.
+   *
+   * Throws UnauthorizedError if the current user is not
+   * the user of the specified membership id and is not
+   * a member of the group.
    * @param user    - The user which requests this query
    * @param id      - The id of the membership
    * @param options - Options for the query
@@ -56,7 +60,20 @@ export class MembershipRepository {
   ): Promise<Membership> {
     const userId = getIdFromModelOrId(user);
 
-    if (userId !== id.userId) {
+    if (userId !== id.userId && userId) {
+      // Check if user is member of that group
+      const userMembership = await Membership.findOne({
+        where: {
+          userId: userId,
+          groupId: id.groupId,
+        },
+        transaction: options?.transaction,
+      });
+
+      if (userMembership === null) {
+        throw new UnauthorizedError();
+      }
+    } else {
       throw new UnauthorizedError('Not authorized to request this membership');
     }
 

@@ -6,3 +6,4 @@ export * from './already-invited-error';
 export * from './already-member-error';
 export * from './group-is-full-error';
 export * from './owner-cannot-leave-error';
+export * from './cannot-change-membership-owner';
