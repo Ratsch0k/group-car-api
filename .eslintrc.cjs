@@ -26,7 +26,7 @@ module.exports = {
     "new-cap": "off",
     "valid-jsdoc": "off",
     "tsdoc/syntax": "warn",
-    "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],
+    "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "next" } ]
   },
 };
