@@ -3,13 +3,13 @@ import updateGroupRouter from './update';
 import deleteGroupRouter from './delete';
 import getGroupRouter from './get';
 import inviteUserToGroupRouter from './invite';
-import groupIdValidationRouter from './group-id-validator';
 import leaveGroupRouter from './leave';
 import groupGroupIdAdminRouter from './admin';
+import {groupIdValidation} from '@app/validators';
 
 const groupGroupIdRouter = Router({mergeParams: true});
 
-groupGroupIdRouter.use(groupIdValidationRouter);
+groupGroupIdRouter.use(groupIdValidation);
 groupGroupIdRouter.put('/', updateGroupRouter);
 groupGroupIdRouter.delete('/', deleteGroupRouter);
 groupGroupIdRouter.get('/', getGroupRouter);
