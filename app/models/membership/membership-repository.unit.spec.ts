@@ -178,4 +178,64 @@ describe('MembershipRepository', function() {
       }));
     });
   });
+
+  describe('changeAdminPermission', function() {
+    it('updates isAdmin field correctly', async function() {
+      const membership: any = {
+        update: sinon.stub().resolves(),
+      };
+
+      const findByIdStub = sinon.stub(Membership, 'findOne')
+          .resolves(membership);
+
+      const id = {
+        userId: 6,
+        groupId: 9,
+      };
+
+      const options: any = {
+        transaction: {},
+      };
+
+      await expect(MembershipRepository
+          .changeAdminPermission(id, true, options))
+          .to.be.eventually.fulfilled;
+
+      assert.calledOnceWithExactly(findByIdStub, match({
+        where: {
+          ...id,
+        },
+        transaction: options.transaction,
+      }));
+
+      assert.calledOnceWithExactly(membership.update,
+          match({isAdmin: true}), options);
+    });
+
+    it('throws MembershipNotFoundError if membership ' +
+    'doesn\'t exist', async function() {
+      const findByIdStub = sinon.stub(Membership, 'findOne')
+          .resolves(null as any);
+
+      const id = {
+        userId: 6,
+        groupId: 9,
+      };
+
+      const options: any = {
+        transaction: {},
+      };
+
+      await expect(MembershipRepository
+          .changeAdminPermission(id, true, options))
+          .to.be.eventually.rejectedWith(MembershipNotFoundError);
+
+      assert.calledOnceWithExactly(findByIdStub, match({
+        where: {
+          ...id,
+        },
+        transaction: options.transaction,
+      }));
+    });
+  });
 });

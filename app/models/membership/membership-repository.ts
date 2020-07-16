@@ -130,11 +130,12 @@ export class MembershipRepository {
   public static async changeAdminPermission(
       id: MembershipId,
       isAdmin: boolean,
+      options?: Partial<RepositoryQueryOptions>,
   ): Promise<Membership> {
     // Get membership of user
-    const membership = await this.findById(id);
+    const membership = await this.findById(id, options);
 
     // Update membership to admin
-    return membership.update({isAdmin});
+    return membership.update({isAdmin}, options);
   }
 }

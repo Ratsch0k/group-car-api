@@ -6,7 +6,6 @@ import {
 } from '@models';
 import {RepositoryQueryOptions} from 'typings';
 import {
-  UnauthorizedError,
   MembershipNotFoundError,
   CannotChangeOwnerMembershipError,
   NotAdminOfGroupError,

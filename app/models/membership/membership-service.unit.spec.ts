@@ -3,7 +3,13 @@ import {expect} from 'chai';
 import {MembershipService} from './membership-service';
 import sinon, {assert, match} from 'sinon';
 import {MembershipRepository} from './membership-repository';
-import {MembershipNotFoundError, NotMemberOfGroupError} from '../../errors';
+import {
+  MembershipNotFoundError,
+  NotMemberOfGroupError,
+  NotAdminOfGroupError,
+  CannotChangeOwnerMembershipError,
+} from '../../errors';
+import {GroupService} from '../group';
 
 describe('MembershipService', function() {
   afterEach(function() {
@@ -176,12 +182,138 @@ describe('MembershipService', function() {
     });
 
     it('throws NotAdminOfGroupError if current user is not ' +
-    'an admin of the group');
+    'an admin of the group', async function() {
+      const currentUser: any = {
+        id: 7,
+      };
+
+      const id = {
+        userId: 8,
+        groupId: 2,
+      };
+
+      const currentUserMembership = {
+        isAdmin: false,
+        groupId: id.groupId,
+        userId: currentUser.id,
+      };
+
+      const membershipRepFindById = sinon.stub(MembershipRepository, 'findById')
+          .resolves(currentUserMembership as any);
+
+      await expect(MembershipService
+          .changeAdminPermission(currentUser, id, false))
+          .to.eventually.be.rejectedWith(NotAdminOfGroupError);
+
+      assert.calledOnceWithExactly(
+          membershipRepFindById,
+          match({
+            userId: currentUser.id,
+            groupId: id.groupId,
+          }),
+          match.any,
+      );
+    });
 
     it('throws CannotChangeOwnerMembershipError if the ' +
-    'membership of the owner should be changed');
+    'membership of the owner should be changed', async function() {
+      const currentUser: any = {
+        id: 7,
+      };
+
+      const id = {
+        userId: 8,
+        groupId: 2,
+      };
+
+      const currentUserMembership = {
+        isAdmin: true,
+        groupId: id.groupId,
+        userId: currentUser.id,
+      };
+
+      const membershipRepFindById = sinon.stub(MembershipRepository, 'findById')
+          .resolves(currentUserMembership as any);
+
+      const group = {
+        ownerId: id.userId,
+      };
+
+      const groupServiceFindById = sinon.stub(GroupService, 'findById')
+          .resolves(group as any);
+
+      await expect(MembershipService
+          .changeAdminPermission(currentUser, id, false))
+          .to.eventually.be.rejectedWith(CannotChangeOwnerMembershipError);
+
+      assert.calledOnceWithExactly(
+          membershipRepFindById,
+          match({
+            userId: currentUser.id,
+            groupId: id.groupId,
+          }),
+          match.any,
+      );
+
+      assert.calledOnceWithExactly(
+          groupServiceFindById,
+          currentUser,
+          id.groupId,
+      );
+    });
 
     it('calls MembershipRepository.changeAdminPermission ' +
-    'with correct parameters');
+    'with correct parameters', async function() {
+      const currentUser: any = {
+        id: 7,
+      };
+
+      const id = {
+        userId: 8,
+        groupId: 2,
+      };
+
+      const currentUserMembership = {
+        isAdmin: true,
+        groupId: id.groupId,
+        userId: currentUser.id,
+      };
+
+      const membershipRepFindById = sinon.stub(MembershipRepository, 'findById')
+          .resolves(currentUserMembership as any);
+
+      const group = {
+        ownerId: 10,
+      };
+
+      const groupServiceFindById = sinon.stub(GroupService, 'findById')
+          .resolves(group as any);
+
+      const membershipRepChangePerm = sinon.stub(
+          MembershipRepository,
+          'changeAdminPermission',
+      ).resolves();
+
+      await expect(MembershipService
+          .changeAdminPermission(currentUser, id, false))
+          .to.eventually.be.fulfilled;
+
+      assert.calledOnceWithExactly(
+          membershipRepFindById,
+          match({
+            userId: currentUser.id,
+            groupId: id.groupId,
+          }),
+          match.any,
+      );
+
+      assert.calledOnceWithExactly(
+          groupServiceFindById,
+          currentUser,
+          id.groupId,
+      );
+
+      assert.calledOnceWithExactly(membershipRepChangePerm, id, false);
+    });
   });
 });
