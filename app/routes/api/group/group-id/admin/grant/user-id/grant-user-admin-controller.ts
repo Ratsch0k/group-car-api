@@ -1,6 +1,6 @@
 import {RequestHandler} from 'express';
-import {BadRequestError} from '@app/errors';
-import {MembershipService} from '@app/models/membership/membership-service';
+import {BadRequestError} from '@errors';
+import {MembershipService} from '@models';
 
 /**
  * Controller for handling granting a user of a group admin permissions.

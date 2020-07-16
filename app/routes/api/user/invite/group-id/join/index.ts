@@ -4,7 +4,7 @@ import {asyncWrapper} from '@app/util/async-wrapper';
 
 export * from './join-group-controller';
 
-const joinGroupRouter = Router({mergeParams: true}).use(
+const joinGroupRouter = Router({mergeParams: true}).post(
     '/',
     asyncWrapper(joinGroupController),
 );

@@ -8,7 +8,7 @@ import {expect} from 'chai';
 import {Invite, Group, User, Membership} from '../../../../../models';
 import sinon from 'sinon';
 
-describe('GetGroup', function() {
+describe('get /api/group/:groupId', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
   let csrf: string;

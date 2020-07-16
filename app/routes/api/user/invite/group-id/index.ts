@@ -8,7 +8,7 @@ inviteIdRouter.use(
     groupIdValidation,
 );
 
-inviteIdRouter.post(
+inviteIdRouter.use(
     '/join',
     joinGroupRouter,
 );

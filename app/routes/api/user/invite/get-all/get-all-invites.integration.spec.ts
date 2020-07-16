@@ -8,7 +8,7 @@ import {User, Group, Invite} from '../../../../../models';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
-describe('GetAllInvites', function() {
+describe('get /api/user/invite', function() {
   let agent: request.SuperTest<request.Test>;
   let user: any;
   let csrf: string;

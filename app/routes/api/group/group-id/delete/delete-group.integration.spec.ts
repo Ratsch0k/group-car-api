@@ -12,7 +12,7 @@ import {Group, Membership, User} from '../../../../../models';
 import Bluebird from 'bluebird';
 import sinon from 'sinon';
 
-describe('DeleteGroup', function() {
+describe('delete /api/group/:groupId', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
   let csrf: string;

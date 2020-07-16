@@ -10,7 +10,7 @@ import {Membership} from '../../../../../models';
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
 
-describe('LeaveGroup', function() {
+describe('post /api/group/:groupId/leave', function() {
   let agent: request.SuperTest<request.Test>;
   // let user: any;
   let csrf: string;

@@ -4,7 +4,7 @@ import inviteIdRouter from './group-id';
 
 const inviteRouter = Router();
 
-inviteRouter.get(
+inviteRouter.use(
     '/',
     getAllInvitesRouter,
 );

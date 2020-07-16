@@ -131,7 +131,7 @@ export class MembershipService {
     // Check if user is owner of group
     const group = await GroupService.findById(currentUser, id.groupId);
 
-    if (group.ownerId === id.userId) {
+    if (group.ownerId == id.userId || group.Owner?.id === id.userId) {
       error('User %d: can\'t change admin of ' +
       'owner of group %d', currentUser.id, id.groupId);
       throw new CannotChangeOwnerMembershipError();

@@ -9,7 +9,7 @@ import sinon from 'sinon';
 import Bluebird from 'bluebird';
 
 
-describe('UpdateGroup', function() {
+describe('put /api/group/:groupId', function() {
   describe('user is not logged in:', function() {
     let agent: request.SuperTest<request.Test>;
 

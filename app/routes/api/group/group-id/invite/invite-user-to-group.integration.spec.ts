@@ -19,7 +19,7 @@ import sinon from 'sinon';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
-describe('InviteUserToGroup', function() {
+describe('post /api/group/:groupId/invite', function() {
   let agent: request.SuperTest<request.Test>;
   let user: any;
   let csrf: string;
