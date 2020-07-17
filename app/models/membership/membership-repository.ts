@@ -1,7 +1,11 @@
 import {getIdFromModelOrId} from '@app/util/get-id-from-user';
 import {RepositoryQueryOptions} from 'typings';
-import {MembershipNotFoundError, UnauthorizedError} from '@errors';
+import {MembershipNotFoundError} from '@errors';
 import {User, Membership} from '@models';
+import debug from 'debug';
+
+const log = debug('group-car:membership:repository');
+const error = debug('group-car:membership:repository:error');
 
 /**
  * If of a membership.
@@ -45,20 +49,14 @@ export class MembershipRepository {
 
   /**
    * Finds a membership by it's id.
-   * @param user    - The user which requests this query
    * @param id      - The id of the membership
    * @param options - Options for the query
    */
   public static async findById(
-      user: Express.User | number,
       id: MembershipId,
       options?: RepositoryQueryOptions,
   ): Promise<Membership> {
-    const userId = getIdFromModelOrId(user);
-
-    if (userId !== id.userId) {
-      throw new UnauthorizedError('Not authorized to request this membership');
-    }
+    log('Find membership %o', id);
 
     const membership = await Membership.findOne({
       where: {
@@ -69,6 +67,7 @@ export class MembershipRepository {
     });
 
     if (membership === null) {
+      error('Membership %o doesn\'t exist');
       throw new MembershipNotFoundError(id);
     } else {
       return membership;
@@ -120,5 +119,23 @@ export class MembershipRepository {
       },
       ...options,
     });
+  }
+
+  /**
+   * Changes the isAdmin field of the membership with the
+   * specified id to the specified value.
+   * @param id      - Id of the membership
+   * @param isAdmin - New value of the isAdmin field
+   */
+  public static async changeAdminPermission(
+      id: MembershipId,
+      isAdmin: boolean,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<Membership> {
+    // Get membership of user
+    const membership = await this.findById(id, options);
+
+    // Update membership to admin
+    return membership.update({isAdmin}, options);
   }
 }

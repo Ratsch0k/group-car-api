@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {MembershipRepository} from '../membership';
 import sinon, {assert, match} from 'sinon';
 import {InviteService} from '../invite';
 import {expect} from 'chai';
 import {GroupService} from './group-service';
 import {UnauthorizedError} from '../../errors';
 import {GroupRepository} from './group-repository';
+import {MembershipService} from '../membership/membership-service';
 
 describe('GroupService', function() {
   afterEach(function() {
@@ -21,7 +21,7 @@ describe('GroupService', function() {
       const groupId = 9;
 
       const membershipFindById = sinon.stub(
-          MembershipRepository, 'findById').rejects();
+          MembershipService, 'findById').rejects();
       const inviteFindById = sinon.stub(InviteService, 'findById')
           .rejects();
       const groupFindById = sinon.stub(GroupRepository, 'findById').rejects();
@@ -43,7 +43,7 @@ describe('GroupService', function() {
       const groupId = 9;
 
       const membershipFindById = sinon.stub(
-          MembershipRepository, 'findById').resolves();
+          MembershipService, 'findById').resolves();
       const inviteFindById = sinon.stub(InviteService, 'findById')
           .rejects();
       const groupFindById = sinon.stub(GroupRepository, 'findById')
@@ -66,7 +66,7 @@ describe('GroupService', function() {
       const groupId = 9;
 
       const membershipFindById = sinon.stub(
-          MembershipRepository, 'findById').rejects();
+          MembershipService, 'findById').rejects();
       const inviteFindById = sinon.stub(InviteService, 'findById')
           .resolves();
       const groupFindById = sinon.stub(GroupRepository, 'findById')

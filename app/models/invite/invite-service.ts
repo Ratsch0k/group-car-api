@@ -10,6 +10,7 @@ import debug from 'debug';
 import {
   CouldNotAssignToGroupError,
 } from '@app/errors/user/could-not-assign-to-group-error';
+import {MembershipService} from '../membership/membership-service';
 
 /**
  * Service for invites.
@@ -82,7 +83,7 @@ export class InviteService {
     // Get memberships of user
     let membership = null;
     try {
-      membership = await MembershipRepository.findById(
+      membership = await MembershipService.findById(
           currentUser,
           {
             userId: currentUser.id,

@@ -7,7 +7,7 @@ import {expect} from 'chai';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
-describe('JoinGroup', function() {
+describe('post /api/user/invite/:groupId/join', function() {
   let agent: request.SuperTest<request.Test>;
   let user: any;
   let csrf: string;

@@ -10,6 +10,7 @@ import {InviteService} from './invite-service';
 import {expect} from 'chai';
 import {MembershipRepository} from '../membership';
 import db from '../../db';
+import {MembershipService} from '../membership/membership-service';
 
 describe('InviteService', function() {
   afterEach(function() {
@@ -196,7 +197,7 @@ describe('InviteService', function() {
         groupId: 71,
       };
 
-      const membershipFindOneStub = sinon.stub(MembershipRepository, 'findById')
+      const membershipFindOneStub = sinon.stub(MembershipService, 'findById')
           .resolves(null as any);
 
       const inviteRepFindByIdStub = sinon.stub(InviteRepository, 'findById');
@@ -223,7 +224,7 @@ describe('InviteService', function() {
         groupId: 71,
       };
 
-      const membershipFindOneStub = sinon.stub(MembershipRepository, 'findById')
+      const membershipFindOneStub = sinon.stub(MembershipService, 'findById')
           .resolves(null as any);
 
       const invite = {
@@ -256,7 +257,7 @@ describe('InviteService', function() {
         groupId: 71,
       };
 
-      const membershipFindOneStub = sinon.stub(MembershipRepository, 'findById')
+      const membershipFindOneStub = sinon.stub(MembershipService, 'findById')
           .resolves(true as any);
 
       const invite = {

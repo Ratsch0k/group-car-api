@@ -6,7 +6,7 @@ import db, {syncPromise} from '../../../../db';
 import {expect} from 'chai';
 
 
-describe('CreateGroup', function() {
+describe('post /api/group', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
   let csrf: string;

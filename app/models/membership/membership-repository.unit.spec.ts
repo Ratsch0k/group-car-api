@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
-import {UnauthorizedError, MembershipNotFoundError} from '../../errors';
+import {MembershipNotFoundError} from '../../errors';
 import sinon, {assert, match} from 'sinon';
 import {User, Membership, MembershipRepository} from '../../models';
 
@@ -10,32 +10,8 @@ describe('MembershipRepository', function() {
   });
 
   describe('findById', function() {
-    it('throws UnauthorizedError if current ' +
-    'user has not specified id', async function() {
-      const user: any = {
-        id: 3,
-      };
-
-      const id = {
-        userId: 5,
-        groupId: 71,
-      };
-
-      const membershipFindOneStub = sinon.stub(Membership, 'findOne');
-
-      await expect(MembershipRepository.findById(user, id))
-          .to.eventually.be.rejectedWith(UnauthorizedError);
-
-
-      assert.notCalled(membershipFindOneStub);
-    });
-
     it('throws MembershipNotFoundError if ' +
     'membership doesn\'t exist', async function() {
-      const user: any = {
-        id: 3,
-      };
-
       const id = {
         userId: 3,
         groupId: 71,
@@ -44,7 +20,7 @@ describe('MembershipRepository', function() {
       const membershipFindOneStub = sinon.stub(Membership, 'findOne')
           .resolves(null as any);
 
-      await expect(MembershipRepository.findById(user, id))
+      await expect(MembershipRepository.findById(id))
           .to.eventually.be.rejectedWith(MembershipNotFoundError);
 
 
@@ -58,10 +34,6 @@ describe('MembershipRepository', function() {
 
     it('returns correct membership and uses ' +
     'transaction if specified', async function() {
-      const user: any = {
-        id: 3,
-      };
-
       const id = {
         userId: 3,
         groupId: 71,
@@ -79,7 +51,6 @@ describe('MembershipRepository', function() {
       const fakeTransaction: any = {};
 
       await expect(MembershipRepository.findById(
-          user,
           id,
           {
             transaction: fakeTransaction,
@@ -204,6 +175,66 @@ describe('MembershipRepository', function() {
           as: 'User',
           attributes: User.simpleAttributes,
         }],
+      }));
+    });
+  });
+
+  describe('changeAdminPermission', function() {
+    it('updates isAdmin field correctly', async function() {
+      const membership: any = {
+        update: sinon.stub().resolves(),
+      };
+
+      const findByIdStub = sinon.stub(Membership, 'findOne')
+          .resolves(membership);
+
+      const id = {
+        userId: 6,
+        groupId: 9,
+      };
+
+      const options: any = {
+        transaction: {},
+      };
+
+      await expect(MembershipRepository
+          .changeAdminPermission(id, true, options))
+          .to.be.eventually.fulfilled;
+
+      assert.calledOnceWithExactly(findByIdStub, match({
+        where: {
+          ...id,
+        },
+        transaction: options.transaction,
+      }));
+
+      assert.calledOnceWithExactly(membership.update,
+          match({isAdmin: true}), options);
+    });
+
+    it('throws MembershipNotFoundError if membership ' +
+    'doesn\'t exist', async function() {
+      const findByIdStub = sinon.stub(Membership, 'findOne')
+          .resolves(null as any);
+
+      const id = {
+        userId: 6,
+        groupId: 9,
+      };
+
+      const options: any = {
+        transaction: {},
+      };
+
+      await expect(MembershipRepository
+          .changeAdminPermission(id, true, options))
+          .to.be.eventually.rejectedWith(MembershipNotFoundError);
+
+      assert.calledOnceWithExactly(findByIdStub, match({
+        where: {
+          ...id,
+        },
+        transaction: options.transaction,
       }));
     });
   });

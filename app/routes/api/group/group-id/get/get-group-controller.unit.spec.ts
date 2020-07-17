@@ -17,14 +17,14 @@ describe('GetGroupController', function() {
   });
 
   it('throws BadRequestError if either groupId or ' +
-      'userId is missing', function() {
+      'userId is missing', async function() {
     // Test none is provided
     req = {
       user: {},
       params: {},
     };
 
-    expect(getGroupController(req, res, next))
+    await expect(getGroupController(req, res, next))
         .to.eventually.be.rejectedWith(BadRequestError);
 
     // Test groupId is missing
@@ -35,18 +35,17 @@ describe('GetGroupController', function() {
       params: {},
     };
 
-    expect(getGroupController(req, res, next))
+    await expect(getGroupController(req, res, next))
         .to.eventually.be.rejectedWith(BadRequestError);
 
     // Test userId is missing
     req = {
-      user: {},
       params: {
         groupId: 3,
       },
     };
 
-    expect(getGroupController(req, res, next))
+    await expect(getGroupController(req, res, next))
         .to.eventually.be.rejectedWith(BadRequestError);
   });
 
