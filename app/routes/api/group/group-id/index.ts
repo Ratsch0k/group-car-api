@@ -4,8 +4,8 @@ import deleteGroupRouter from './delete';
 import getGroupRouter from './get';
 import inviteUserToGroupRouter from './invite';
 import leaveGroupRouter from './leave';
-import groupGroupIdAdminRouter from './admin';
 import {groupIdValidation} from '@app/validators';
+import groupGroupIdUserIdRouter from './user-id';
 
 const groupGroupIdRouter = Router({mergeParams: true});
 
@@ -15,7 +15,7 @@ groupGroupIdRouter.delete('/', deleteGroupRouter);
 groupGroupIdRouter.get('/', getGroupRouter);
 groupGroupIdRouter.use('/invite', inviteUserToGroupRouter);
 groupGroupIdRouter.use('/leave', leaveGroupRouter);
-groupGroupIdRouter.use('/admin', groupGroupIdAdminRouter);
+groupGroupIdRouter.use('/:userId', groupGroupIdUserIdRouter);
 
 export default groupGroupIdRouter;
 
@@ -23,4 +23,4 @@ export * from './delete';
 export * from './get';
 export * from './update';
 export * from './invite';
-export * from './admin';
+export * from './user-id';

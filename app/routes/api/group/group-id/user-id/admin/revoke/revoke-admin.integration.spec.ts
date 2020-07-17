@@ -16,7 +16,7 @@ import {
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
-describe('/api/group/:groupId/admin/grant/:userId', function() {
+describe('put /api/group/:groupId/:userId/admin/revoke', function() {
   let agent: supertest.SuperTest<supertest.Test>;
   let user: any;
   let csrf: string;
@@ -33,7 +33,7 @@ describe('/api/group/:groupId/admin/grant/:userId', function() {
   });
 
   it('responses with 401 if user not logged in', function() {
-    return supertest(app).put('/api/group/1/admin/grant/1')
+    return supertest(app).put('/api/group/1/1/admin/revoke')
         .set(csrfHeaderName, csrf)
         .send()
         .expect(401);
@@ -41,7 +41,7 @@ describe('/api/group/:groupId/admin/grant/:userId', function() {
 
   it('responses with NotMemberOfGroupError if current ' +
   'user is not member of the group', function() {
-    return agent.put('/api/group/1/admin/grant/2')
+    return agent.put('/api/group/1/2/admin/revoke')
         .set(csrfHeaderName, csrf)
         .send()
         .expect(401)
@@ -79,7 +79,7 @@ describe('/api/group/:groupId/admin/grant/:userId', function() {
       isAdmin: false,
     });
 
-    await agent.put(`/api/group/${group.id}/admin/grant/8`)
+    await agent.put(`/api/group/${group.id}/8/admin/revoke`)
         .set(csrfHeaderName, csrf)
         .send()
         .expect(401)
@@ -116,7 +116,7 @@ describe('/api/group/:groupId/admin/grant/:userId', function() {
       isAdmin: true,
     });
 
-    await agent.put(`/api/group/${group.id}/admin/grant/${user.id}`)
+    await agent.put(`/api/group/${group.id}/${user.id}/admin/revoke`)
         .set(csrfHeaderName, csrf)
         .send()
         .expect(400)
@@ -137,7 +137,7 @@ describe('/api/group/:groupId/admin/grant/:userId', function() {
         .then((res) => res.body);
 
     // Create new user
-    const notAdminUser = await agent.post('/auth/sign-up')
+    const firstAdminUser = await agent.post('/auth/sign-up')
         .set(csrfHeaderName, csrf)
         .send({
           username: 'NOT_ADMIN_USER',
@@ -157,14 +157,15 @@ describe('/api/group/:groupId/admin/grant/:userId', function() {
         .expect(201)
         .then((res) => res.body);
 
-    // Shortcut by creating membership for new not admin user
+    // Shortcut by creating membership for new admin user
     await Membership.create({
       groupId: group.id,
-      userId: notAdminUser.id,
-      isAdmin: false,
+      userId: firstAdminUser.id,
+      isAdmin: true,
     });
 
-    // Shortcut by creating membership for new admin user
+    // Shortcut by creating membership for another
+    // admin user which will revoke admin for first admin user
     await Membership.create({
       groupId: group.id,
       userId: adminUser.id,
@@ -172,7 +173,7 @@ describe('/api/group/:groupId/admin/grant/:userId', function() {
     });
 
     // Send request while being logged in as admin
-    await agent.put(`/api/group/${group.id}/admin/grant/${notAdminUser.id}`)
+    await agent.put(`/api/group/${group.id}/${firstAdminUser.id}/admin/revoke`)
         .set(csrfHeaderName, csrf)
         .send()
         .expect(204);
@@ -181,11 +182,11 @@ describe('/api/group/:groupId/admin/grant/:userId', function() {
     const notAdminMembership = await Membership.findOne({
       where: {
         groupId: group.id,
-        userId: notAdminUser.id,
+        userId: firstAdminUser.id,
       },
     });
 
     expect(notAdminMembership).to.be.not.null;
-    expect(notAdminMembership!.isAdmin).to.be.true;
+    expect(notAdminMembership!.isAdmin).to.be.false;
   });
 });
