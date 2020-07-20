@@ -405,22 +405,21 @@ paths:
   /api/group/{groupId}/{userId}/admin/revoke:
     parameters:
       - $ref: '#/components/parameters/XsrfParameter'
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
     put:
       summary: Grants a user admin permissions
       description: Grants the specified user admin permissions.
       tags:
         - Group
-      parameters:
-        - name: groupId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: integer
       responses:
         204:
           description: Admin permission for the user has been successfully revoked.
@@ -436,7 +435,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
-    
+  /api/group/{groupId}/{userId}/admin/transfer-ownership:
+    parameters:
+      - $ref: '#/components/parameters/XsrfParameter'
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+      
+    post:
+      summary: Transfers ownership to specified user
+      description: Transfers the ownership of the currently logged in user of the specified group to the specified user
+      tags: 
+        - Group
+      responses:
+        204:
+          description: The specified user is now the owner of the specified group
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          description: The currently logged in user is either not a member, not an admin or not the owner of the specified group.
+            Or the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
+        
 # Components
 components:
 
