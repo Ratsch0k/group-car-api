@@ -7,3 +7,4 @@ export * from './already-member-error';
 export * from './group-is-full-error';
 export * from './owner-cannot-leave-error';
 export * from './cannot-change-membership-owner';
+export * from './cannot-transfer-ownership-to-not-admin-error';

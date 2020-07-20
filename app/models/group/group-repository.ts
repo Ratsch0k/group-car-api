@@ -98,6 +98,21 @@ export class GroupRepository {
   }
 
   /**
+   * Changes the owner of the specified group to the specified user.
+   * @param groupId     - The group which should be updated
+   * @param newOwnerId  - The new id of the owner
+   */
+  public static async changeOwnership(
+      groupId: number,
+      newOwnerId: number,
+  ): Promise<Group> {
+    const group = await this.findById(groupId);
+    return group.update({
+      ownerId: newOwnerId,
+    });
+  }
+
+  /**
    * Build options for the query builder.
    */
   private static readonly queryBuildOptions = buildFindQueryOptionsMethod(

@@ -455,8 +455,12 @@ paths:
       tags: 
         - Group
       responses:
-        204:
+        200:
           description: The specified user is now the owner of the specified group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupWithMembers'
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
         401:
