@@ -7,6 +7,8 @@ import {
   UnauthorizedError,
   NotOwnerOfGroupError,
   CannotTransferOwnershipToNotAdminError,
+  MembershipNotFoundError,
+  NotMemberOfGroupError,
 } from '@app/errors';
 import {MembershipService} from '../membership/membership-service';
 import debug from 'debug';
@@ -102,13 +104,29 @@ export class GroupService {
     }
 
     // Check if user to which the ownership should be transferred is an admin
-    const membership = await MembershipService.findById(
-        currentUser,
-        {
-          userId: toId,
+    let membership;
+    try {
+      membership = await MembershipService.findById(
+          currentUser,
+          {
+            userId: toId,
+            groupId,
+          },
+      );
+    } catch (_error) {
+      error(
+          'User %d: tries to transfer ownership to a user ' +
+          'who is not a member of the group',
+          currentUser.id,
           groupId,
-        },
-    );
+      );
+      if (_error instanceof MembershipNotFoundError) {
+        throw new NotMemberOfGroupError(toId);
+      } else {
+        throw _error;
+      }
+    }
+
 
     if (!membership.isAdmin) {
       error(

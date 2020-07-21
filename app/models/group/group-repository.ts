@@ -105,11 +105,12 @@ export class GroupRepository {
   public static async changeOwnership(
       groupId: number,
       newOwnerId: number,
+      options?: Partial<RepositoryQueryOptions>,
   ): Promise<Group> {
-    const group = await this.findById(groupId);
+    const group = await this.findById(groupId, options);
     return group.update({
       ownerId: newOwnerId,
-    });
+    }, options);
   }
 
   /**
