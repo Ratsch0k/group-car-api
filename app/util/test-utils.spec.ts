@@ -7,6 +7,11 @@ export interface SignUpReturn {
   user: any;
   csrf: string;
   agent: request.SuperTest<request.Test>;
+  signUpBody: {
+    username: string;
+    password: string;
+    email: string;
+  };
 }
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
@@ -56,6 +61,7 @@ export class TestUtils {
       user,
       csrf,
       agent,
+      signUpBody,
     };
   }
 }
