@@ -8,9 +8,8 @@ import {
   NotOwnerOfGroupError,
   MembershipNotFoundError,
   InviteNotFoundError,
-  CannotTransferOwnershipToNotAdminError,
-  NotMemberOfGroupError,
-  NotAdminOfGroupError,
+  UserNotAdminOfGroupError,
+  UserNotMemberOfGroupError,
 } from '../../errors';
 import {GroupRepository} from './group-repository';
 import {MembershipService} from '../membership/membership-service';
@@ -223,7 +222,7 @@ describe('GroupService', function() {
       assert.calledOnceWithExactly(groupFindById, groupId, match.any);
     });
 
-    it('throws NotMemberOfGroup if owner tries to transfer ' +
+    it('throws UserNotMemberOfGroup if owner tries to transfer ' +
     'ownership to a user who is not a member of the group', async function() {
       const groupId = 8;
       const toId = 10;
@@ -250,8 +249,11 @@ describe('GroupService', function() {
       const groupFindById = sinon.stub(GroupRepository, 'findById')
           .resolves(group as any);
 
-      await expect(GroupService.transferOwnership(currentUser, groupId, toId))
-          .to.be.eventually.rejectedWith(NotMemberOfGroupError);
+      const error = await expect(GroupService
+          .transferOwnership(currentUser, groupId, toId))
+          .to.be.eventually.rejectedWith(UserNotMemberOfGroupError);
+
+      expect(error.message).to.eql(new UserNotMemberOfGroupError(toId).message);
 
       assert.calledWithExactly(
           membershipFindById,
@@ -273,7 +275,7 @@ describe('GroupService', function() {
       assert.calledOnceWithExactly(groupFindById, groupId, match.any);
     });
 
-    it('throws NotAdminOfGroupError if ' +
+    it('throws UserNotAdminOfGroupError if ' +
     'owner tries to transfer ownership to member who is not ' +
     'admin of specified group', async function() {
       const groupId = 8;
@@ -310,9 +312,9 @@ describe('GroupService', function() {
       const error = await expect(GroupService
           .transferOwnership(currentUser, groupId, toId))
           .to.be.eventually
-          .rejectedWith(NotAdminOfGroupError);
+          .rejectedWith(UserNotAdminOfGroupError);
 
-      expect(error).to.be.instanceOf(NotAdminOfGroupError);
+      expect(error).to.be.instanceOf(UserNotAdminOfGroupError);
       expect(error).to.have
           .haveOwnProperty(
               'message',

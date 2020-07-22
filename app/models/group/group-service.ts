@@ -6,10 +6,9 @@ import {
 import {
   UnauthorizedError,
   NotOwnerOfGroupError,
-  CannotTransferOwnershipToNotAdminError,
   MembershipNotFoundError,
-  NotMemberOfGroupError,
-  NotAdminOfGroupError,
+  UserNotAdminOfGroupError,
+  UserNotMemberOfGroupError,
 } from '@app/errors';
 import {MembershipService} from '../membership/membership-service';
 import debug from 'debug';
@@ -122,7 +121,7 @@ export class GroupService {
           groupId,
       );
       if (_error instanceof MembershipNotFoundError) {
-        throw new NotMemberOfGroupError(toId);
+        throw new UserNotMemberOfGroupError(toId);
       } else {
         throw _error;
       }
@@ -137,7 +136,7 @@ export class GroupService {
           toId,
           groupId,
       );
-      throw new NotAdminOfGroupError(toId);
+      throw new UserNotAdminOfGroupError(toId);
     }
 
     // Transfer ownership
