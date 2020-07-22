@@ -12,7 +12,6 @@ const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
 describe('post /api/group/:groupId/leave', function() {
   let agent: request.SuperTest<request.Test>;
-  // let user: any;
   let csrf: string;
 
   beforeEach(async function() {
@@ -22,7 +21,6 @@ describe('post /api/group/:groupId/leave', function() {
     const response = await TestUtils.signUp();
 
     agent = response.agent;
-    // user = response.user;
     csrf = response.csrf;
   });
 

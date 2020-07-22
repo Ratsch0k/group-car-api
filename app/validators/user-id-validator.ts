@@ -12,7 +12,7 @@ export const userIdValidator = [
       .exists()
       .withMessage('userId is missing')
       .isNumeric()
-      .withMessage('userId has to be number'),
+      .withMessage('userId has to be a number'),
 ];
 
 /**

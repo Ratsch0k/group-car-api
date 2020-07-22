@@ -87,4 +87,49 @@ describe('GroupRepository', function() {
       assert.notCalled(findUserOfGroupStub);
     });
   });
+
+  describe('changeOwnership', function() {
+    it('updates ownership and returns group and uses ' +
+    'specified options', async function() {
+      const group = {
+        update: sinon.stub().resolvesThis(),
+      };
+
+      const options = {
+        transaction: {},
+      };
+
+      const findByPkStub = sinon.stub(Group, 'findByPk').resolves(group as any);
+
+      const groupId = 5;
+      const newOwnerId = 7;
+
+      await expect(GroupRepository.changeOwnership(
+          groupId,
+          newOwnerId,
+          options as any,
+      )).to.eventually.be.equal(group);
+
+      assert.calledOnceWithExactly(findByPkStub, groupId, match.any);
+      assert.calledOnceWithExactly(
+          group.update,
+          match({
+            ownerId: newOwnerId,
+          }),
+          options,
+      );
+    });
+
+    it('throws GroupNotFoundError if group doesn\'t exist', async function() {
+      const findByPkStub = sinon.stub(Group, 'findByPk').resolves(null as any);
+
+      const groupId = 5;
+      const newOwnerId = 7;
+
+      await expect(GroupRepository.changeOwnership(groupId, newOwnerId))
+          .to.eventually.be.rejectedWith(GroupNotFoundError);
+
+      assert.calledOnceWithExactly(findByPkStub, groupId, match.any);
+    });
+  });
 });

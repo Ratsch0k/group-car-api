@@ -10,6 +10,9 @@ tags:
   description: Requests for everything user related
 - name: Group
   description: Requests for everything groups related
+  
+security:
+  - csrfToken: []
 
 # Paths
 paths:
@@ -40,8 +43,6 @@ paths:
       description: Logs the user in with the given username and the given password
       tags:
       - Authentication
-      parameters:
-      - $ref: '#/components/parameters/XsrfParameter'
       requestBody:
         description: Login data
         content:
@@ -69,8 +70,6 @@ paths:
       description: Signs the user up with the given attributes
       tags:
       - Authentication
-      parameters:
-      - $ref: '#/components/parameters/XsrfParameter'
       requestBody:
         description: The sign up properties
         content:
@@ -98,8 +97,6 @@ paths:
       tags:
       - Authentication
       description: Log the client out by replacing the jwt cookie with a pre-login one
-      parameters:
-      - $ref: '#/components/parameters/XsrfParameter'
       responses:
         204:
           description: The client is logged out
@@ -111,8 +108,6 @@ paths:
       tags:
       - Authentication
       description: Check if the current state of the client indicates that it is logged in. Checks the jwt token and the payload within.
-      parameters:
-      - $ref: '#/components/parameters/XsrfParameter'
       responses:
         200:
           description: The client is logged in
@@ -202,7 +197,6 @@ paths:
         required: true
         schema:
           type: integer
-      - $ref: '#/components/parameters/XsrfParameter'
     post:
       summary: Joins the group
       tags:
@@ -231,8 +225,6 @@ paths:
       tags:
       - Group
       description: Create a new group with the currently logged in user as admin and owner.
-      parameters:
-      - $ref: '#/components/parameters/XsrfParameter'
       requestBody:
         description: The initial group data.
         content:
@@ -254,7 +246,6 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /api/group/{groupId}:
     parameters: 
-    - $ref: '#/components/parameters/XsrfParameter'
     - $ref: '#/components/parameters/GroupId'
     get:
       summary: Get group data
@@ -323,7 +314,6 @@ paths:
       - Group
       description: Invites a user to the group
       parameters: 
-      - $ref: '#/components/parameters/XsrfParameter'
       - $ref: '#/components/parameters/GroupId'
       requestBody:
         description: Information about who to invite
@@ -348,8 +338,6 @@ paths:
         404:
           $ref: '#/components/responses/UserNotFoundErrorResponse'
   /api/group/{groupId}/leave:
-    parameters:
-      - $ref: '#/components/parameters/XsrfParameter'
     post:
       summary: Leaves the specified group
       tags:
@@ -369,8 +357,6 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /api/group/{groupId}/{userId}/admin/grant:
-    parameters:
-      - $ref: '#/components/parameters/XsrfParameter'
     put:
       summary: Grants a user admin permissions
       description: Grants the specified user admin permissions.
@@ -404,23 +390,21 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /api/group/{groupId}/{userId}/admin/revoke:
     parameters:
-      - $ref: '#/components/parameters/XsrfParameter'
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
     put:
       summary: Grants a user admin permissions
       description: Grants the specified user admin permissions.
       tags:
         - Group
-      parameters:
-        - name: groupId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: integer
       responses:
         204:
           description: Admin permission for the user has been successfully revoked.
@@ -436,7 +420,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
-    
+  /api/group/{groupId}/{userId}/admin/transfer-ownership:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+      
+    post:
+      summary: Transfers ownership to specified user
+      description: Transfers the ownership of the currently logged in user of the specified group to the specified user
+      tags: 
+        - Group
+      responses:
+        200:
+          description: The specified user is now the owner of the specified group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupWithMembers'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          description: The currently logged in user is either not a member, not an admin or not the owner of the specified group.
+            Or the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
+        
 # Components
 components:
 
@@ -732,18 +750,20 @@ components:
             
   # Parameter
   parameters:
-    XsrfParameter:
-      name: XSRF-TOKEN
-      in: header
-      required: false
-      schema:
-        type: string
     GroupId:
       name: groupId
       in: path
       schema:
         type: integer
       required: true
+      
+  # Security Definitions
+  securitySchemes:
+    csrfToken:
+      type: apiKey
+      name: XSRF-TOKEN
+      in: header
+  
 # External docs
 externalDocs:
   description: Code documentation is here
