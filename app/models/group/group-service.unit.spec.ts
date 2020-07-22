@@ -10,6 +10,7 @@ import {
   InviteNotFoundError,
   CannotTransferOwnershipToNotAdminError,
   NotMemberOfGroupError,
+  NotAdminOfGroupError,
 } from '../../errors';
 import {GroupRepository} from './group-repository';
 import {MembershipService} from '../membership/membership-service';
@@ -272,7 +273,7 @@ describe('GroupService', function() {
       assert.calledOnceWithExactly(groupFindById, groupId, match.any);
     });
 
-    it('throws CannotTransferOwnershipToNotAdminError if ' +
+    it('throws NotAdminOfGroupError if ' +
     'owner tries to transfer ownership to member who is not ' +
     'admin of specified group', async function() {
       const groupId = 8;
@@ -306,9 +307,17 @@ describe('GroupService', function() {
       const groupFindById = sinon.stub(GroupRepository, 'findById')
           .resolves(group as any);
 
-      await expect(GroupService.transferOwnership(currentUser, groupId, toId))
+      const error = await expect(GroupService
+          .transferOwnership(currentUser, groupId, toId))
           .to.be.eventually
-          .rejectedWith(CannotTransferOwnershipToNotAdminError);
+          .rejectedWith(NotAdminOfGroupError);
+
+      expect(error).to.be.instanceOf(NotAdminOfGroupError);
+      expect(error).to.have
+          .haveOwnProperty(
+              'message',
+              `User with id ${toId} is not an admin of the group`,
+          );
 
       assert.calledWithExactly(
           membershipFindById,
@@ -344,8 +353,7 @@ describe('GroupService', function() {
       const toIdMembership = {
         userId: currentUser.id + 2,
         groupId,
-        isAdmin: true,
-      };
+        isAdmin: true};
 
       const group = {
         id: 8,

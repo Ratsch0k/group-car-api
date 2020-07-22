@@ -9,6 +9,7 @@ import {
   CannotTransferOwnershipToNotAdminError,
   MembershipNotFoundError,
   NotMemberOfGroupError,
+  NotAdminOfGroupError,
 } from '@app/errors';
 import {MembershipService} from '../membership/membership-service';
 import debug from 'debug';
@@ -136,7 +137,7 @@ export class GroupService {
           toId,
           groupId,
       );
-      throw new CannotTransferOwnershipToNotAdminError();
+      throw new NotAdminOfGroupError(toId);
     }
 
     // Transfer ownership
