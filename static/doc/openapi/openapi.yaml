@@ -356,6 +356,42 @@ paths:
           $ref: '#/components/responses/BadRequestErrorResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/group/{groupId}/{userId}/kick:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      summary: Kicks a user
+      description: Kicks the specified user from the specified group. The owner can kick any user, an admin can kick any non-admin user and normal members cannot kick any user.
+      tags: 
+        - Group
+      responses:
+        200:
+          description: The user was successfully kicked from the group. The response data is the new group data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupWithMembers'
+        400:
+          description: Either the parameters are wrong or the user tried to kick himself/herself
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestErrorSchema'
+        401:
+          description: Either the user is not an admin, or he/she is an admin but tried to kick another admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /api/group/{groupId}/{userId}/admin/grant:
     put:
       summary: Grants a user admin permissions
