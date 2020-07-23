@@ -9,9 +9,12 @@ import {
   MembershipNotFoundError,
   UserNotAdminOfGroupError,
   UserNotMemberOfGroupError,
+  CannotKickSelfError,
+  NotAdminOfGroupError,
 } from '@app/errors';
 import {MembershipService} from '../membership/membership-service';
 import debug from 'debug';
+import {MembershipRepository} from '../membership';
 
 const log = debug('group-car:group:service');
 const error = debug('group-car:group:service:error');
@@ -148,6 +151,75 @@ export class GroupService {
         toId,
     );
 
+    return this.findById(currentUser, groupId);
+  }
+
+  /**
+   * Kicks the specified user from the specified group.
+   *
+   * This method enforces the following constraints:
+   *  - A normal member can not kick any member
+   *  - An admin can only kick normal members
+   *  - The owner can kick every members (admins included)
+   *  - No member can kick himself/herself
+   *
+   * Throws UnauthorizedError if the current user is not
+   * a member or not an admin of the specified group or
+   * if an admin tries to kick another admin.
+   * Throws CannotKickSelfError if the current user
+   * tries to kick himself/herself.
+   * @param currentUser - The currently logged in user
+   * @param groupId     - The id of the group from where the
+   *                      user should be kicked
+   * @param userId      - The id of the user who should be kicked
+   * @returns A promise which resolves in the updated group data or rejected
+   *  by an error
+   */
+  public static async kickUser(
+      currentUser: Express.User,
+      groupId: number,
+      userId: number,
+  ): Promise<Group> {
+    // Check if kicking self
+    if (userId === currentUser.id) {
+      throw new CannotKickSelfError();
+    }
+
+    // Get membership of current user
+    const currentMembership = await MembershipService.findById(
+        currentUser,
+        {
+          userId: currentUser.id,
+          groupId,
+        },
+    );
+
+    // Check if current user is admin (owner is also admin)
+    if (!currentMembership.isAdmin) {
+      throw new NotAdminOfGroupError();
+    }
+
+    // Get membership of user to kick
+    const toKickMembership = await MembershipService.findById(
+        currentUser,
+        {
+          userId,
+          groupId,
+        },
+    );
+
+    // If other user is admin, check if current user is owner
+    if (toKickMembership.isAdmin) {
+      const group = await GroupRepository.findById(groupId);
+
+      if (group.ownerId != currentUser.id) {
+        throw new NotOwnerOfGroupError();
+      }
+    }
+
+    await MembershipRepository.removeUserFromGroup(userId, groupId);
+
+    // Return new group data
     return this.findById(currentUser, groupId);
   }
 }
