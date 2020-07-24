@@ -65,7 +65,6 @@ export class GroupRepository {
     if (!options?.simple) {
       const buildOptions = this.queryBuildOptions(options);
       include = buildOptions.include;
-      attributes = buildOptions.attributes;
     } else {
       attributes = Group.simpleAttributes;
     }
@@ -124,7 +123,6 @@ export class GroupRepository {
           as: 'Owner',
           attributes: User.simpleAttributes,
         }],
-        exclude: ['ownerId'],
       }],
       defaultOptions,
   )

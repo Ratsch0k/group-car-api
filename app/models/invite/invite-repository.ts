@@ -53,7 +53,7 @@ export class InviteRepository {
       options?: Partial<FindOptions>,
   ): Promise<Invite> {
     // Prepare the include array
-    const {include, attributes} = this.buildOptions(options);
+    const {include} = this.buildOptions(options);
 
     const invite = await Invite.findOne({
       where: {
@@ -61,7 +61,6 @@ export class InviteRepository {
         groupId: id.groupId,
       },
       include,
-      attributes,
       transaction: options?.transaction,
     });
 
@@ -82,14 +81,13 @@ export class InviteRepository {
       options?: Partial<FindOptions>,
   ): Promise<Invite[]> {
     // Prepare the include array
-    const {include, attributes} = this.buildOptions(options);
+    const {include} = this.buildOptions(options);
 
     return Invite.findAll({
       where: {
         userId,
       },
       include,
-      attributes,
       transaction: options?.transaction,
     });
   }
@@ -150,7 +148,6 @@ export class InviteRepository {
               attributes: User.simpleAttributes,
             }],
           }],
-          exclude: ['groupId'],
         },
         {
           key: 'withUserData',
@@ -159,7 +156,6 @@ export class InviteRepository {
             as: 'InviteSender',
             attributes: User.simpleAttributes,
           }],
-          exclude: ['userId'],
         },
         {
           key: 'withInvitedByData',
@@ -168,7 +164,6 @@ export class InviteRepository {
             as: 'InviteSender',
             attributes: User.simpleAttributes,
           }],
-          exclude: ['invitedBy'],
         },
       ],
       defaultFindOptions,

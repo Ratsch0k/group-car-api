@@ -5,7 +5,6 @@ import {Includeable} from 'sequelize/types';
  */
 export interface QueryOptions {
   include: Includeable[] | undefined;
-  attributes: {exclude: string[]} | undefined;
 }
 
 /**
@@ -24,15 +23,10 @@ export interface OptionsListEntry {
    * List of models to include in the query.
    */
   include: Includeable[];
-
-  /**
-   * List of attributes to exclude in the query.
-   */
-  exclude: string[];
 }
 /**
  * Builds a method for handling options and generating
- * include and attribute excludes from it.
+ * include from it.
  * @param optionsList     - The list of options to handle
  * @param defaultOptions  - The default options
  */
@@ -55,9 +49,6 @@ export const buildFindQueryOptionsMethod = (
   }
 
   const include: Includeable[] = [];
-  const attributes = {
-    exclude: [] as string[],
-  };
 
   // Iterate through options and update include and exclude list.
   for (let i = 0; i < optionsList.length; i++) {
@@ -65,12 +56,10 @@ export const buildFindQueryOptionsMethod = (
 
     if (mergedOptions[entry.key]) {
       include.push(...entry.include);
-      attributes.exclude.push(...entry.exclude);
     }
   }
 
   return {
     include: include.length <= 0 ? undefined : include,
-    attributes: attributes.exclude.length > 0 ? attributes : undefined,
   };
 };
