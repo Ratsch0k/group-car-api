@@ -403,4 +403,29 @@ describe('GroupService', function() {
       assert.calledOnceWithExactly(groupChangeOwnership, groupId, toId);
     });
   });
+
+  describe('kickUser', function() {
+    describe('throws', function() {
+      it('CannotKickSelfError if specified userId and id of current user ' +
+      'is equal');
+
+      it('UnauthorizedError if current user is not member of the ' +
+      'specified group');
+
+      it('NotAdminOfGroupError if current user is member but not admin ' +
+      'of group');
+
+      it('MembershipNotFoundError if the specified user is not a member ' +
+      'of the group');
+
+      it('NotOwnerOfGroupError if specified user is admin of the group ' +
+      'but current user is not the owner');
+    });
+
+    describe('removes the specified user from the group if', function() {
+      it('specified user is normal member and current user is admin');
+
+      it('specified user is admin and current user is owner');
+    });
+  });
 });
