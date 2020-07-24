@@ -15,7 +15,7 @@ export const kickUserController: RequestHandler = async (req, res, next) => {
 
   if (typeof currentUser === 'object' && !isNaN(groupId) && !isNaN(userId)) {
     // Call to service
-    const group = await GroupService.kickUser(currentUser, userId, groupId);
+    const group = await GroupService.kickUser(currentUser, groupId, userId);
     res.send(group);
   } else {
     throw new BadRequestError();
