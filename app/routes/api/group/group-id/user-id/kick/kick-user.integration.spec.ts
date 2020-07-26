@@ -101,7 +101,6 @@ describe('post /api/group/{groupId}/{userId}/kick', function() {
             .send()
             .expect(401)
             .then((res) => {
-              console.dir(res);
               expect(res.body.message).to
                   .equal(new NotMemberOfGroupError().message);
             });

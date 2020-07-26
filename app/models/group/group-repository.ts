@@ -133,7 +133,7 @@ export class GroupRepository {
 
     // Build array to use in query
     const orArray = [];
-    for (let i = 0; i < ids.length - 1; i++) {
+    for (let i = 0; i < ids.length; i++) {
       const id = ids[i];
 
       orArray.push({id});

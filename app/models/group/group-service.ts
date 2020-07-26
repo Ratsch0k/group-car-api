@@ -16,7 +16,6 @@ import {
 import {MembershipService} from '../membership/membership-service';
 import debug from 'debug';
 import {MembershipRepository} from '../membership';
-import {group} from 'console';
 
 const log = debug('group-car:group:service');
 const error = debug('group-car:group:service:error');
@@ -216,7 +215,7 @@ export class GroupService {
           'group %d, user is not member of group',
             currentUser.id,
             userId,
-            group,
+            groupId,
             err,
         );
         throw new NotMemberOfGroupError();
