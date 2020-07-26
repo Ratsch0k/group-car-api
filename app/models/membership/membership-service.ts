@@ -25,8 +25,8 @@ export class MembershipService {
    *
    * Throws {@link MembershipNotFoundError} if the membership
    * doesn't exist. Throws {@link UnauthorizedError} if
-   * the current user is neither the user to which is
-   * referenced in the membership nor a member
+   * the current user is not the user which is
+   * referenced in the membership and not a member
    * of the group.
    * @param currentUser - Currently logged in user
    * @param id          - Id to search for

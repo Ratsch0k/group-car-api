@@ -10,9 +10,13 @@ import {
   InviteNotFoundError,
   UserNotAdminOfGroupError,
   UserNotMemberOfGroupError,
+  CannotKickSelfError,
+  NotAdminOfGroupError,
+  NotMemberOfGroupError,
 } from '../../errors';
 import {GroupRepository} from './group-repository';
 import {MembershipService} from '../membership/membership-service';
+import {MembershipRepository} from '../membership';
 
 describe('GroupService', function() {
   afterEach(function() {
@@ -405,27 +409,352 @@ describe('GroupService', function() {
   });
 
   describe('kickUser', function() {
+    let currentUser: any;
+    let groupId: number;
+    let userId: number;
+
+    let memberServFindById: sinon.SinonStub<any, any>;
+    let memberRepRemoveUser: sinon.SinonStub<any, any>;
+    let groupRepFindById: sinon.SinonStub<any, any>;
+
+    beforeEach(function() {
+      memberServFindById = sinon.stub(MembershipService, 'findById');
+      memberRepRemoveUser = sinon.stub(
+          MembershipRepository,
+          'removeUserFromGroup',
+      );
+      groupRepFindById = sinon.stub(GroupRepository, 'findById');
+    });
+
     describe('throws', function() {
       it('CannotKickSelfError if specified userId and id of current user ' +
-      'is equal');
+      'is equal', async function() {
+        userId = 8;
+        currentUser = {
+          id: userId,
+        };
+        groupId = 10;
 
-      it('UnauthorizedError if current user is not member of the ' +
-      'specified group');
+        await expect(GroupService.kickUser(
+            currentUser,
+            groupId,
+            userId,
+        )).to.be.rejectedWith(CannotKickSelfError);
+
+        assert.notCalled(memberRepRemoveUser);
+        assert.notCalled(memberServFindById);
+        assert.notCalled(groupRepFindById);
+      });
+
+      it('NotMemberOfGroupError if current user is not member of the ' +
+      'specified group', async function() {
+        userId = 8;
+        currentUser = {
+          id: 9,
+        };
+        groupId = 10;
+
+        memberServFindById.rejects(new MembershipNotFoundError({
+          userId: currentUser.id,
+          groupId,
+        }));
+
+        await expect(GroupService.kickUser(
+            currentUser,
+            groupId,
+            userId,
+        )).to.be.rejectedWith(NotMemberOfGroupError);
+
+        assert.calledOnceWithExactly(
+            memberServFindById,
+            currentUser,
+            match({
+              userId: currentUser.id,
+              groupId,
+            }),
+        );
+
+        assert.notCalled(memberRepRemoveUser);
+        assert.notCalled(groupRepFindById);
+      });
 
       it('NotAdminOfGroupError if current user is member but not admin ' +
-      'of group');
+      'of group', async function() {
+        userId = 8;
+        currentUser = {
+          id: 9,
+        };
+        groupId = 10;
+
+        const currentMembership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: false,
+        };
+
+        memberServFindById.resolves(currentMembership as any);
+
+        await expect(GroupService.kickUser(
+            currentUser,
+            groupId,
+            userId,
+        )).to.be.rejectedWith(NotAdminOfGroupError);
+
+        assert.calledOnceWithExactly(
+            memberServFindById,
+            currentUser,
+            match({
+              userId: currentUser.id,
+              groupId,
+            }),
+        );
+
+        assert.notCalled(memberRepRemoveUser);
+        assert.notCalled(groupRepFindById);
+      });
 
       it('MembershipNotFoundError if the specified user is not a member ' +
-      'of the group');
+      'of the group', async function() {
+        userId = 8;
+        currentUser = {
+          id: 9,
+        };
+        groupId = 10;
+
+        const currentMembership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: true,
+        };
+
+        memberServFindById
+            .onFirstCall().resolves(currentMembership as any)
+            .onSecondCall().rejects(
+                new MembershipNotFoundError({userId, groupId}));
+
+        const error = await expect(GroupService.kickUser(
+            currentUser,
+            groupId,
+            userId,
+        )).to.be.rejectedWith(MembershipNotFoundError);
+
+        expect(error.detail).to.eql({userId, groupId});
+
+        assert.calledWithMatch(
+            memberServFindById,
+            currentUser, {
+              userId: currentUser.id,
+              groupId,
+            },
+        );
+
+        assert.calledWithMatch(
+            memberServFindById,
+            currentUser, {
+              userId,
+              groupId,
+            },
+        );
+
+        assert.notCalled(memberRepRemoveUser);
+        assert.notCalled(groupRepFindById);
+      });
 
       it('NotOwnerOfGroupError if specified user is admin of the group ' +
-      'but current user is not the owner');
+      'but current user is not the owner', async function() {
+        userId = 8;
+        currentUser = {
+          id: 9,
+        };
+        groupId = 10;
+
+        const currentMembership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: true,
+        };
+
+        const userMembership = {
+          userId,
+          groupId,
+          isAdmin: true,
+        };
+
+        memberServFindById
+            .onFirstCall().resolves(currentMembership as any)
+            .onSecondCall().resolves(userMembership as any);
+
+        const group = {
+          name: 'TEST',
+          description: 'TEST',
+          ownerId: currentUser.id + 1,
+        };
+
+        groupRepFindById.resolves(group as any);
+
+        await expect(GroupService.kickUser(
+            currentUser,
+            groupId,
+            userId,
+        )).to.be.rejectedWith(NotOwnerOfGroupError);
+
+        assert.calledWithMatch(
+            memberServFindById,
+            currentUser, {
+              userId: currentUser.id,
+              groupId,
+            },
+        );
+
+        assert.calledWithMatch(
+            memberServFindById,
+            currentUser, {
+              userId,
+              groupId,
+            },
+        );
+
+        assert.calledOnceWithExactly(groupRepFindById, groupId);
+
+        assert.notCalled(memberRepRemoveUser);
+      });
     });
 
     describe('removes the specified user from the group if', function() {
-      it('specified user is normal member and current user is admin');
+      it('specified user is normal member and current ' +
+      'user is admin', async function() {
+        userId = 8;
+        currentUser = {
+          id: 9,
+        };
+        groupId = 10;
 
-      it('specified user is admin and current user is owner');
+        const currentMembership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: true,
+        };
+
+        const userMembership = {
+          userId,
+          groupId,
+          isAdmin: false,
+        };
+
+        memberServFindById
+            .onFirstCall().resolves(currentMembership as any)
+            .onSecondCall().resolves(userMembership as any);
+
+        memberRepRemoveUser.resolves();
+
+        const group = {
+          name: 'TEST',
+          description: 'TEST',
+          ownerId: currentUser.id + 1,
+        };
+
+        groupRepFindById.resolves(group as any);
+
+
+        await expect(GroupService.kickUser(
+            currentUser,
+            groupId,
+            userId,
+        )).to.be.fulfilled;
+
+        assert.calledWithMatch(
+            memberServFindById,
+            currentUser, {
+              userId: currentUser.id,
+              groupId,
+            },
+        );
+
+        assert.calledWithMatch(
+            memberServFindById,
+            currentUser, {
+              userId,
+              groupId,
+            },
+        );
+
+        assert.calledOnceWithExactly(memberRepRemoveUser, userId, groupId);
+
+        assert.calledWithMatch(
+            groupRepFindById,
+            groupId, {
+              withMembers: true,
+              withOwnerData: true,
+            },
+        );
+      });
+
+      it('specified user is admin and current user is owner', async function() {
+        userId = 8;
+        currentUser = {
+          id: 9,
+        };
+        groupId = 10;
+
+        const currentMembership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: true,
+        };
+
+        const userMembership = {
+          userId,
+          groupId,
+          isAdmin: true,
+        };
+
+        memberServFindById
+            .onFirstCall().resolves(currentMembership as any)
+            .onSecondCall().resolves(userMembership as any);
+
+        const group = {
+          name: 'TEST',
+          description: 'TEST',
+          ownerId: currentUser.id,
+        };
+
+        groupRepFindById.resolves(group as any);
+
+        memberRepRemoveUser.resolves();
+
+
+        await expect(GroupService.kickUser(
+            currentUser,
+            groupId,
+            userId,
+        )).to.be.fulfilled;
+
+        assert.calledWithMatch(
+            memberServFindById,
+            currentUser, {
+              userId: currentUser.id,
+              groupId,
+            },
+        );
+
+        assert.calledWithMatch(
+            memberServFindById,
+            currentUser, {
+              userId,
+              groupId,
+            },
+        );
+
+        assert.calledOnceWithExactly(memberRepRemoveUser, userId, groupId);
+
+        assert.calledWithMatch(
+            groupRepFindById,
+            groupId, {
+              withMembers: true,
+              withOwnerData: true,
+            },
+        );
+      });
     });
   });
 });

@@ -11,10 +11,12 @@ import {
   UserNotMemberOfGroupError,
   CannotKickSelfError,
   NotAdminOfGroupError,
+  NotMemberOfGroupError,
 } from '@app/errors';
 import {MembershipService} from '../membership/membership-service';
 import debug from 'debug';
 import {MembershipRepository} from '../membership';
+import {group} from 'console';
 
 const log = debug('group-car:group:service');
 const error = debug('group-car:group:service:error');
@@ -38,11 +40,16 @@ export class GroupService {
       userId: currentUser.id,
       groupId: id,
     };
+
     log(`Find group with id ${id} for user ${currentUser.id}`);
+
+
     // First, check if user is member (gets more information)
     try {
       await MembershipService.findById(currentUser, modelId);
+
       log(`User ${currentUser.id} is member of group ${id}`);
+
       return GroupRepository.findById(id, {
         withMembers: true,
         withOwnerData: true,
@@ -58,7 +65,9 @@ export class GroupService {
           currentUser,
           modelId,
       );
+
       log(`User ${currentUser.id} has invite for group ${id}`);
+
       return GroupRepository.findById(id, {simple: true, withOwnerData: true});
     } catch (_) {
       log(`User ${currentUser.id} has no invite for group ${id}`);
@@ -186,13 +195,36 @@ export class GroupService {
     }
 
     // Get membership of current user
-    const currentMembership = await MembershipService.findById(
-        currentUser,
-        {
-          userId: currentUser.id,
-          groupId,
-        },
-    );
+    let currentMembership;
+    try {
+      currentMembership = await MembershipService.findById(
+          currentUser,
+          {
+            userId: currentUser.id,
+            groupId,
+          },
+      );
+    } catch (err) {
+      /*
+       * If the current user is not a member of the specified group,
+       * indicated by the MembershipNotFoundError,
+       * throw a NotMemberOfGroupError.
+       */
+      if (err instanceof MembershipNotFoundError) {
+        error(
+            'User %d: cannot kick user %d from ' +
+          'group %d, user is not member of group',
+            currentUser.id,
+            userId,
+            group,
+            err,
+        );
+        throw new NotMemberOfGroupError();
+      } else {
+        throw err;
+      }
+    }
+
 
     // Check if current user is admin (owner is also admin)
     if (!currentMembership.isAdmin) {
