@@ -254,4 +254,26 @@ export class GroupService {
     // Return new group data
     return this.findById(currentUser, groupId);
   }
+
+  /**
+   * Returns a list of all groups the current user is a member of.
+   * @param currentUser - The currently logged in user.
+   */
+  public static async findAllForUser(
+      currentUser: Express.User,
+  ): Promise<Group[]> {
+    log('User %d: Get all groups', currentUser.id);
+    // Get all groups of user by getting all memberships
+    const memberships = await MembershipService.findAllOfUser(currentUser);
+
+    log('User %d: Got all membership', currentUser.id);
+    // Convert memberships into array of group ids
+    const groupIdArray = memberships.map((m) => m.groupId);
+
+    log(
+        'User %d: build list of ids with a length of %d',
+        currentUser.id,
+        groupIdArray.length);
+    return GroupRepository.findAllWithIds(groupIdArray);
+  }
 }

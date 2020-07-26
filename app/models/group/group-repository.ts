@@ -3,6 +3,9 @@ import {GroupNotFoundError} from '@app/errors';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 import {Group, User, MembershipRepository} from '@models';
 import debug from 'debug';
+import Sequelize from 'sequelize';
+
+const Op = Sequelize.Op;
 
 const log = debug('group-car:group:repository');
 const error = debug('group-car:group:repository:error');
@@ -110,6 +113,42 @@ export class GroupRepository {
     return group.update({
       ownerId: newOwnerId,
     }, options);
+  }
+
+  /**
+   * Gets all groups with the specified ids
+   * @param ids  - The list of ids for which to get the groups
+   * @param options - Additional query options
+   * @returns A promise which resolved to the list of all groups of the user
+   */
+  public static async findAllWithIds(
+      ids: number[],
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<Group[]> {
+    // Check if all ids in the list are numbers
+    if (ids.some((id) => typeof id !== 'number')) {
+      error('At least one id in the array is not a number');
+      throw TypeError('The ids array should only contain numbers');
+    }
+
+    // Build array to use in query
+    const orArray = [];
+    for (let i = 0; i < ids.length - 1; i++) {
+      const id = ids[i];
+
+      orArray.push({id});
+    }
+    log('Build array with %d entries', orArray.length);
+
+    const {include} = this.queryBuildOptions({withOwnerData: true});
+
+    return Group.findAll({
+      where: {
+        [Op.or]: orArray,
+      },
+      include,
+      ...options,
+    });
   }
 
   /**

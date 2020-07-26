@@ -140,4 +140,14 @@ export class MembershipService {
     log('User %d: forward to repository');
     return MembershipRepository.changeAdminPermission(id, isAdmin);
   }
+
+  /**
+   * Gets all memberships of the currently logged in user.
+   * @param currentUser - The currently logged in user.
+   */
+  public static async findAllOfUser(
+      currentUser: Express.User,
+  ): Promise<Membership[]> {
+    return MembershipRepository.findAllForUser(currentUser.id);
+  }
 }
