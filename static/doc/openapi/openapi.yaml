@@ -392,6 +392,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
+        404:
+          description: The user who should be kicked is not a member of the group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipNotFoundSchema'
   /api/group/{groupId}/{userId}/admin/grant:
     put:
       summary: Grants a user admin permissions
@@ -723,33 +729,41 @@ components:
       allOf:
       - $ref: '#/components/schemas/RestError'
       - example:
-          status: Entity Not Found Error
+          message: Entity Not Found Error
           statusCode: 404
-          message: Entity not found
+          status: Not found
           detail: {}
           timestamp: '2020-05-03T13:21:35.938Z'
     UserNotFoundErrorSchema:
       allOf:
       - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
       - example:
-          status: A user with id 4 doesn't exist
+          message: A user with id 4 doesn't exist
           detail:
             userId: 4
     GroupNotFoundErrorSchema:
       allOf:
       - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
       - example:
-          status: A group with id 4 doesn't exist
+          message: A group with id 4 doesn't exist
           detail: 
             groupId: 4
     InviteNotFoundSchema:
       allOf:
       - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
       - example:
-          status: An invite for the group doesn't exist
+          message: An invite for the group doesn't exist
           detail: 
             groupId: 4
             userId: 2
+    MembershipNotFoundSchema:
+      allOf:
+        - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+        - example:
+            message: Membership of user 2 for group 4 doesn't exist
+            detail: 
+              groupId: 4
+              userId: 2
   # Responses
   responses:
     # Error
