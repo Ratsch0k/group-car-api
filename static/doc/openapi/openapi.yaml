@@ -231,9 +231,14 @@ paths:
           content:
             application/json:
               schema:
-               type: array
-               items:
-                 $ref: '#/components/schemas/GroupWithMembers'
+                type: object
+                required:
+                  - groups
+                properties:
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GroupWithMembers'
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
     post:
