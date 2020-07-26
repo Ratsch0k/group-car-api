@@ -9,3 +9,4 @@ export * from './owner-cannot-leave-error';
 export * from './cannot-change-membership-owner';
 export * from './user-not-admin-of-group-error';
 export * from './user-not-member-of-group-error';
+export * from './cannot-kick-self-error';
