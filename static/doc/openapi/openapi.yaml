@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Group car api
-  version: 0.2.1
+  version: 0.4.0
   
 tags:
 - name: Authentication
@@ -238,7 +238,7 @@ paths:
                   groups:
                     type: array
                     items:
-                      $ref: '#/components/schemas/GroupWithMembers'
+                      $ref: '#/components/schemas/GroupWithOwner'
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
     post:
