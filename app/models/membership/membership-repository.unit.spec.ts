@@ -238,4 +238,59 @@ describe('MembershipRepository', function() {
       }));
     });
   });
+
+  describe('findAllForUser', function() {
+    let membershipStub: sinon.SinonStub<any, any>;
+
+    beforeEach(function() {
+      membershipStub = sinon.stub(Membership, 'findAll');
+    });
+
+    it('throws TypeError if specified userId is not ' +
+    'a number', async function() {
+      const userId = 'test';
+
+      await expect(MembershipRepository.findAllForUser(userId as any))
+          .to.be.eventually.rejectedWith(TypeError);
+
+      assert.notCalled(membershipStub);
+    });
+
+    it('returns list of membership for the specified user', async function() {
+      const userId = 3;
+
+      const memberships = [
+        {
+          userId,
+          groupId: 1,
+          isAdmin: true,
+        },
+        {
+          userId,
+          groupId: 2,
+          isAdmin: false,
+        },
+      ];
+
+      membershipStub.resolves(memberships as any);
+
+      const options = {
+        transaction: {},
+      };
+
+      const response = await expect(MembershipRepository.findAllForUser(
+        userId as any,
+         options as any,
+      )).to.be.eventually.fulfilled;
+
+      expect(response).to.be.equal(memberships);
+
+      assert.calledOnceWithExactly(membershipStub, match({
+        where: {
+          userId,
+        },
+        ...options,
+      }));
+    });
+  });
 });

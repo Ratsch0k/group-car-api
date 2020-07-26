@@ -145,7 +145,7 @@ export class MembershipService {
    * Gets all memberships of the currently logged in user.
    * @param currentUser - The currently logged in user.
    */
-  public static async findAllOfUser(
+  public static async findAllForUser(
       currentUser: Express.User,
   ): Promise<Membership[]> {
     return MembershipRepository.findAllForUser(currentUser.id);

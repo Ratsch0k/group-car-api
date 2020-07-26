@@ -264,7 +264,7 @@ export class GroupService {
   ): Promise<Group[]> {
     log('User %d: Get all groups', currentUser.id);
     // Get all groups of user by getting all memberships
-    const memberships = await MembershipService.findAllOfUser(currentUser);
+    const memberships = await MembershipService.findAllForUser(currentUser);
 
     log('User %d: Got all membership', currentUser.id);
     // Convert memberships into array of group ids
