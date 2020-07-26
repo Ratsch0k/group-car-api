@@ -316,4 +316,36 @@ describe('MembershipService', function() {
       assert.calledOnceWithExactly(membershipRepChangePerm, id, false);
     });
   });
+
+  describe('findAllForUser', function() {
+    it('calls MembershipRepository.findAllForUser ' +
+    'with correct parameters', async function() {
+      const currentUser = {
+        id: 9,
+      };
+
+      const memberships = [
+        {
+          userId: currentUser.id,
+          groupId: 1,
+          isAdmin: true,
+        },
+        {
+          userId: currentUser.id,
+          groupId: 2,
+          isAdmin: false,
+        },
+      ];
+
+      const findAllForUserStub = sinon.stub(
+          MembershipRepository,
+          'findAllForUser',
+      ).resolves(memberships as any);
+
+      await expect(MembershipService.findAllForUser(currentUser as any))
+          .to.be.eventually.fulfilled;
+
+      assert.calledOnceWithExactly(findAllForUserStub, currentUser.id);
+    });
+  });
 });

@@ -82,7 +82,7 @@ export class MembershipRepository {
    */
   public static async findUsersOfGroup(
       groupId: number,
-      options?: RepositoryQueryOptions,
+      options?: Partial<RepositoryQueryOptions>,
   ): Promise<Membership[]> {
     const memberships = await Membership.findAll({
       where: {
@@ -98,6 +98,28 @@ export class MembershipRepository {
     });
 
     return memberships;
+  }
+
+  /**
+   * Gets all memberships of the specified user.
+   * @param userId  - The id of the user for which all
+   *    memberships should be returned
+   * @param options - Additional query options.
+   */
+  public static async findAllForUser(
+      userId: number,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<Membership[]> {
+    if (typeof userId !== 'number') {
+      throw new TypeError('userId has to be a number');
+    }
+
+    return Membership.findAll({
+      where: {
+        userId,
+      },
+      ...options,
+    });
   }
 
   /**

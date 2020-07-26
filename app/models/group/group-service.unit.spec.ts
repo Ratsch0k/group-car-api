@@ -757,4 +757,48 @@ describe('GroupService', function() {
       });
     });
   });
+
+  describe('findAllForUser', function() {
+    let membershipFindAllForUser: sinon.SinonStub<any, any>;
+    let groupFindAllWithIds: sinon.SinonStub<any, any>;
+
+    beforeEach(function() {
+      membershipFindAllForUser = sinon.stub(
+          MembershipService,
+          'findAllForUser',
+      );
+      groupFindAllWithIds = sinon.stub(GroupRepository, 'findAllWithIds');
+    });
+
+    it('calls GroupRepository.findAllWithIds with correct ' +
+    'parameters', async function() {
+      const currentUser = {
+        id: 99,
+      };
+
+      const memberships = [
+        {
+          userId: currentUser.id,
+          groupId: 1,
+          isAdmin: false,
+        },
+        {
+          userId: currentUser.id,
+          groupId: 2,
+          isAdmin: true,
+        },
+      ];
+
+      membershipFindAllForUser.resolves(memberships as any);
+      groupFindAllWithIds.resolves();
+
+      const expected = [1, 2];
+
+      await expect(GroupService.findAllForUser(currentUser as any))
+          .to.be.eventually.fulfilled;
+
+      assert.calledOnceWithExactly(membershipFindAllForUser, currentUser);
+      assert.calledOnceWithExactly(groupFindAllWithIds, match(expected));
+    });
+  });
 });

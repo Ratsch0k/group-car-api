@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Group car api
-  version: 0.2.1
+  version: 0.4.0
   
 tags:
 - name: Authentication
@@ -220,6 +220,27 @@ paths:
   
   # Group
   /api/group:
+    get:
+      summary: Gets groups
+      description: Returns the list of groups the currently logged in user is a member of
+      tags:
+        - Group
+      responses:
+        200:
+          description: A list of group of which the user is a member
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - groups
+                properties:
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GroupWithOwner'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
     post:
       summary: Creates a new group
       tags:
@@ -576,14 +597,23 @@ components:
           type: string
         description:
           type: string
-        owner:
-          type: string
+        ownerId:
+          type: number
         createdAt:
           type: string
           format: date-time
         updatedAt:
           type: string
           format: date-time
+    GroupWithOwner:
+      allOf:
+        - $ref: '#/components/schemas/GroupData'
+        - type: object
+          required:
+            - Owner
+          properties:
+            Owner:
+              $ref: '#/components/schemas/UserSimple'
     GroupMember:
       type: object
       required: 
@@ -596,7 +626,7 @@ components:
           type: boolean
     GroupWithMembers:
       allOf:
-        - $ref: '#/components/schemas/GroupData'
+        - $ref: '#/components/schemas/GroupWithOwner'
         - type: object
           required:
           - members
