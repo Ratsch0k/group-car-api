@@ -6,6 +6,12 @@ import debug from 'debug';
 const log = debug('group-car:group:get-all:controller');
 const error = debug('group-car:group:get-all:controller:error');
 
+/**
+ * Controller for handling returning all groups of the currently logged in user.
+ * @param req   - Request
+ * @param res   - Response
+ * @param next  - Next
+ */
 export const getGroupsController: RequestHandler = async (req, res, next) => {
   const currentUser = req.user;
 
