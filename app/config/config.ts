@@ -52,6 +52,8 @@ export interface PbConfig {
 export interface UserConfig {
   pb: PbConfig;
   signUpThroughRequest: boolean;
+  maxLimitQuery: number;
+  maxUsernameLength: number;
 }
 
 export interface GroupConfig {
@@ -185,6 +187,8 @@ const user: UserConfig = {
     process.env.DISABLE_SIGN_UP_THROUGH_REQUEST === undefined ?
     true :
     !Boolean(process.env.DISABLE_SIGN_UP_THROUGH_REQUEST),
+  maxLimitQuery: 20,
+  maxUsernameLength: 25,
 };
 
 const group: GroupConfig = {

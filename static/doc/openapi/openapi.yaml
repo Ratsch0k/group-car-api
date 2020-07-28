@@ -140,7 +140,7 @@ paths:
           type: number
       responses:
         200:
-          description: The generation was successfull and the picture is returned.
+          description: The generation was successful and the picture is returned.
           content:
             image/jpeg:
               schema:
@@ -182,6 +182,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/UserSimple'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
   /api/user/{userId}/profile-pic:
     parameters: 
       - name: userId
@@ -362,7 +364,7 @@ paths:
                   type: integer
       responses:
         201:
-          description: 'The user was successully invited'
+          description: 'The user was successfully invited'
           content:
             application/json:
               schema:

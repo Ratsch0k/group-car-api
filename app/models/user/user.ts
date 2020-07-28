@@ -114,7 +114,7 @@ User.init(
         type: DataTypes.INTEGER,
       },
       username: {
-        type: DataTypes.STRING(25),
+        type: DataTypes.STRING(config.user.maxUsernameLength || 25),
         allowNull: false,
         unique: true,
         validate: {
