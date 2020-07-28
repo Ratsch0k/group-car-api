@@ -148,6 +148,40 @@ paths:
                 format: binary
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
+  /api/user/search:
+    get:
+      summary: Searches for users
+      description: Searches for a limited list of users which start with the specified query.
+        The maximum amount of the list is 20 users
+      tags:
+        - User
+      parameters:
+        - name: filter
+          description: Filters with what the username of the returned users should start with
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          description: Limits the amount of users which are returned. Maximum is 20.
+          in: query
+          required: false
+          schema:
+            type: number
+      responses:
+        200:
+          description: A list with at most 20 users which start with the specified query.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - users
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserSimple'
   /api/user/{userId}/profile-pic:
     parameters: 
       - name: userId
@@ -170,26 +204,7 @@ paths:
                 format: binary
         404:
           $ref: '#/components/responses/UserNotFoundErrorResponse'
-  /api/user/invite:
-    get:
-      summary: Get invites of logged in user
-      tags:
-        - User
-      description: Gets all invites of the currently logged in user
-      responses:
-        200:
-          description: All invites of the user
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  invites:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/InviteWithGroupInvitedByData'
-        401:
-          $ref: '#/components/responses/UnauthorizedErrorResponse'
+
   /api/user/invite/{groupId}/join:
     parameters:
       - name: groupId
