@@ -58,7 +58,7 @@ export class UserService {
 
     // Assign max value if specified parameter is bigger.
     limit = Math.min(
-        limit || config.user.maxUsernameLength,
+        limit || config.user.maxLimitQuery,
         config.user.maxLimitQuery,
     );
 

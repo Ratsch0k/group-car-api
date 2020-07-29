@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {searchUserController} from './search-user';
+import {searchUserController} from './search-user-controller';
 import searchUserValidationRouter from './search-user-validator';
 import {asyncWrapper} from '@app/util/async-wrapper';
 
