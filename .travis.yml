@@ -33,8 +33,8 @@ jobs:
     - stage: "Static Analysis"
       name: "Eslint"
       script: yarn eslint
-    #- script: yarn audit
-    #  name: "Audit"
+    - script: yarn audit
+      name: "Audit"
 
      # Building job
     - stage: "Build"
