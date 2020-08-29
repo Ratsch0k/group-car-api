@@ -45,6 +45,9 @@
     "postcoverage": "yarn marge",
     "marge": "marge -f index.html -o static/test/ -p Report mochawesome-report/mochawesome.json"
   },
+  "resolutions": {
+    "lodash": ">=4.17.19"
+  },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.30",
@@ -62,7 +65,7 @@
     "@types/sinon": "^9.0.0",
     "@types/supertest": "^2.0.8",
     "@types/validator": "^13.0.0",
-    "bcrypt": "^4.0.1",
+    "bcrypt": "^5.0.0",
     "canvas": "^2.6.1",
     "cookie-parser": "~1.4.4",
     "csrf": "^3.1.0",
