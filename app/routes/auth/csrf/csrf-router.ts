@@ -7,7 +7,7 @@ const router = express.Router();
  */
 router.head('/', (req, res, next) => {
   res.set('XSRF-TOKEN', req.getCsrfToken?.());
-  next();
+  res.send();
 });
 
 export default router;
