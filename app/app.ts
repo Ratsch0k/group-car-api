@@ -59,13 +59,16 @@ app.use(express.static('static'));
 /**
  * Configure static service
  */
-app.use(express.static(config.staticPath.path));
-app.get('/*', (req, res) => {
-  res.sendFile(
-      path.join(
-          config.staticPath.path,
-          'index.html'));
-});
+if (!config.static.disabled) {
+  app.use(express.static(config.static.path));
+  app.get('/*', (req, res) => {
+    res.sendFile(
+        path.join(
+            config.static.path,
+            'index.html'));
+  });
+}
+
 
 // Register error handler
 app.use(errorHandler);

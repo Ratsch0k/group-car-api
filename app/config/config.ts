@@ -4,6 +4,7 @@ import jwt from './jwt-config';
 import dbConfig from './database-config';
 import {JWTConfig} from './jwt-config';
 import {Config as SequelizeConfig} from 'sequelize/types';
+import {argv} from 'yargs';
 
 const log = debug('group-car:config');
 
@@ -28,8 +29,9 @@ export interface BcryptConfig {
   saltRounds: number;
 }
 
-export interface StaticPathConfig {
+export interface StaticConfig {
   path: string;
+  disabled: boolean;
 }
 
 export interface ErrorConfig {
@@ -79,7 +81,7 @@ export interface MailConfig {
 export interface Config {
   database: DBConfig;
   bcrypt: BcryptConfig;
-  staticPath: StaticPathConfig;
+  static: StaticConfig;
   error: ErrorConfig;
   jwt: JWTConfig;
   morgan: MorganConfig;
@@ -152,8 +154,9 @@ try {
 } catch (err) {
   pathToStatic = 'static';
 }
-const staticPathConfig: StaticPathConfig = {
+const staticConfig: StaticConfig = {
   path: pathToStatic,
+  disabled: argv.disableStaticServe ? true : false,
 };
 
 // Get the mail config from environment variables
@@ -184,6 +187,8 @@ const user: UserConfig = {
   },
   signUpThroughRequest: environment === 'test' ?
     false :
+    argv.allowSignUp ?
+    false :
     process.env.DISABLE_SIGN_UP_THROUGH_REQUEST === undefined ?
     true :
     !Boolean(process.env.DISABLE_SIGN_UP_THROUGH_REQUEST),
@@ -198,7 +203,7 @@ const group: GroupConfig = {
 const config: Config = {
   database,
   bcrypt,
-  staticPath: staticPathConfig,
+  static: staticConfig,
   error,
   jwt,
   morgan,
