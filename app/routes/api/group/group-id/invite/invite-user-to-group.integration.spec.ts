@@ -51,7 +51,7 @@ describe('post /api/group/:groupId/invite', function() {
           });
     });
 
-    it('if userId is missing', function() {
+    it('if userId and username are missing', function() {
       return agent
           .post('/api/group/2/invite')
           .set(csrfHeaderName, csrf)
@@ -59,6 +59,7 @@ describe('post /api/group/:groupId/invite', function() {
           .expect(400)
           .then((res) => {
             expect(res.body.message).to.contain('userId is missing');
+            expect(res.body.message).to.contain('username is missing');
           });
     });
 
@@ -318,6 +319,47 @@ describe('post /api/group/:groupId/invite', function() {
         .post(`/api/group/${group.id}/invite`)
         .set(csrfHeaderName, csrf)
         .send({userId: user.id + 1})
+        .expect(201)
+        .then((res) => {
+          expect(res.body).to.include(expectedInvite);
+          expect(res.body.createdAt).to.be.a('string');
+        });
+
+    // Check if invite exists
+    const invite = await Invite.findOne({
+      where: {
+        groupId: group.id,
+        userId: invitee.id,
+      },
+    });
+
+    expect(invite).to.be.not.null;
+  });
+
+  it('can also work with username', async function() {
+    const group = await Group.create({
+      ownerId: user.id,
+      name: 'NAME',
+      description: 'DESC',
+    });
+
+    // Create invitee
+    const invitee = await User.create({
+      username: 'INVITEE',
+      password: 'INVITEEPASSWORD',
+      email: 'INVITEE@mail.com',
+    });
+
+    const expectedInvite = {
+      userId: invitee.id,
+      groupId: group.id,
+      invitedBy: user.id,
+    };
+
+    await agent
+        .post(`/api/group/${group.id}/invite`)
+        .set(csrfHeaderName, csrf)
+        .send({username: invitee.username})
         .expect(201)
         .then((res) => {
           expect(res.body).to.include(expectedInvite);

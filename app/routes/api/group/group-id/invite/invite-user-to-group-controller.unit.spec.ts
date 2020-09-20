@@ -22,6 +22,7 @@ import {
 import {Membership, Group, User, Invite} from '../../../../../models';
 import Bluebird from 'bluebird';
 import config from '../../../../../config';
+import { expect } from 'chai';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 describe('InviteUserToGroupController', function() {
@@ -243,6 +244,32 @@ describe('InviteUserToGroupController', function() {
           userFindByPk as any, req.body.userId);
         sinon.assert.calledOnceWithExactly(next,
             match.instanceOf(UserNotFoundError));
+        done();
+      });
+
+      checkUser(req, res, next);
+    });
+
+    it('sets userId on body if no id provided but username', function(done) {
+      req = {
+        body: {
+          username: 'test-user',
+        },
+      };
+
+      const user = {
+        username: req.body.username,
+        id: 11,
+      };
+
+      const userFindByUsername = sinon.stub(User, 'findByUsername')
+          .usingPromise(Bluebird).resolves(user as any);
+
+      next = sinon.stub().callsFake(() => {
+        sinon.assert.calledOnceWithExactly(
+          userFindByUsername as any, req.body.username);
+        sinon.assert.calledOnceWithExactly(next);
+        expect(req.body.userId).to.equal(user.id);
         done();
       });
 
