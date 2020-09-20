@@ -387,7 +387,7 @@ paths:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/UserNotFoundErrorSchema'
-                  - $ref: '#/components/schemas/UsernameNotFoundErrorSchema' 
+                  - $ref: '#/components/schemas/UsernameNotFoundErrorSchema'
   /api/group/{groupId}/leave:
     post:
       summary: Leaves the specified group
@@ -601,7 +601,7 @@ components:
           type: string
         description:
           type: string
-      example: 
+      example:
         name: Family group
         description: Our new group for the family
     CreateGroupRequest:
