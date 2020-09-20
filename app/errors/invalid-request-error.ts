@@ -21,7 +21,16 @@ class InvalidRequestError extends BadRequestError {
       const resultArray: Array<Record<string, unknown>> =
           validationResult.array();
       for (let i = 0; i < resultArray.length; i++) {
-        message += `${resultArray[i].param} -> ${resultArray[i].msg}, `;
+        // Check if this item has nested errors, if it does, append them
+        if (resultArray[i].nestedErrors) {
+          const nested = resultArray[i].nestedErrors as
+              Array<Record<string, unknown>>;
+          for (let j = 0; j < nested.length; j++) {
+            message += `${nested[j].param} -> ${nested[j].msg}, `;
+          }
+        } else {
+          message += `${resultArray[i].param} -> ${resultArray[i].msg}, `;
+        }
       }
 
       // Remove the last ', '

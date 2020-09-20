@@ -7,6 +7,7 @@ import {
   AlreadyMemberError,
   AlreadyInvitedError,
   GroupIsFullError,
+  UsernameNotFoundError,
 } from '@errors';
 import {Group, Membership, User, Invite} from '@models';
 import {Router, RequestHandler} from 'express';
@@ -75,16 +76,28 @@ export const checkGroup: RequestHandler = (req, res, next) => {
  * @param next  - Next
  */
 export const checkUser: RequestHandler = (req, res, next) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const userId = req.body.userId;
+  if (req.body.userId !== undefined) {
+    const userId = req.body.userId;
 
-  User.findByPk(userId).then((user) => {
-    if (user === null) {
-      next(new UserNotFoundError(userId));
-    } else {
-      next();
-    }
-  }).catch(next);
+    User.findByPk(userId).then((user) => {
+      if (user === null) {
+        next(new UserNotFoundError(userId));
+      } else {
+        next();
+      }
+    }).catch(next);
+  } else if (req.body.username !== undefined) {
+    const username = req.body.username;
+    User.findByUsername(username).then((user) => {
+      if (user == null) {
+        next(new UsernameNotFoundError(username));
+      } else {
+        // Set the user id so that the next handlers will still work
+        req.body.userId = user.id;
+        next();
+      }
+    });
+  }
 };
 
 /**

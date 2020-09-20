@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Group car api
   version: 0.4.0
-  
+
 tags:
 - name: Authentication
   description: Requests for authentication
@@ -10,7 +10,7 @@ tags:
   description: Requests for everything user related
 - name: Group
   description: Requests for everything groups related
-  
+
 security:
   - csrfToken: []
 
@@ -27,7 +27,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusObject'
-  
+
   # Authentication
   /auth:
     head:
@@ -117,7 +117,7 @@ paths:
                 $ref: '#/components/schemas/User'
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
-                
+   
   # User
   /user/generate-profile-pic:
     get:
@@ -127,7 +127,7 @@ paths:
       description: Generates a new pseudo-random profile picture with the given username as seed. An offset can be
         send with the username to generate a different profile picture for the same username. The same username and offset will
         always produce the same profile picture.
-      parameters: 
+      parameters:
       - name: username
         in: query
         required: true
@@ -185,7 +185,7 @@ paths:
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
   /api/user/{userId}/profile-pic:
-    parameters: 
+    parameters:
       - name: userId
         in: path
         required: true
@@ -234,7 +234,7 @@ paths:
                 oneOf:
                 - $ref: '#/components/schemas/GroupNotFoundErrorSchema'
                 - $ref: '#/components/schemas/InviteNotFoundSchema'
-  
+
   # Group
   /api/group:
     get:
@@ -283,7 +283,7 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /api/group/{groupId}:
-    parameters: 
+    parameters:
     - $ref: '#/components/parameters/GroupId'
     get:
       summary: Get group data
@@ -351,17 +351,24 @@ paths:
       tags:
       - Group
       description: Invites a user to the group
-      parameters: 
+      parameters:
       - $ref: '#/components/parameters/GroupId'
       requestBody:
-        description: Information about who to invite
+        description: Either the id or the username of the user. If both are provided the username will be ignored.
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                userId:
-                  type: integer
+              oneOf:
+                - type: object
+                  properties:
+                    userId:
+                      type: integer
+                - type: object
+                  properties:
+                    username:
+                      type: string
+              example: 
+                username: 'test-user'
       responses:
         201:
           description: 'The user was successfully invited'
@@ -374,7 +381,13 @@ paths:
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
         404:
-          $ref: '#/components/responses/UserNotFoundErrorResponse'
+          description: The user with the given identifier (username or id) doesn't exist
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/UserNotFoundErrorSchema'
+                  - $ref: '#/components/schemas/UsernameNotFoundErrorSchema'
   /api/group/{groupId}/leave:
     post:
       summary: Leaves the specified group
@@ -588,7 +601,7 @@ components:
           type: string
         description:
           type: string
-      example: 
+      example:
         name: Family group
         description: Our new group for the family
     CreateGroupRequest:
@@ -788,6 +801,13 @@ components:
           message: A user with id 4 doesn't exist
           detail:
             userId: 4
+    UsernameNotFoundErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+      - example:
+          message: A user with then name "test-user" doesn't exist
+          detail:
+            username: 'test-user'
     GroupNotFoundErrorSchema:
       allOf:
       - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
@@ -838,6 +858,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UserNotFoundErrorSchema'
+    UsernameNotFoundErrorResponse:
+      description: A user with the given username doesn't exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsernameNotFoundErrorSchema'
     GroupNotFoundErrorResponse:
       description: A group with the given groupId doesn't exist
       content:
