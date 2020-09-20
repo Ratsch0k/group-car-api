@@ -22,7 +22,7 @@ import {
 import {Membership, Group, User, Invite} from '../../../../../models';
 import Bluebird from 'bluebird';
 import config from '../../../../../config';
-import { expect } from 'chai';
+import {expect} from 'chai';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 describe('InviteUserToGroupController', function() {

@@ -96,7 +96,7 @@ export const checkUser: RequestHandler = (req, res, next) => {
         req.body.userId = user.id;
         next();
       }
-    })
+    });
   }
 };
 
