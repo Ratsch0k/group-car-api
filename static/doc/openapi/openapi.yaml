@@ -354,14 +354,21 @@ paths:
       parameters: 
       - $ref: '#/components/parameters/GroupId'
       requestBody:
-        description: Information about who to invite
+        description: Either the id or the username of the user. If both are provided the username will be ignored.
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                userId:
-                  type: integer
+              oneOf:
+                - type: object
+                  properties:
+                    userId:
+                      type: integer
+                - type: object
+                  properties:
+                    username:
+                      type: string
+              example: 
+                username: 'test-user'
       responses:
         201:
           description: 'The user was successfully invited'
@@ -374,7 +381,13 @@ paths:
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
         404:
-          $ref: '#/components/responses/UserNotFoundErrorResponse'
+          description: The user with the given identifier (username or id) doesn't exist
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/UserNotFoundErrorSchema'
+                  - $ref: '#/components/schemas/UsernameNotFoundErrorSchema' 
   /api/group/{groupId}/leave:
     post:
       summary: Leaves the specified group
@@ -788,6 +801,13 @@ components:
           message: A user with id 4 doesn't exist
           detail:
             userId: 4
+    UsernameNotFoundErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+      - example:
+          message: A user with then name "test-user" doesn't exist
+          detail:
+            username: 'test-user'
     GroupNotFoundErrorSchema:
       allOf:
       - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
@@ -838,6 +858,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UserNotFoundErrorSchema'
+    UsernameNotFoundErrorResponse:
+      description: A user with the given username doesn't exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsernameNotFoundErrorSchema'
     GroupNotFoundErrorResponse:
       description: A group with the given groupId doesn't exist
       content:
