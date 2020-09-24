@@ -178,7 +178,7 @@ const mail: MailConfig = {
 
 const database: DBConfig = {
   sequelize,
-  withFlush,
+  withFlush: argv.disableFlush ? false : withFlush,
 };
 
 const user: UserConfig = {
