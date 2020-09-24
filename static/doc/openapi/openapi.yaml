@@ -345,6 +345,34 @@ paths:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
         404:
           $ref: '#/components/responses/GroupNotFoundErrorResponse'
+  /api/group/{groupId}/invites:
+    get:
+      summary: Get all invited users of this group
+      tags:
+        - Group
+      description: Gets a list of all users which are invited to the specified group.
+      parameters: 
+      - $ref: '#/components/parameters/GroupId'
+      responses:
+        200:
+          description: The list of invited users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invites:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Invite'
+                        - $ref: '#/components/schemas/InviteInvitedBy'
+                        - $ref: '#/components/schemas/InviteUser'
+                    
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        404:
+          $ref: '#/components/responses/GroupNotFoundErrorResponse'
   /api/group/{groupId}/invite:
     post:
       summary: Invites a user to the group
@@ -700,18 +728,21 @@ components:
           format: date-time
         invitedBy:
           type: integer
-    InviteWithGroupInvitedByData:
+    InviteInvitedBy:
       type: object
       properties:
-        userId:
-          type: integer
-        Group:
-          $ref: '#/components/schemas/GroupSimpleWithOwner'
         InviteSender:
           $ref: '#/components/schemas/UserSimple'
-        createdAt:
-          type: string
-          format: date-time
+    InviteUser:
+      type: object
+      properties:
+        User:
+          $ref: '#/components/schemas/UserSimple'
+    InviteGroup:
+      type: object
+      properties:
+        Group:
+          $ref: '#/components/schemas/GroupWithOwner'
           
     # Authentication
     LoginObject:
