@@ -2,6 +2,7 @@ import {User, Group, Invite} from '@models';
 import {InviteNotFoundError} from '@errors';
 import {RepositoryQueryOptions} from 'typings';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
+import debug from 'debug';
 
 export type InviteId = {userId: number, groupId: number};
 
@@ -42,6 +43,15 @@ const defaultFindOptions: FindOptions = {
  * over the model.
  */
 export class InviteRepository {
+  /**
+   * Method for logging.
+   */
+  private static log = debug('group-car:invite:repository');
+
+  /**
+   * Method for error logging.
+   */
+  private static logE = debug('group-car:invite:repository:error');
   /**
    * Returns the invite with the given id.
    * If no invite exists will throw {@link InviteNotFoundError}.
@@ -130,6 +140,26 @@ export class InviteRepository {
   }
 
   /**
+   * Gets all invites for the specified group.
+   * @param groupId - The if of the group
+   * @param options - Query options
+   */
+  public static async findAllForGroup(
+      groupId: number,
+      options?: Partial<FindOptions>,
+  ): Promise<Invite[]> {
+    this.log('Find all invites for group %d (options: %o)', groupId, options);
+    const {include} = this.buildOptions(options);
+
+    return Invite.findAll({
+      where: {
+        groupId,
+      },
+      include,
+    });
+  }
+
+  /**
    * Builds the array of models to include
    * in the query from {@link FindOptions}.
    * @param options - The options which define the to included models.
@@ -153,7 +183,7 @@ export class InviteRepository {
           key: 'withUserData',
           include: [{
             model: User,
-            as: 'InviteSender',
+            as: 'User',
             attributes: User.simpleAttributes,
           }],
         },
