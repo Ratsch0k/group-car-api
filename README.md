@@ -52,6 +52,12 @@ Optional environment variables:
  - **HTML_STATIC**: Path to the frontend which will served on every url which is not directly served by the backend, if not set the field `config.public` in the `package.json` is 
  - **PORT**: Port on which the server should listen, if not set the field `config.port` in the ´package.json` is used
 
+### Command line options
+`--allowSignUp`: The server will usually only allow sign up via a *SignUp Request*. This options allows a direct sign up
+
+`--disableFlush`: Disables resetting the database on startup. Is only active if the
+server is running in **development** mode.
+
 ### Database
 The server can run without a connection to a database, but only static serving is fully functioning as almost everything else needs a database.\
 The database connection can be configured in the file [app/config/database-config.js](https://github.com/Ratsch0k/group-car-api/blob/master/app/config/database-config.js).
