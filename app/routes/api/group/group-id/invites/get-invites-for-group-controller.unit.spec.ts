@@ -77,7 +77,7 @@ describe('getInvitesController', function() {
     });
   });
 
-  describe('sends invites for specified group', async function() {
+  it('sends invites for specified group', async function() {
     req = {
       params: {
         groupId: '14',
@@ -98,13 +98,13 @@ describe('getInvitesController', function() {
       },
     ];
 
-    findAllForGroupStub.resolves(invites);
+    findAllForGroupStub.resolves(invites as any);
 
     await expect(getInvitesForGroupController(req, res, next))
         .to.eventually.be.fulfilled;
 
     assert.calledOnceWithExactly(res.send, match({invites}));
-    assert.calledOnceWithExactly(findAllForGroupStub, req.user, req.group);
+    assert.calledOnceWithExactly(findAllForGroupStub, req.user, 14);
     assert.notCalled(next);
   });
 });
