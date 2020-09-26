@@ -4,6 +4,8 @@ import {
   InviteNotFoundError,
   CouldNotAssignToGroupError,
   UnauthorizedError,
+  MembershipNotFoundError,
+  NotMemberOfGroupError,
 } from '../../errors';
 import sinon, {assert, match} from 'sinon';
 import {InviteService} from './invite-service';
@@ -322,6 +324,77 @@ describe('InviteService', function() {
         withGroupData: true,
         withInvitedByData: true,
       }));
+    });
+  });
+
+  describe('findAllForGroup', function() {
+    it('throws NotMemberOfGroupError if specified user ' +
+    'is not a member of specified group', async function() {
+      const user = {
+        id: 5,
+      };
+      const groupId = 12;
+
+      const membershipFindById = sinon.stub(MembershipService, 'findById')
+          .rejects(new MembershipNotFoundError({userId: user.id, groupId}));
+
+      await expect(InviteService.findAllForGroup(user as any, groupId))
+          .to.eventually.be.rejectedWith(NotMemberOfGroupError);
+
+      assert.calledOnceWithExactly(
+          membershipFindById,
+        user as any,
+        match({
+          userId: user.id,
+          groupId,
+        }),
+      );
+    });
+
+    it('returns all invites by calling repository', async function() {
+      const user = {
+        id: 5,
+      };
+      const groupId = 12;
+
+      const invites = [
+        {
+          userId: 4,
+          groupId,
+        },
+        {
+          userId: 1,
+          groupId,
+        },
+      ];
+
+      const membershipFindById = sinon.stub(MembershipService, 'findById')
+          .resolves();
+
+      const inviteRepFindAllForGroup = sinon
+          .stub(InviteRepository, 'findAllForGroup')
+          .resolves(invites as any);
+
+      await expect(InviteService.findAllForGroup(user as any, groupId))
+          .to.eventually.be.eql(invites);
+
+      assert.calledOnceWithExactly(
+          membershipFindById,
+        user as any,
+        match({
+          userId: user.id,
+          groupId,
+        }),
+      );
+
+      assert.calledOnceWithExactly(
+          inviteRepFindAllForGroup,
+          groupId,
+          match({
+            withInvitedByData: true,
+            withUserData: true,
+          }),
+      );
     });
   });
 });
