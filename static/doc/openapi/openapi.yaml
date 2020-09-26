@@ -117,7 +117,7 @@ paths:
                 $ref: '#/components/schemas/User'
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
-   
+
   # User
   /user/generate-profile-pic:
     get:
@@ -395,7 +395,7 @@ paths:
                   properties:
                     username:
                       type: string
-              example: 
+              example:
                 username: 'test-user'
       responses:
         201:
@@ -421,7 +421,7 @@ paths:
       summary: Leaves the specified group
       tags:
         - Group
-      parameters: 
+      parameters:
         - name: groupId
           in: path
           required: true
@@ -450,7 +450,7 @@ paths:
     post:
       summary: Kicks a user
       description: Kicks the specified user from the specified group. The owner can kick any user, an admin can kick any non-admin user and normal members cannot kick any user.
-      tags: 
+      tags:
         - Group
       responses:
         200:
@@ -557,7 +557,7 @@ paths:
     post:
       summary: Transfers ownership to specified user
       description: Transfers the ownership of the currently logged in user of the specified group to the specified user
-      tags: 
+      tags:
         - Group
       responses:
         200:
@@ -714,7 +714,7 @@ components:
         properties:
           Owner:
             $ref: '#/components/schemas/UserSimple'
-    
+
     # Invite
     Invite:
       type: object
@@ -917,7 +917,7 @@ components:
       type: apiKey
       name: XSRF-TOKEN
       in: header
-  
+
 # External docs
 externalDocs:
   description: Code documentation is here
