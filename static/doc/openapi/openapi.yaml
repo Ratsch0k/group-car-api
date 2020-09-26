@@ -553,7 +553,7 @@ paths:
         required: true
         schema:
           type: integer
-      
+
     post:
       summary: Transfers ownership to specified user
       description: Transfers the ownership of the currently logged in user of the specified group to the specified user
