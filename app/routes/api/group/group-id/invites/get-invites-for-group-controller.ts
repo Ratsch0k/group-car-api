@@ -9,7 +9,8 @@ import {RequestHandler} from 'express';
  * @param res   - Response
  * @param next  - Next
  */
-export const getInvitesController: RequestHandler = async (req, res, next) => {
+export const getInvitesForGroupController: RequestHandler =
+async (req, res, next) => {
   const groupId = parseInt(req.params.groupId, 10);
   const user = req.user;
 
