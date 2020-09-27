@@ -176,4 +176,39 @@ describe('InviteRepository', function() {
       }));
     });
   });
+
+  describe('findAllForGroup', function() {
+    it('returns invites for specified group', async function() {
+      const groupId = 51;
+
+      const invites = [
+        {
+          groupId,
+          userId: 1,
+        },
+        {
+          groupId,
+          userId: 2,
+        },
+        {
+          groupId,
+          userId: 3,
+        },
+      ];
+
+      const inviteFindAll = sinon.stub(Invite, 'findAll')
+          .resolves(invites as any);
+
+      await expect(
+          InviteRepository.findAllForGroup(groupId),
+      ).to.eventually.be.eql(invites);
+
+      assert.calledOnceWithExactly(
+          inviteFindAll,
+          match({
+            where: {groupId},
+          }),
+      );
+    });
+  });
 });

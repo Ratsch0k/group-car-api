@@ -3,14 +3,18 @@ import {
   Invite,
   InviteRepository,
   MembershipRepository,
+  MembershipService,
 } from '@models';
 import db from '@db';
-import {UnauthorizedError} from '@errors';
+import {
+  MembershipNotFoundError,
+  NotMemberOfGroupError,
+  UnauthorizedError,
+} from '@errors';
 import debug from 'debug';
 import {
   CouldNotAssignToGroupError,
 } from '@app/errors/user/could-not-assign-to-group-error';
-import {MembershipService} from '../membership/membership-service';
 
 /**
  * Service for invites.
@@ -20,6 +24,11 @@ export class InviteService {
    * Logging method for errors.
    */
   private static logE = debug('group-car:invite:service:error');
+
+  /**
+   * Method for logging.
+   */
+  private static log = debug('group-car:invite:service');
 
   /**
    * Assigns the given user to the group with the given groupId.
@@ -125,6 +134,51 @@ export class InviteService {
         {
           withGroupData: true,
           withInvitedByData: true,
+        },
+    );
+  }
+
+  /**
+   * Gets all invites of the specified group.
+   *
+   * If the specified user is not a member of the specified
+   * group an `NotMemberOfGroupError` will be thrown.
+   * @param currentUser - The user which request this
+   * @param groupId     - The id of the group
+   */
+  public static async findAllForGroup(
+      currentUser: Express.User,
+      groupId: number,
+  ): Promise<Invite[]> {
+    this.log('User %d: Find all invites for group %d', currentUser.id, groupId);
+
+    // Check if current user is a member of the group
+    try {
+      await MembershipService.findById(
+          currentUser, {
+            userId: currentUser.id,
+            groupId,
+          },
+      );
+      this.log('User %d: is member of group %d', currentUser.id, groupId);
+    } catch (e) {
+      if (e instanceof MembershipNotFoundError) {
+        this.log(
+            'User %d: is not a member of group %d',
+            currentUser.id,
+            groupId,
+        );
+        throw new NotMemberOfGroupError();
+      } else {
+        throw e;
+      }
+    }
+
+    return InviteRepository.findAllForGroup(
+        groupId,
+        {
+          withInvitedByData: true,
+          withUserData: true,
         },
     );
   }

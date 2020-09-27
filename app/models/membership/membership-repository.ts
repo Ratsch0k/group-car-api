@@ -67,7 +67,7 @@ export class MembershipRepository {
     });
 
     if (membership === null) {
-      error('Membership %o doesn\'t exist');
+      error('Membership %o doesn\'t exist', id);
       throw new MembershipNotFoundError(id);
     } else {
       return membership;
