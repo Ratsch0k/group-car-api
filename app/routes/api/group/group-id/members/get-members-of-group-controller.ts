@@ -2,6 +2,12 @@ import {BadRequestError} from '@app/errors';
 import {MembershipService} from '@app/models';
 import {RequestHandler} from 'express';
 
+/**
+ * Handles request to get all members of the specified group.
+ * @param req   - Request
+ * @param res   - Response
+ * @param next  - Next
+ */
 export const getMembersOfGroupController: RequestHandler =
 async (req, res, next) => {
   const user = req.user;
