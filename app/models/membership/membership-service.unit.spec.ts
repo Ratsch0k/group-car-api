@@ -342,7 +342,7 @@ describe('MembershipService', function() {
           'findAllForUser',
       ).resolves(memberships as any);
 
-      await expect(MembershipService.findAllByUser(currentUser as any))
+      await expect(MembershipService.findAllForUser(currentUser as any))
           .to.be.eventually.fulfilled;
 
       assert.calledOnceWithExactly(

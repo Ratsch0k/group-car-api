@@ -8,7 +8,7 @@ async (req, res, next) => {
   const groupId = parseInt(req.params.groupId, 10);
 
   if (!isNaN(groupId) && user) {
-    const members = await MembershipService.findAllByGroup(user, groupId);
+    const members = await MembershipService.findAllForGroup(user, groupId);
     res.send({members});
   } else {
     throw new BadRequestError('Missing information');

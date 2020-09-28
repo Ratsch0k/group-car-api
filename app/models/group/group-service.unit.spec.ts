@@ -758,14 +758,14 @@ describe('GroupService', function() {
     });
   });
 
-  describe('findAllByUser', function() {
+  describe('findAllForUser', function() {
     let membershipFindAllForUser: sinon.SinonStub<any, any>;
     let groupFindAllWithIds: sinon.SinonStub<any, any>;
 
     beforeEach(function() {
       membershipFindAllForUser = sinon.stub(
           MembershipService,
-          'findAllByUser',
+          'findAllForUser',
       );
       groupFindAllWithIds = sinon.stub(GroupRepository, 'findAllWithIds');
     });
