@@ -435,6 +435,30 @@ paths:
           $ref: '#/components/responses/BadRequestErrorResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/group/{groupId}/members:
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+    get:
+      summary: Get members
+      description: Get the list of members of the specified group
+      tags:
+        - Group
+      responses:
+        200:
+          description: The list of members
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  members:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GroupMember'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
   /api/group/{groupId}/{userId}/kick:
     parameters:
       - name: groupId
