@@ -342,10 +342,14 @@ describe('MembershipService', function() {
           'findAllForUser',
       ).resolves(memberships as any);
 
-      await expect(MembershipService.findAllForUser(currentUser as any))
+      await expect(MembershipService.findAllByUser(currentUser as any))
           .to.be.eventually.fulfilled;
 
-      assert.calledOnceWithExactly(findAllForUserStub, currentUser.id);
+      assert.calledOnceWithExactly(
+          findAllForUserStub,
+          currentUser.id,
+          match({withUserData: true}),
+      );
     });
   });
 });

@@ -42,7 +42,7 @@ describe('GroupRepository', function() {
       }];
 
       const findUserOfGroupStub = sinon
-          .stub(MembershipRepository, 'findUsersOfGroup')
+          .stub(MembershipRepository, 'findAllForGroup')
           .resolves(members as any);
 
       const groupResponse = await expect(
@@ -57,7 +57,11 @@ describe('GroupRepository', function() {
         5,
         match.any,
       );
-      assert.calledOnceWithExactly(findUserOfGroupStub, group.id);
+      assert.calledOnceWithExactly(
+          findUserOfGroupStub,
+          group.id,
+          match({withUserData: true}),
+      );
     });
 
     it('returns group', async function() {
@@ -72,7 +76,7 @@ describe('GroupRepository', function() {
       }];
 
       const findUserOfGroupStub = sinon
-          .stub(MembershipRepository, 'findUsersOfGroup')
+          .stub(MembershipRepository, 'findAllForGroup')
           .resolves(members as any);
 
       const groupResponse = await expect(GroupRepository.findById(group.id))

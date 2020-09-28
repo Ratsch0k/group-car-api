@@ -124,6 +124,7 @@ describe('get /api/group/:groupId', function() {
         username: user.username,
         id: user.id,
       },
+      userId: user.id,
       isAdmin: true,
     }];
 
@@ -140,6 +141,7 @@ describe('get /api/group/:groupId', function() {
           id: member.id,
         },
         isAdmin: i % 2 === 0,
+        userId: member.id,
       });
 
       await Membership.create({
@@ -160,7 +162,15 @@ describe('get /api/group/:groupId', function() {
             description: (group as any).description,
           });
           expect(res.body).to.haveOwnProperty('Owner');
-          expect(res.body.members).to.eql(expectedMemberList);
+          expect(res.body.members).to.be.an('array');
+          res.body.members.forEach((member: any) => {
+            const expected = expectedMemberList.find((el: any) => {
+              return el.userId == member.userId;
+            });
+            expect(member.userId).to.equal(expected.userId);
+            expect(member.isAdmin).to.equal(expected.isAdmin);
+            expect(member.User).to.eql(expected.User);
+          });
         });
   });
 });
