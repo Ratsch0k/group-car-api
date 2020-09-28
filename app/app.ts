@@ -48,7 +48,6 @@ app.use(
     preLoginJwtValidator,
     apiRouter,
 );
-app.use('/api', apiRouter);
 
 
 /**
