@@ -345,7 +345,11 @@ describe('MembershipService', function() {
       await expect(MembershipService.findAllForUser(currentUser as any))
           .to.be.eventually.fulfilled;
 
-      assert.calledOnceWithExactly(findAllForUserStub, currentUser.id);
+      assert.calledOnceWithExactly(
+          findAllForUserStub,
+          currentUser.id,
+          match({withUserData: true}),
+      );
     });
   });
 });

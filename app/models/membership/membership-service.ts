@@ -3,8 +3,8 @@ import {
   MembershipRepository,
   Membership,
   GroupService,
+  MembershipQueryOptions,
 } from '@models';
-import {RepositoryQueryOptions} from 'typings';
 import {
   MembershipNotFoundError,
   CannotChangeOwnerMembershipError,
@@ -13,13 +13,21 @@ import {
 } from '@errors';
 import debug from 'debug';
 
-const log = debug('group-car:membership:service');
-const error = debug('group-car:membership:service:error');
-
 /**
  * Service for complex membership operations.
  */
 export class MembershipService {
+  /**
+   * Logging method.
+   */
+  private static log = debug('group-car:membership:service');
+
+  /**
+   * Logging method for errors.
+   */
+  private static error = debug('group-car:membership:service:error');
+
+
   /**
    * Returns a membership with the specific id if it exists.
    *
@@ -35,7 +43,7 @@ export class MembershipService {
   public static async findById(
       currentUser: Express.User,
       id: MembershipId,
-      options?: RepositoryQueryOptions,
+      options?: Partial<MembershipQueryOptions>,
   ): Promise<Membership> {
     const userId = currentUser.id;
 
@@ -44,10 +52,10 @@ export class MembershipService {
       throw new TypeError('Id of current user has to be a number');
     }
 
-    log(`User %d: Find membership with %o`, currentUser.id, id);
+    this.log(`User %d: Find membership with %o`, currentUser.id, id);
 
     if (userId !== id.userId) {
-      log('User %d: not user of membership. ' +
+      this.log('User %d: not user of membership. ' +
       'Check if member of group', currentUser.id);
 
       // Check if user is member of that group
@@ -59,21 +67,21 @@ export class MembershipService {
             },
             options,
         );
-        log('User %d: is member of group referenced in membership',
+        this.log('User %d: is member of group referenced in membership',
             currentUser.id);
       } catch (err) {
         if (err instanceof MembershipNotFoundError) {
-          error('User %d: not member of group referenced ' +
+          this.error('User %d: not member of group referenced ' +
           'in membership $o', currentUser.id, id);
           throw new NotMemberOfGroupError();
         } else {
-          error('Unexpected error', err);
+          this.error('Unexpected error', err);
           throw err;
         }
       }
     }
 
-    log('User %d: can access membership %o', currentUser.id, id);
+    this.log('User %d: can access membership %o', currentUser.id, id);
 
     // Call the repository method
     return MembershipRepository.findById(id, options);
@@ -100,7 +108,7 @@ export class MembershipService {
       throw new TypeError('Id of current user has to be a number');
     }
 
-    log('User %d: change admin of membership %o', currentUser.id, id);
+    this.log('User %d: change admin of membership %o', currentUser.id, id);
 
     // Check if current user is an admin of the group
     let currentMembership;
@@ -111,19 +119,20 @@ export class MembershipService {
             groupId: id.groupId,
           },
       );
-      log('User %d: member of group %d', currentUser.id, id.groupId);
+      this.log('User %d: member of group %d', currentUser.id, id.groupId);
     } catch (err) {
       if (err instanceof MembershipNotFoundError) {
-        error('User %d: not member of group %d', currentUser.id, id.groupId);
+        this.error('User %d: not member of group %d',
+            currentUser.id, id.groupId);
         throw new NotMemberOfGroupError();
       } else {
-        error('Unknown error', err);
+        this.error('Unknown error', err);
         throw err;
       }
     }
 
     if (!currentMembership.isAdmin) {
-      error('User %d: not admin of group %d. ' +
+      this.error('User %d: not admin of group %d. ' +
       'Can\'t give or take admin', currentUser.id, id.groupId);
       throw new NotAdminOfGroupError();
     }
@@ -132,12 +141,12 @@ export class MembershipService {
     const group = await GroupService.findById(currentUser, id.groupId);
 
     if (group.ownerId == id.userId || group.Owner?.id === id.userId) {
-      error('User %d: can\'t change admin of ' +
+      this.error('User %d: can\'t change admin of ' +
       'owner of group %d', currentUser.id, id.groupId);
       throw new CannotChangeOwnerMembershipError();
     }
 
-    log('User %d: forward to repository');
+    this.log('User %d: forward to repository');
     return MembershipRepository.changeAdminPermission(id, isAdmin);
   }
 
@@ -148,6 +157,44 @@ export class MembershipService {
   public static async findAllForUser(
       currentUser: Express.User,
   ): Promise<Membership[]> {
-    return MembershipRepository.findAllForUser(currentUser.id);
+    return MembershipRepository.findAllForUser(
+        currentUser.id,
+        {
+          withUserData: true,
+        },
+    );
+  }
+
+  /**
+   * Gets all memberships for the specified group.
+   * @param currentUser - The currently logged in user
+   * @param groupId     - The id of the group
+   */
+  public static async findAllForGroup(
+      currentUser: Express.User,
+      groupId: number,
+  ): Promise<Membership[]> {
+    // Check if user is member of group
+    this.log('User %d: find all memberships for group %d',
+        currentUser.id, groupId);
+
+    try {
+      await MembershipRepository.findById({userId: currentUser.id, groupId});
+      this.log('User %d: user is not a member of group %d',
+          currentUser.id, groupId);
+    } catch (e) {
+      if (e instanceof MembershipNotFoundError) {
+        throw new NotMemberOfGroupError();
+      } else {
+        throw e;
+      }
+    }
+
+    return MembershipRepository.findAllForGroup(
+        groupId,
+        {
+          withUserData: true,
+        },
+    );
   }
 }

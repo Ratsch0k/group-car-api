@@ -1,5 +1,4 @@
 import {Router} from 'express';
-
 import {getGroupController} from './get-group-controller';
 import {asyncWrapper} from '@app/util/async-wrapper';
 

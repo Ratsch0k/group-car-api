@@ -54,7 +54,7 @@ describe('MembershipRepository', function() {
           id,
           {
             transaction: fakeTransaction,
-          },
+          } as any,
       )).to.eventually.be.equal(membership);
 
 
@@ -136,7 +136,7 @@ describe('MembershipRepository', function() {
     });
   });
 
-  describe('findUsersOfGroup', function() {
+  describe('findAllForGroup', function() {
     it('returns list of members for specified group', async function() {
       const groupId = 12;
 
@@ -162,7 +162,12 @@ describe('MembershipRepository', function() {
       const findAllStub = sinon.stub(Membership, 'findAll')
           .resolves(members as any);
 
-      const actual = await MembershipRepository.findUsersOfGroup(groupId);
+      const actual = await MembershipRepository.findAllForGroup(
+          groupId,
+          {
+            withUserData: true,
+          },
+      );
 
       expect(actual).to.have.members(members);
 

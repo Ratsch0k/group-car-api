@@ -3,6 +3,7 @@ import {RepositoryQueryOptions} from 'typings';
 import {MembershipNotFoundError} from '@errors';
 import {User, Membership} from '@models';
 import debug from 'debug';
+import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 
 const log = debug('group-car:membership:repository');
 const error = debug('group-car:membership:repository:error');
@@ -13,6 +14,16 @@ const error = debug('group-car:membership:repository:error');
 export interface MembershipId {
   userId: number;
   groupId: number;
+}
+
+/**
+ * Query options.
+ */
+export interface MembershipQueryOptions extends RepositoryQueryOptions {
+  /**
+   * Whether or not user data should be included in the query.
+   */
+  withUserData: boolean;
 }
 
 /**
@@ -54,15 +65,18 @@ export class MembershipRepository {
    */
   public static async findById(
       id: MembershipId,
-      options?: RepositoryQueryOptions,
+      options?: Partial<MembershipQueryOptions>,
   ): Promise<Membership> {
     log('Find membership %o', id);
+
+    const {include} = this.queryBuildOptions(options);
 
     const membership = await Membership.findOne({
       where: {
         userId: id.userId,
         groupId: id.groupId,
       },
+      include,
       transaction: options?.transaction,
     });
 
@@ -80,20 +94,17 @@ export class MembershipRepository {
    * @param options - Query options
    * @returns Promise of a list of members
    */
-  public static async findUsersOfGroup(
+  public static async findAllForGroup(
       groupId: number,
-      options?: Partial<RepositoryQueryOptions>,
+      options?: Partial<MembershipQueryOptions>,
   ): Promise<Membership[]> {
+    const {include} = this.queryBuildOptions(options);
+
     const memberships = await Membership.findAll({
       where: {
         groupId,
       },
-      include: [{
-        model: User,
-        as: 'User',
-        attributes: User.simpleAttributes,
-      }],
-      attributes: ['isAdmin'],
+      include,
       ...options,
     });
 
@@ -108,16 +119,19 @@ export class MembershipRepository {
    */
   public static async findAllForUser(
       userId: number,
-      options?: Partial<RepositoryQueryOptions>,
+      options?: Partial<MembershipQueryOptions>,
   ): Promise<Membership[]> {
     if (typeof userId !== 'number') {
       throw new TypeError('userId has to be a number');
     }
 
+    const {include} = this.queryBuildOptions(options);
+
     return Membership.findAll({
       where: {
         userId,
       },
+      include,
       ...options,
     });
   }
@@ -160,4 +174,20 @@ export class MembershipRepository {
     // Update membership to admin
     return membership.update({isAdmin}, options);
   }
+
+  /**
+   * Build options for the query builder.
+   */
+  private static readonly queryBuildOptions = buildFindQueryOptionsMethod(
+      [
+        {
+          key: 'withUserData',
+          include: [{
+            model: User,
+            as: 'User',
+            attributes: User.simpleAttributes,
+          }],
+        },
+      ],
+  );
 }

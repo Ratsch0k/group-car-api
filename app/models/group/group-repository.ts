@@ -15,7 +15,7 @@ const error = debug('group-car:group:repository:error');
  */
 interface GroupQueryOptions extends RepositoryQueryOptions {
   /**
-   * Whether or not the owner data should be included or only the id.
+   * Whether or not the owner data should be included.
    */
   withOwnerData: boolean;
 
@@ -89,7 +89,12 @@ export class GroupRepository {
     // Check if members should be included
     if (options?.withMembers) {
       log('Get members of group');
-      const members = await MembershipRepository.findUsersOfGroup(id);
+      const members = await MembershipRepository.findAllForGroup(
+          id,
+          {
+            withUserData: true,
+          },
+      );
       return {
         ...group.get({plain: true}),
         members,

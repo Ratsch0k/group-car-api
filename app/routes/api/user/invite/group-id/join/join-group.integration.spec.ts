@@ -111,12 +111,14 @@ describe('post /api/user/invite/:groupId/join', function() {
 
       expect(userPovGroup).to.have.property('members');
       expect(userPovGroup.members).to.be.a('array');
-      expect(userPovGroup.members).to.deep.include({
-        User: {
-          username: user.username,
-          id: user.id,
-        },
-        isAdmin: false,
+      userPovGroup.members.forEach((member: any) => {
+        if (member.userId === user.id) {
+          expect(member.User).to.eql({
+            username: user.username,
+            id: user.id,
+          });
+          expect(member.isAdmin).is.false;
+        }
       });
     });
   });
