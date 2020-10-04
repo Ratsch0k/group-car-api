@@ -763,11 +763,11 @@ describe('GroupService', function() {
         );
 
         assert.calledOnceWithExactly(
-          memberFindAllForGroup,
-          groupId,
-          match({
-            withUserData: true,
-          }),
+            memberFindAllForGroup,
+            groupId,
+            match({
+              withUserData: true,
+            }),
         );
       });
     });
