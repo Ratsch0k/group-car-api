@@ -47,7 +47,7 @@ describe('GroupService', function() {
       assert.notCalled(groupFindById);
     });
 
-    it('returns group if user is member with members list', async function() {
+    it('returns full group if user is member', async function() {
       const user: any = {
         id: 6,
       };
@@ -67,7 +67,7 @@ describe('GroupService', function() {
           membershipFindById, user, match({userId: user.id, groupId}));
       assert.notCalled(inviteFindById);
       assert.calledOnceWithExactly(
-          groupFindById, groupId, match({withMembers: true}));
+          groupFindById, groupId, match({withOwnerData: true}));
     });
 
     it('returns simple group if user has invite for group', async function() {
@@ -416,6 +416,7 @@ describe('GroupService', function() {
     let memberServFindById: sinon.SinonStub<any, any>;
     let memberRepRemoveUser: sinon.SinonStub<any, any>;
     let groupRepFindById: sinon.SinonStub<any, any>;
+    let memberFindAllForGroup: sinon.SinonStub<any, any>;
 
     beforeEach(function() {
       memberServFindById = sinon.stub(MembershipService, 'findById');
@@ -424,6 +425,10 @@ describe('GroupService', function() {
           'removeUserFromGroup',
       );
       groupRepFindById = sinon.stub(GroupRepository, 'findById');
+      memberFindAllForGroup = sinon.stub(
+          MembershipRepository,
+          'findAllForGroup',
+      );
     });
 
     describe('throws', function() {
@@ -444,6 +449,7 @@ describe('GroupService', function() {
         assert.notCalled(memberRepRemoveUser);
         assert.notCalled(memberServFindById);
         assert.notCalled(groupRepFindById);
+        assert.notCalled(memberFindAllForGroup);
       });
 
       it('NotMemberOfGroupError if current user is not member of the ' +
@@ -476,6 +482,7 @@ describe('GroupService', function() {
 
         assert.notCalled(memberRepRemoveUser);
         assert.notCalled(groupRepFindById);
+        assert.notCalled(memberFindAllForGroup);
       });
 
       it('NotAdminOfGroupError if current user is member but not admin ' +
@@ -511,6 +518,7 @@ describe('GroupService', function() {
 
         assert.notCalled(memberRepRemoveUser);
         assert.notCalled(groupRepFindById);
+        assert.notCalled(memberFindAllForGroup);
       });
 
       it('MembershipNotFoundError if the specified user is not a member ' +
@@ -558,6 +566,7 @@ describe('GroupService', function() {
 
         assert.notCalled(memberRepRemoveUser);
         assert.notCalled(groupRepFindById);
+        assert.notCalled(memberFindAllForGroup);
       });
 
       it('NotOwnerOfGroupError if specified user is admin of the group ' +
@@ -617,6 +626,7 @@ describe('GroupService', function() {
         assert.calledOnceWithExactly(groupRepFindById, groupId);
 
         assert.notCalled(memberRepRemoveUser);
+        assert.notCalled(memberFindAllForGroup);
       });
     });
 
@@ -680,12 +690,12 @@ describe('GroupService', function() {
 
         assert.calledOnceWithExactly(memberRepRemoveUser, userId, groupId);
 
-        assert.calledWithMatch(
-            groupRepFindById,
-            groupId, {
-              withMembers: true,
-              withOwnerData: true,
-            },
+        assert.notCalled(groupRepFindById);
+
+        assert.calledOnceWithExactly(
+            memberFindAllForGroup,
+            groupId,
+            match({withUserData: true}),
         );
       });
 
@@ -749,10 +759,15 @@ describe('GroupService', function() {
 
         assert.calledWithMatch(
             groupRepFindById,
-            groupId, {
-              withMembers: true,
-              withOwnerData: true,
-            },
+            groupId,
+        );
+
+        assert.calledOnceWithExactly(
+          memberFindAllForGroup,
+          groupId,
+          match({
+            withUserData: true,
+          }),
         );
       });
     });
