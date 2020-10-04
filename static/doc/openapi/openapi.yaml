@@ -351,7 +351,7 @@ paths:
       tags:
         - Group
       description: Gets a list of all users which are invited to the specified group.
-      parameters: 
+      parameters:
       - $ref: '#/components/parameters/GroupId'
       responses:
         200:
@@ -368,7 +368,7 @@ paths:
                         - $ref: '#/components/schemas/Invite'
                         - $ref: '#/components/schemas/InviteInvitedBy'
                         - $ref: '#/components/schemas/InviteUser'
-                    
+
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
         404:
@@ -601,7 +601,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
-        
+
 # Components
 components:
 
@@ -620,7 +620,7 @@ components:
       enum:
       - 'up'
       - 'down'
-      
+
     # User
     User:
       type: object
@@ -646,7 +646,7 @@ components:
           type: integer
         username:
           type: string
-          
+
     # Group
     GroupRequest:
       type: object
@@ -700,7 +700,7 @@ components:
               $ref: '#/components/schemas/UserSimple'
     GroupMember:
       type: object
-      required: 
+      required:
       - userId
       - isAdmin
       properties:
@@ -768,14 +768,14 @@ components:
       properties:
         Group:
           $ref: '#/components/schemas/GroupWithOwner'
-          
+
     # Authentication
     LoginObject:
       type: object
       properties:
         username:
           type: string
-        password: 
+        password:
           type: string
       example:
         username: demo
@@ -783,7 +783,7 @@ components:
     SignUpObject:
       type: object
       properties:
-        email: 
+        email:
           type: string
         username:
           type: string
@@ -793,11 +793,11 @@ components:
         email: demo@mai.com
         username: demo
         password: '123456'
-        
+
     # Error
     RestError:
       type: object
-      required: 
+      required:
       - status
       - statusCode
       - timestamp
@@ -869,14 +869,14 @@ components:
       - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
       - example:
           message: A group with id 4 doesn't exist
-          detail: 
+          detail:
             groupId: 4
     InviteNotFoundSchema:
       allOf:
       - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
       - example:
           message: An invite for the group doesn't exist
-          detail: 
+          detail:
             groupId: 4
             userId: 2
     MembershipNotFoundSchema:
@@ -884,7 +884,7 @@ components:
         - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
         - example:
             message: Membership of user 2 for group 4 doesn't exist
-            detail: 
+            detail:
               groupId: 4
               userId: 2
   # Responses
@@ -926,7 +926,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/GroupNotFoundErrorSchema'
-            
+
   # Parameter
   parameters:
     GroupId:
@@ -935,7 +935,7 @@ components:
       schema:
         type: integer
       required: true
-      
+
   # Security Definitions
   securitySchemes:
     csrfToken:
