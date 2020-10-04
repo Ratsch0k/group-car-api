@@ -106,13 +106,6 @@ export class Group extends Model {
   public createUser!: HasManyCreateAssociationMixin<User>;
 
   /**
-   * List of members of group.
-   *
-   * Only exists if included in query.
-   */
-  public readonly members?: Membership[];
-
-  /**
    * User data of the owner.
    *
    * Only exists if explicitly included in query.

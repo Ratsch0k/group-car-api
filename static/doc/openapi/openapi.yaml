@@ -716,6 +716,8 @@ components:
           format: date-time
         userId:
           type: number
+        groupId:
+          type: number
     GroupSimple:
       type: object
       required:
