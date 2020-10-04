@@ -297,7 +297,7 @@ paths:
             application/json:
               schema:
                 oneOf:
-                - $ref: '#/components/schemas/GroupWithMembers'
+                - $ref: '#/components/schemas/GroupWithOwner'
                 - $ref: '#/components/schemas/GroupSimple'
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
@@ -482,7 +482,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupWithMembers'
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupMember'
         400:
           description: Either the parameters are wrong or the user tried to kick himself/herself
           content:
@@ -589,7 +591,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupWithMembers'
+                $ref: '#/components/schemas/GroupWithOwner'
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
         401:
@@ -712,18 +714,8 @@ components:
         updatedAt:
           type: string
           format: date-time
-        userId: number
-    GroupWithMembers:
-      allOf:
-        - $ref: '#/components/schemas/GroupWithOwner'
-        - type: object
-          required:
-          - members
-          properties:
-            members:
-              type: array
-              items:
-                $ref: '#/components/schemas/GroupMember'
+        userId:
+          type: number
     GroupSimple:
       type: object
       required:
