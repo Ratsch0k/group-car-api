@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {GroupService} from '../../../../../../models';
-import sinon, {assert} from 'sinon';
+import sinon, {assert, match} from 'sinon';
 import {expect} from 'chai';
 import {kickUserController} from './kick-user-controller';
 import {BadRequestError} from '../../../../../../errors';
@@ -82,12 +82,14 @@ describe('kickUserController', function() {
       },
     };
 
-    const group = {
-      name: 'TEST',
-      description: 'TEST',
-    };
+    const members = [
+      {
+        userId: 1,
+        groupId: 1,
+      },
+    ];
 
-    groupKickUser.resolves(group as any);
+    groupKickUser.resolves(members as any);
 
     res = {
       send: sinon.stub(),
@@ -103,6 +105,6 @@ describe('kickUserController', function() {
         req.params.userId,
     );
 
-    assert.calledOnceWithExactly(res.send, group);
+    assert.calledOnceWithExactly(res.send, match({members}));
   });
 });

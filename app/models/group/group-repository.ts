@@ -1,7 +1,7 @@
 import {RepositoryQueryOptions} from 'typings';
 import {GroupNotFoundError} from '@app/errors';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
-import {Group, User, MembershipRepository} from '@models';
+import {Group, User} from '@models';
 import debug from 'debug';
 import Sequelize from 'sequelize';
 
@@ -20,14 +20,6 @@ interface GroupQueryOptions extends RepositoryQueryOptions {
   withOwnerData: boolean;
 
   /**
-   * Whether or not all members should be included in an array.
-   *
-   * If `simple` is set, this option will do nothing as the members list
-   * doesn't exist on a simple group object.
-   */
-  withMembers: boolean;
-
-  /**
    * Wether or not the group should only contain attributes of a simple group.
    */
   simple: boolean;
@@ -38,7 +30,6 @@ interface GroupQueryOptions extends RepositoryQueryOptions {
  */
 const defaultOptions: GroupQueryOptions = {
   withOwnerData: false,
-  withMembers: false,
   simple: false,
 };
 
@@ -85,23 +76,7 @@ export class GroupRepository {
       error(`Group with id ${id} doesn't exist`);
       throw new GroupNotFoundError(id);
     }
-
-    // Check if members should be included
-    if (options?.withMembers) {
-      log('Get members of group');
-      const members = await MembershipRepository.findAllForGroup(
-          id,
-          {
-            withUserData: true,
-          },
-      );
-      return {
-        ...group.get({plain: true}),
-        members,
-      } as Group;
-    } else {
-      return group;
-    }
+    return group;
   }
 
   /**

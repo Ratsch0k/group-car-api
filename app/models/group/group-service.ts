@@ -15,7 +15,7 @@ import {
 } from '@app/errors';
 import {MembershipService} from '../membership/membership-service';
 import debug from 'debug';
-import {MembershipRepository} from '../membership';
+import {Membership, MembershipRepository} from '../membership';
 
 const log = debug('group-car:group:service');
 const error = debug('group-car:group:service:error');
@@ -50,7 +50,6 @@ export class GroupService {
       log(`User ${currentUser.id} is member of group ${id}`);
 
       return GroupRepository.findById(id, {
-        withMembers: true,
         withOwnerData: true,
       });
     } catch (_) {
@@ -187,7 +186,7 @@ export class GroupService {
       currentUser: Express.User,
       groupId: number,
       userId: number,
-  ): Promise<Group> {
+  ): Promise<Membership[]> {
     // Check if kicking self
     if (userId === currentUser.id) {
       throw new CannotKickSelfError();
@@ -251,7 +250,7 @@ export class GroupService {
     await MembershipRepository.removeUserFromGroup(userId, groupId);
 
     // Return new group data
-    return this.findById(currentUser, groupId);
+    return MembershipRepository.findAllForGroup(groupId, {withUserData: true});
   }
 
   /**

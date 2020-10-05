@@ -108,18 +108,7 @@ describe('post /api/user/invite/:groupId/join', function() {
       // Check if it includes timestamp
       expect(userPovGroup).to.have.property('createdAt');
       expect(userPovGroup).to.have.property('updatedAt');
-
-      expect(userPovGroup).to.have.property('members');
-      expect(userPovGroup.members).to.be.a('array');
-      userPovGroup.members.forEach((member: any) => {
-        if (member.userId === user.id) {
-          expect(member.User).to.eql({
-            username: user.username,
-            id: user.id,
-          });
-          expect(member.isAdmin).is.false;
-        }
-      });
+      expect(userPovGroup).to.not.have.property('members');
     });
   });
 });

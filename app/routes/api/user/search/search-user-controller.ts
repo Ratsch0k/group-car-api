@@ -18,7 +18,7 @@ export const searchUserController: RequestHandler = async (req, res, next) => {
 
   const currentUser = req.user;
   const startsWith = req.query.filter;
-  const limit = req.query.limit ? parseInt(req.query.limit) : undefined;
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : undefined;
 
   if (typeof currentUser === 'object') {
     const users = await UserService.findLimitedWithFilter(

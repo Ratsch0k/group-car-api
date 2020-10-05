@@ -7,8 +7,8 @@ export const transferOwnershipController: RequestHandler = async (
   res,
   next,
 ) => {
-  const groupId = parseInt(req.params.groupId);
-  const userId = parseInt(req.params.userId);
+  const groupId = parseInt(req.params.groupId, 10);
+  const userId = parseInt(req.params.userId, 10);
   const currentUser = req.user;
 
   if (currentUser && !isNaN(groupId) && !isNaN(userId)) {

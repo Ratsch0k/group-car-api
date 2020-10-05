@@ -27,7 +27,7 @@ before_script:
 - sudo -u postgres createuser groupcarapitest
 - sudo -u postgres psql -c "CREATE DATABASE groupcartest WITH OWNER groupcarapitest;"
 
-jobs: 
+jobs:
   include:
     # Jobs for static analysis
     - stage: "Static Analysis"
