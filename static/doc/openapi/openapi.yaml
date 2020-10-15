@@ -207,6 +207,36 @@ paths:
         404:
           $ref: '#/components/responses/UserNotFoundErrorResponse'
 
+  /api/user/invite:
+    get:
+      tags:
+        - User
+      summary: Get all invites
+      description: Get a list of all invites of the currently logged in user
+      responses:
+        200:
+          description: List of all invites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invites:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Invite'
+                        - $ref: '#/components/schemas/InviteUser'
+                        - $ref: '#/components/schemas/InviteInvitedBy'
+                        - $ref: '#/components/schemas/InviteGroup'
+        401:
+          description: User is not logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /api/user/invite/{groupId}/join:
     parameters:
       - name: groupId
