@@ -63,7 +63,14 @@ export class Group extends Model {
    * List of attributes which should be used if group reference is eagerly
    * loaded.
    */
-  public static simpleAttributes = ['id', 'name', 'description', 'ownerId'];
+  public static simpleAttributes = [
+    'id',
+    'name',
+    'description',
+    'ownerId',
+    'createdAt',
+    'updatedAt',
+  ];
 
   /**
    * Gets the owner.
