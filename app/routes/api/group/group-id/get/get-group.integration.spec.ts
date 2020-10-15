@@ -105,8 +105,8 @@ describe('get /api/group/:groupId', function() {
           });
           expect(res.body).to.haveOwnProperty('ownerId');
           expect(res.body).to.not.have.property('members');
-          expect(res.body).to.not.have.property('createdAt');
-          expect(res.body).to.not.have.property('updatedAt');
+          expect(res.body).to.have.property('createdAt');
+          expect(res.body).to.have.property('updatedAt');
         });
   });
 
