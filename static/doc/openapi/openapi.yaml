@@ -226,7 +226,6 @@ paths:
                     items:
                       allOf:
                         - $ref: '#/components/schemas/Invite'
-                        - $ref: '#/components/schemas/InviteUser'
                         - $ref: '#/components/schemas/InviteInvitedBy'
                         - $ref: '#/components/schemas/InviteGroup'
         401:
