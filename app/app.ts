@@ -11,7 +11,7 @@ import morganDebug from 'morgan-debug';
 import config from '@config';
 import authRouter from '@app/routes/auth';
 import jwtCsrf from './routes/auth/jwt/jwt-csrf';
-import {preLoginJwtValidator} from './routes/auth/jwt/jwt-util';
+import {postLoginJwtValidator} from './routes/auth/jwt/jwt-util';
 import apiRouter from './routes/api';
 import {userRouter} from './routes/user';
 
@@ -45,7 +45,7 @@ app.use(
       requestProperty: 'auth',
       algorithms: ['HS512'],
     }),
-    preLoginJwtValidator,
+    postLoginJwtValidator,
     apiRouter,
 );
 

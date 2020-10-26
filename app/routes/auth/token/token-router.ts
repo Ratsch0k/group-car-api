@@ -1,6 +1,6 @@
 import * as express from 'express';
 import tokenController from './token-controller';
-import {preLoginJwtValidator} from '@app/routes/auth/jwt/jwt-util';
+import {postLoginJwtValidator} from '@app/routes/auth/jwt/jwt-util';
 import debug from 'debug';
 import config from '@config';
 import expressJwt from 'express-jwt';
@@ -23,7 +23,7 @@ router.put('/',
       algorithms: ['HS512'],
       requestProperty: 'auth',
     }),
-    preLoginJwtValidator,
+    postLoginJwtValidator,
     tokenLogger,
     tokenController,
 );
