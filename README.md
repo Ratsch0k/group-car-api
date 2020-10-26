@@ -55,8 +55,9 @@ Optional environment variables:
 ### Command line options
 `--allowSignUp`: The server will usually only allow sign up via a *SignUp Request*. This options allows a direct sign up
 
-`--disableFlush`: Disables resetting the database on startup. Is only active if the
-server is running in **development** mode.
+`--flush`: Flushes the database on every start. Flushing empties all tables.
+
+`--disableStaticServer`: Disables serving of static files from the static directory (or if any other folder if specified)
 
 ### Database
 The server can run without a connection to a database, but only static serving is fully functioning as almost everything else needs a database.\
