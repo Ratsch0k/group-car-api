@@ -1,7 +1,7 @@
 import config from '@config';
 import jwt from 'jsonwebtoken';
 import {User} from '@models';
-import {UnauthorizedError} from '@errors';
+import {NotLoggedInError, UnauthorizedError} from '@errors';
 import {RequestHandler} from 'express';
 
 /**
@@ -70,9 +70,9 @@ export function convertUserToJwtPayload(user: User): UserJwtPayload {
  * @param res  - Http response
  * @param next - Next handler
  */
-export const preLoginJwtValidator: RequestHandler = (req, res, next) => {
+export const postLoginJwtValidator: RequestHandler = (req, res, next) => {
   if (!req.auth || !req.auth.loggedIn || !req.auth.id) {
-    throw new UnauthorizedError();
+    throw new NotLoggedInError();
   } else {
     // Check if a user with the user id exists
     User.findByPk(req.auth.id).then((user) => {
@@ -82,7 +82,7 @@ export const preLoginJwtValidator: RequestHandler = (req, res, next) => {
         req.user = user;
         next();
       } else {
-        next(new UnauthorizedError());
+        next(new NotLoggedInError());
       }
     });
   }

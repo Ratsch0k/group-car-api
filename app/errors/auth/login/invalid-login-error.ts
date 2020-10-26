@@ -1,4 +1,4 @@
-import BadRequestError from '../bad-request-error';
+import BadRequestError from '../../bad-request-error';
 
 /**
  * Error if the user provided wrong credentials for a login.

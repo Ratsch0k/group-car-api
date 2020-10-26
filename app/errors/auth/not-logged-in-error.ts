@@ -1,4 +1,4 @@
-import UnauthorizedError from './unauthorized-error';
+import UnauthorizedError from '../unauthorized-error';
 
 /**
  * This error is thrown if a user tries to access something which requires to

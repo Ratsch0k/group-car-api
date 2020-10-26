@@ -6,7 +6,7 @@ import config from '../../../config';
 import {
   generateToken,
   convertUserToJwtPayload,
-  preLoginJwtValidator,
+  postLoginJwtValidator,
 } from './jwt-util';
 import {expect} from 'chai';
 import {UnauthorizedError} from '../../../errors';
@@ -202,7 +202,7 @@ describe('jwt-util', function() {
     });
   });
 
-  describe('preLoginJwtValidator', function() {
+  describe('postLoginJwtValidator', function() {
     it('calls next if jwt not pre-login jwt', function(done) {
       const request: any = sandbox.stub();
       request.auth = {
@@ -221,7 +221,7 @@ describe('jwt-util', function() {
       });
       const response: any = sandbox.stub();
 
-      preLoginJwtValidator(request, response, next);
+      postLoginJwtValidator(request, response, next);
     });
 
     it('throws UnauthorizedError if jwt doesn\'t exist on request', function() {
@@ -229,7 +229,7 @@ describe('jwt-util', function() {
       const next: any = sandbox.stub();
       const response: any = sandbox.stub();
 
-      expect(() => preLoginJwtValidator(request, response, next))
+      expect(() => postLoginJwtValidator(request, response, next))
           .to.throw(UnauthorizedError);
       sandbox.assert.notCalled(next);
     });
@@ -243,7 +243,7 @@ describe('jwt-util', function() {
       const next: any = sandbox.stub();
       const response: any = sandbox.stub();
 
-      expect(() => preLoginJwtValidator(request, response, next))
+      expect(() => postLoginJwtValidator(request, response, next))
           .to.throw(UnauthorizedError);
       sandbox.assert.notCalled(next);
     });
@@ -268,7 +268,7 @@ describe('jwt-util', function() {
       });
       const response: any = sandbox.stub();
 
-      preLoginJwtValidator(request, response, next);
+      postLoginJwtValidator(request, response, next);
     });
   });
 });

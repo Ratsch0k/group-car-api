@@ -46,8 +46,16 @@ describe('ErrorHandler', () => {
         match.has('timestamp', match.date));
     sandbox.assert.calledWith(responseStub.send,
         match.has('statusCode', error.statusCode));
-    sandbox.assert.calledWith(responseStub.send,
-        match.has('detail', error.detail));
+    sandbox.assert.calledWith(
+        responseStub.send,
+        match.has(
+            'detail',
+            {
+              ...error.detail,
+              errorName: 'InvalidRequestError',
+            },
+        ),
+    );
   });
 
   it('throws InternalError if not instanceof RestError', () => {

@@ -27,7 +27,7 @@ export class RestError extends Error {
   /**
    * The error object which was thrown.
    */
-  public readonly detail?: Record<string, unknown>;
+  public detail?: Record<string, unknown>;
 
   /**
    * Creates an instance of this class.
