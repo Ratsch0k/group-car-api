@@ -4,6 +4,7 @@ import config from '@config';
 import debug from 'debug';
 
 const log = debug('group-car-db');
+const httpLog = debug('group-car:http');
 
 /**
  * An extension of the {@link Sequelize} class which also
@@ -49,7 +50,7 @@ const database = new Database(config.database.sequelize.database,
 let syncPromise: Promise<void>;
 if (config.database.withFlush) {
   syncPromise = database.sync({force: true, logging: false}).then(() => {
-    log('Synced database');
+    httpLog('Flushed database');
   });
 } else {
   syncPromise = Promise.resolve();

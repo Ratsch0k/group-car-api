@@ -4,9 +4,35 @@
  * Module dependencies.
  */
 
-import app from './app';
 import debug from 'debug';
+import {argv} from 'yargs';
+
+/*
+ * Check if provided command line arguments are all correct and
+ * if not, stop executing and show error message
+ */
+const allowedArgs = ['flush', 'allowSignUp', 'disableStaticServe'];
+const argsCorrect = Object.keys(argv).every((arg) => {
+  if (arg === '_' || arg === '$0') {
+    return true;
+  } else {
+    return allowedArgs.includes(arg);
+  }
+});
+
+if (!argsCorrect) {
+  let message = 'At least one incorrect command line ' +
+    'argument provided!\nAllowed are:\n';
+  allowedArgs.forEach((arg) => {
+    message += `\t- ${arg}\n`;
+  });
+
+  console.error(message);
+  process.exit(1);
+}
+
 import http = require('http');
+import app from './app';
 import db from '@db';
 
 const log = debug('group-car:http');
