@@ -49,6 +49,9 @@ const database = new Database(config.database.sequelize.database,
 let syncPromise: Promise<void>;
 if (config.database.withFlush) {
   httpLog('Flush');
+  database.authenticate().then(() => {
+    httpLog('DB Available');
+  });
   syncPromise = database.sync({force: true, logging: false}).then(() => {
     httpLog('Flushed database');
   }).catch((err) => {
