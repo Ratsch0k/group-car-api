@@ -36,7 +36,14 @@
       "outFiles": ["${workspaceFolder}/build/**/*.js"],
       "env": {
         "NODE_ENV": "development",
+        "SERVER_TYPE": "development",
+        "DEBUG": "group-car*",
         "JWT_SECRET": "secret",
+        "DB_USERNAME": "group-car-dev",
+        "DB_PASSWORD": "group-car-dev",
+        "DB_NAME": "group-car-dev",
+        "DB_HOSTNAME": "127.0.0.1",
+        "DISABLE_SIGN_UP_THROUGH_REQUEST": "true"
       },
       "runtimeArgs": [
         "-r", 

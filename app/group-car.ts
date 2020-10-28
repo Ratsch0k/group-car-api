@@ -4,12 +4,38 @@
  * Module dependencies.
  */
 
-import app from './app';
 import debug from 'debug';
+import {argv} from 'yargs';
+
+/*
+ * Check if provided command line arguments are all correct and
+ * if not, stop executing and show error message
+ */
+const allowedArgs = ['flush', 'allowSignUp', 'disableStaticServe'];
+const argsCorrect = Object.keys(argv).every((arg) => {
+  if (arg === '_' || arg === '$0') {
+    return true;
+  } else {
+    return allowedArgs.includes(arg);
+  }
+});
+
+if (!argsCorrect) {
+  let message = 'At least one incorrect command line ' +
+    'argument provided!\nAllowed are:\n';
+  allowedArgs.forEach((arg) => {
+    message += `\t- ${arg}\n`;
+  });
+
+  console.error(message);
+  process.exit(1);
+}
+
 import http = require('http');
+import app from './app';
 import db from '@db';
 
-const log = debug('group-car:http:log');
+const log = debug('group-car:http');
 const error = debug('group-car:http:error');
 
 /**
@@ -37,8 +63,8 @@ server.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.
- * @param val  a string which represent a port
- * @return the normalized port
+ * @param val - a string which represent a port
+ * @returns the normalized port
  */
 function normalizePort(val: string) {
   const port = parseInt(val, 10);
@@ -58,9 +84,9 @@ function normalizePort(val: string) {
 
 /**
  * Event listener for HTTP server "error" event.
- * @param error the thrown error
+ * @param error - the thrown error
  */
-function onError(error: any) {
+function onError(error: Record<string, unknown>) {
   if (error.syscall !== 'listen') {
     throw error;
   }

@@ -13,6 +13,7 @@ cache:
   directories:
     - node_modules
     - static/doc/typedoc # Cache generated typescript documentation
+  yarn: true
 
 services:
 - postgresql
@@ -24,10 +25,12 @@ install:
 
 before_script:
   # Install postgres, create test user and test database for integration tests
+- cd ~postgres/
 - sudo -u postgres createuser groupcarapitest
 - sudo -u postgres psql -c "CREATE DATABASE groupcartest WITH OWNER groupcarapitest;"
+- cd ~travis/build/Ratsch0k/group-car-api
 
-jobs: 
+jobs:
   include:
     # Jobs for static analysis
     - stage: "Static Analysis"
@@ -36,11 +39,11 @@ jobs:
     - script: yarn audit
       name: "Audit"
 
-    # Building job
+     # Building job
     - stage: "Build"
       script: yarn tsc
 
-    # Testing jobs
+     # Testing jobs
     - stage: "Test"
       name: "Unit Tests"
       script: yarn test:unit
@@ -48,10 +51,6 @@ jobs:
       env:
       - NODE_ENV=test
       name: "Integration Tests"
-
-    # Jobs for generating documentation
-    - stage: "Generate typedoc"
-      script: yarn typedoc
 
       # Deploy jobs
     - stage: "Deploy Development"
@@ -68,11 +67,14 @@ stages:
   - "Static Analysis"
   - "Build"
   - "Test"
-  - "Generate typedoc"
+  - name: "Compare version and tag"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
   - name: "Deploy Development"
-    if: NOT tag IS present AND type = push AND fork = false AND branch = develop
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-alpha(.\d+)*$/
+  - name: "Compare version and tag"
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-beta(.\d+)*$/
   - name: "Deploy Beta"
-    if: NOT tag IS present AND type = push AND fork = false AND branch = master
+    if: tag IS present AND tag ~= /^v\d+.\d+.\d+-beta(.\d+)*$/
   - name: "Compare version and tag"
     if: tag IS present AND tag ~= /^v\d+.\d+.\d+$/
   - name: "Deploy Release"

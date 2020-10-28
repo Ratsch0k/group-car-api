@@ -38,8 +38,8 @@ Every url which is not listed below will route the frontend
 ## How to run
 The server can run in the following configurations:
   - `yarn dev` ts-node is used to run the typescript code. Only http request and database operations are logged
-  - `yarn debug` ts-node is used to run typescript code. Http request, database operations and logging of server code is enabled
-  - `yarn debugAll` ts-node is used to run typescript code. Every type of logging is enabled
+  - `yarn dev:log` ts-node is used to run typescript code. Http request, database operations and logging of server code is enabled
+  - `yarn dev:log:all` ts-node is used to run typescript code. Every type of logging is enabled
   - `yarn prod` Typescript code is compiled into javascript code and saved in the subdirectory `build` the the javascript code is executed (recommended for production)
 
 Configuration can be changed in `app/config` and in the `package.json`.
@@ -51,6 +51,13 @@ The server needs the following environment variables to fully function:
 Optional environment variables:
  - **HTML_STATIC**: Path to the frontend which will served on every url which is not directly served by the backend, if not set the field `config.public` in the `package.json` is 
  - **PORT**: Port on which the server should listen, if not set the field `config.port` in the ´package.json` is used
+
+### Command line options
+`--allowSignUp`: The server will usually only allow sign up via a *SignUp Request*. This options allows a direct sign up
+
+`--flush`: Flushes the database on every start. Flushing empties all tables.
+
+`--disableStaticServer`: Disables serving of static files from the static directory (or if any other folder if specified)
 
 ### Database
 The server can run without a connection to a database, but only static serving is fully functioning as almost everything else needs a database.\

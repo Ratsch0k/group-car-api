@@ -1,19 +1,19 @@
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import morgan from 'morgan';
-import errorHandler from '@app/errors/error-handler';
+import errorHandler from '@errors';
 import expressJwt from 'express-jwt';
+import morganDebug from 'morgan-debug';
 
 /**
  * Import router
  */
 import config from '@config';
-import authRouter from '@app/auth';
-import jwtCsrf from './jwt/jwt-csrf';
-import {preLoginJwtValidator} from './jwt/jwt-util';
-import apiRouter from './api';
-import {userRouter} from './user';
+import authRouter from '@app/routes/auth';
+import jwtCsrf from './routes/auth/jwt/jwt-csrf';
+import {postLoginJwtValidator} from './routes/auth/jwt/jwt-util';
+import apiRouter from './routes/api';
+import {userRouter} from './routes/user';
 
 const app: express.Application = express();
 
@@ -22,7 +22,7 @@ app.set('trust proxy', true);
 
 // Only log http request if a format string is provided
 if (config.morgan.formatString !== null) {
-  app.use(morgan(config.morgan.formatString));
+  app.use(morganDebug('group-car-http', config.morgan.formatString));
 }
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
@@ -36,15 +36,18 @@ app.use('/auth', authRouter);
 // Add user routers
 app.use('/user', userRouter);
 
-// Add api routers
-app.use('/api',
+// Add api router
+app.use(
+    '/api',
     expressJwt({
       secret: config.jwt.secret,
       getToken: config.jwt.getToken,
+      requestProperty: 'auth',
       algorithms: ['HS512'],
     }),
-    preLoginJwtValidator,
-    apiRouter);
+    postLoginJwtValidator,
+    apiRouter,
+);
 
 
 /**
@@ -55,13 +58,16 @@ app.use(express.static('static'));
 /**
  * Configure static service
  */
-app.use(express.static(config.staticPath.path));
-app.get('/*', (req, res) => {
-  res.sendFile(
-      path.join(
-          config.staticPath.path,
-          'index.html'));
-});
+if (!config.static.disabled) {
+  app.use(express.static(config.static.path));
+  app.get('/*', (req, res) => {
+    res.sendFile(
+        path.join(
+            config.static.path,
+            'index.html'));
+  });
+}
+
 
 // Register error handler
 app.use(errorHandler);

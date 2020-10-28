@@ -1,8 +1,13 @@
 {
   "cSpell.words": [
     "Hashable",
+    "Includeable",
     "openapi",
     "postgres",
     "typedoc"
-  ]
+  ],
+  "editor.tabSize": 2,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrace": false,
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.preferences.quoteStyle": "single"
 }

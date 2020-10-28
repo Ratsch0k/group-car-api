@@ -1,6 +1,9 @@
 import {Sequelize} from 'sequelize';
-type Options = import('sequelize').Options;
+import {Options} from 'sequelize';
 import config from '@config';
+import debug from 'debug';
+
+const httpLog = debug('group-car:http');
 
 /**
  * An extension of the {@link Sequelize} class which also
@@ -45,8 +48,8 @@ const database = new Database(config.database.sequelize.database,
     // If currently in environment sync the database
 let syncPromise: Promise<void>;
 if (config.database.withFlush) {
-  syncPromise = database.sync({force: true}).then(() => {
-    console.log('Sync database');
+  syncPromise = database.sync({force: true, logging: false}).then(() => {
+    httpLog('Flushed database');
   });
 } else {
   syncPromise = Promise.resolve();

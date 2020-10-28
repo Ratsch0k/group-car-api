@@ -1,13 +1,18 @@
 openapi: 3.0.3
 info:
   title: Group car api
-  version: 0.2.1
-  
+  version: 0.4.0
+
 tags:
 - name: Authentication
   description: Requests for authentication
 - name: User
   description: Requests for everything user related
+- name: Group
+  description: Requests for everything groups related
+
+security:
+  - csrfToken: []
 
 # Paths
 paths:
@@ -22,18 +27,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusObject'
-  /api/user:
-    get:
-      summary: Get all users
-      description: Get a list of all users
-      responses:
-        200:
-          description: The list of all users
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserList'
-  
+
   # Authentication
   /auth:
     head:
@@ -49,12 +43,6 @@ paths:
       description: Logs the user in with the given username and the given password
       tags:
       - Authentication
-      parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string
       requestBody:
         description: Login data
         content:
@@ -75,19 +63,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /auth/sign-up:
-    put:
+    post:
       summary: Sign up
       description: Signs the user up with the given attributes
       tags:
       - Authentication
-      parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string
       requestBody:
         description: The sign up properties
         content:
@@ -108,40 +90,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /auth/logout:
     put:
       summary: Log the client out
       tags:
       - Authentication
       description: Log the client out by replacing the jwt cookie with a pre-login one
-      parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string 
       responses:
         204:
           description: The client is logged out
         401:
-          description: The action can't be performed due to authorization.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
   /auth/token:
     put:
       summary: Check if logged in
       tags:
       - Authentication
       description: Check if the current state of the client indicates that it is logged in. Checks the jwt token and the payload within.
-      parameters:
-      - name: XSRF-TOKEN
-        in: header
-        required: false
-        schema:
-          type: string 
       responses:
         200:
           description: The client is logged in
@@ -150,12 +116,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         401:
-          description: The client is not logged in
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError'
-                
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+
   # User
   /user/generate-profile-pic:
     get:
@@ -165,7 +127,7 @@ paths:
       description: Generates a new pseudo-random profile picture with the given username as seed. An offset can be
         send with the username to generate a different profile picture for the same username. The same username and offset will
         always produce the same profile picture.
-      parameters: 
+      parameters:
       - name: username
         in: query
         required: true
@@ -178,30 +140,62 @@ paths:
           type: number
       responses:
         200:
-          description: The generation was successfull and the picture is returned.
+          description: The generation was successful and the picture is returned.
           content:
             image/jpeg:
               schema:
                 type: string
                 format: binary
         400:
-          description: The request is missing parameters and/or is malformed.
+          $ref: '#/components/responses/BadRequestErrorResponse'
+  /api/user/search:
+    get:
+      summary: Searches for users
+      description: Searches for a limited list of users which start with the specified query.
+        The maximum amount of the list is 20 users
+      tags:
+        - User
+      parameters:
+        - name: filter
+          description: Filters with what the username of the returned users should start with
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          description: Limits the amount of users which are returned. Maximum is 20.
+          in: query
+          required: false
+          schema:
+            type: number
+      responses:
+        200:
+          description: A list with at most 20 users which start with the specified query.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RestError'
+                type: object
+                required:
+                  - users
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserSimple'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
   /api/user/{userId}/profile-pic:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
     get:
       summary: Get the profile picture
       tags:
       - User
       description: Get the profile picture of the user with the given id
-      parameters: 
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: number
       responses:
         200:
           description: The profile picture as jpeg
@@ -211,13 +205,436 @@ paths:
                 type: string
                 format: binary
         404:
-          description: No user with the given id exists
+          $ref: '#/components/responses/UserNotFoundErrorResponse'
+
+  /api/user/invite:
+    get:
+      tags:
+        - User
+      summary: Get all invites
+      description: Get a list of all invites of the currently logged in user
+      responses:
+        200:
+          description: List of all invites
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RestError'
+                type: object
+                properties:
+                  invites:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Invite'
+                        - $ref: '#/components/schemas/InviteInvitedBy'
+                        - $ref: '#/components/schemas/InviteGroup'
+        401:
+          description: User is not logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/user/invite/{groupId}/join:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      summary: Joins the group
+      tags:
+        - User
+      description: Joins the group with the given id by accepting an invite for it
+      responses:
+        204:
+          description: The invite was accepted and the user is a new member of the group.
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          description: "Either the invite itself doesn't exist or the group which the user tries to join doesn't"
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GroupNotFoundErrorSchema'
+                - $ref: '#/components/schemas/InviteNotFoundSchema'
+
+  # Group
+  /api/group:
+    get:
+      summary: Gets groups
+      description: Returns the list of groups the currently logged in user is a member of
+      tags:
+        - Group
+      responses:
+        200:
+          description: A list of group of which the user is a member
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - groups
+                properties:
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GroupWithOwner'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+    post:
+      summary: Creates a new group
+      tags:
+      - Group
+      description: Create a new group with the currently logged in user as admin and owner.
+      requestBody:
+        description: The initial group data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupRequest'
+      responses:
+        201:
+          description: The group was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupData'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/group/{groupId}:
+    parameters:
+    - $ref: '#/components/parameters/GroupId'
+    get:
+      summary: Get group data
+      tags:
+      - Group
+      description: Get the data of a group if the user is a member of that group
+      responses:
+        200:
+          description: The data could be successfully retrieved. If the user is a member of the group this response will contain all group data and a list of members. If the user is not a member of the group the response will only contain the id and the name.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GroupWithOwner'
+                - $ref: '#/components/schemas/GroupSimple'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          description: The group doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupNotFoundErrorSchema'
+    put:
+      summary: Updates a group
+      tags:
+      - Group
+      description: Updated the group with the given data. The user can only update a group if the user is an admin of that group.
+      requestBody:
+        description: The data with which the group should be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupRequest'
+      responses:
+        200:
+          description: The updated group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupData'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/GroupNotFoundErrorResponse'
+    delete:
+      summary: Deletes a group
+      tags:
+      - Group
+      description: Delete the group which has the given id if the user which requests the action is the owner of that group
+      responses:
+        204:
+          description: Successfully deleted the group
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/GroupNotFoundErrorResponse'
+  /api/group/{groupId}/invites:
+    get:
+      summary: Get all invited users of this group
+      tags:
+        - Group
+      description: Gets a list of all users which are invited to the specified group.
+      parameters:
+      - $ref: '#/components/parameters/GroupId'
+      responses:
+        200:
+          description: The list of invited users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invites:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Invite'
+                        - $ref: '#/components/schemas/InviteInvitedBy'
+                        - $ref: '#/components/schemas/InviteUser'
+
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        404:
+          $ref: '#/components/responses/GroupNotFoundErrorResponse'
+  /api/group/{groupId}/invite:
+    post:
+      summary: Invites a user to the group
+      tags:
+      - Group
+      description: Invites a user to the group
+      parameters:
+      - $ref: '#/components/parameters/GroupId'
+      requestBody:
+        description: Either the id or the username of the user. If both are provided the username will be ignored.
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  properties:
+                    userId:
+                      type: integer
+                - type: object
+                  properties:
+                    username:
+                      type: string
+              example:
+                username: 'test-user'
+      responses:
+        201:
+          description: 'The user was successfully invited'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invite'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          description: The user with the given identifier (username or id) doesn't exist
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/UserNotFoundErrorSchema'
+                  - $ref: '#/components/schemas/UsernameNotFoundErrorSchema'
+  /api/group/{groupId}/leave:
+    post:
+      summary: Leaves the specified group
+      tags:
+        - Group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      description: Removes the currently logged in user from the specified group.
+      responses:
+        204:
+          description: The user left the group successfully.
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/group/{groupId}/members:
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+    get:
+      summary: Get members
+      description: Get the list of members of the specified group
+      tags:
+        - Group
+      responses:
+        200:
+          description: The list of members
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  members:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GroupMember'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+  /api/group/{groupId}/{userId}/kick:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      summary: Kicks a user
+      description: Kicks the specified user from the specified group. The owner can kick any user, an admin can kick any non-admin user and normal members cannot kick any user.
+      tags:
+        - Group
+      responses:
+        200:
+          description: The user was successfully kicked from the group. The response data is the new group data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupMember'
+        400:
+          description: Either the parameters are wrong or the user tried to kick himself/herself
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestErrorSchema'
+        401:
+          description: Either the user is not an admin, or he/she is an admin but tried to kick another admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
+        404:
+          description: The user who should be kicked is not a member of the group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipNotFoundSchema'
+  /api/group/{groupId}/{userId}/admin/grant:
+    put:
+      summary: Grants a user admin permissions
+      description: Grants the specified user admin permissions.
+      tags:
+        - Group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: The user was granted admin permissions
+        400:
+          description: Either the request is missing parameter, the user is not a member of the group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestErrorSchema'
+        401:
+          description: Current user is either not logged in, not a member of the group or not an admin of the group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
+  /api/group/{groupId}/{userId}/admin/revoke:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      summary: Grants a user admin permissions
+      description: Grants the specified user admin permissions.
+      tags:
+        - Group
+      responses:
+        204:
+          description: Admin permission for the user has been successfully revoked.
+        400:
+          description: Either the request is missing parameter, the user is not a member of the group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestErrorSchema'
+        401:
+          description: Current user is either not logged in, not a member of the group or not an admin of the group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
+  /api/group/{groupId}/{userId}/admin/transfer-ownership:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+
+    post:
+      summary: Transfers ownership to specified user
+      description: Transfers the ownership of the currently logged in user of the specified group to the specified user
+      tags:
+        - Group
+      responses:
+        200:
+          description: The specified user is now the owner of the specified group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupWithOwner'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          description: The currently logged in user is either not a member, not an admin or not the owner of the specified group.
+            Or the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorSchema'
+
 # Components
 components:
+
+  # Schemas
   schemas:
     # Status
     StatusObject:
@@ -232,6 +649,7 @@ components:
       enum:
       - 'up'
       - 'down'
+
     # User
     User:
       type: object
@@ -250,25 +668,151 @@ components:
         updatedAt:
           type: string
           format: date-time
-    UserList:
-      type: array
-      items:
-        $ref: '#/components/schemas/User'
+    UserSimple:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+
+    # Group
+    GroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      example:
+        name: Family group
+        description: Our new group for the family
+    CreateGroupRequest:
+      allOf:
+      - type: object # Override required of GroupData
+        required:
+        - name
+        properties:
+          name:
+            type: string
+      - $ref: '#/components/schemas/GroupRequest'
+    GroupData:
+      type: object
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        ownerId:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    GroupWithOwner:
+      allOf:
+        - $ref: '#/components/schemas/GroupData'
+        - type: object
+          required:
+            - Owner
+          properties:
+            Owner:
+              $ref: '#/components/schemas/UserSimple'
+    GroupMember:
+      type: object
+      required:
+      - userId
+      - isAdmin
+      properties:
+        User:
+          $ref: '#/components/schemas/UserSimple'
+        isAdmin:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        userId:
+          type: number
+        groupId:
+          type: number
+    GroupSimple:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        ownerId:
+          type: integer
+        description:
+          type: string
+    GroupSimpleWithOwner:
+      allOf:
+      - $ref: '#/components/schemas/GroupSimple'
+      - type: object
+        properties:
+          Owner:
+            $ref: '#/components/schemas/UserSimple'
+
+    # Invite
+    Invite:
+      type: object
+      properties:
+        userId:
+          type: integer
+        groupId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        invitedBy:
+          type: integer
+    InviteInvitedBy:
+      type: object
+      properties:
+        InviteSender:
+          $ref: '#/components/schemas/UserSimple'
+    InviteUser:
+      type: object
+      properties:
+        User:
+          $ref: '#/components/schemas/UserSimple'
+    InviteGroup:
+      type: object
+      properties:
+        Group:
+          $ref: '#/components/schemas/GroupWithOwner'
+
     # Authentication
     LoginObject:
       type: object
       properties:
         username:
           type: string
-        password: 
+        password:
           type: string
       example:
         username: demo
-        password: 123456
+        password: '123456'
     SignUpObject:
       type: object
       properties:
-        email: 
+        email:
           type: string
         username:
           type: string
@@ -277,11 +821,12 @@ components:
       example:
         email: demo@mai.com
         username: demo
-        password: 123456
+        password: '123456'
+
     # Error
     RestError:
       type: object
-      required: 
+      required:
       - status
       - statusCode
       - timestamp
@@ -298,7 +843,7 @@ components:
           type: string
         detail:
           type: object
-    UnauthorizedError:
+    UnauthorizedErrorSchema:
       allOf:
       - $ref: '#/components/schemas/RestError'
       - example:
@@ -307,6 +852,125 @@ components:
           message: You're not authorized to view the requested resourced.
           detail: {}
           timestamp: '2020-05-03T13:21:35.938Z'
+    BadRequestErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/RestError'
+      - example:
+          status: Bad Request
+          statusCode: 400
+          message: The sent request is missing required attributes.
+          detail: {}
+          timestamp: '2020-05-03T13:21:35.938Z'
+    InternalServerErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/RestError'
+      - example:
+          status: Internal Server Error
+          statusCode: 500
+          message: An unexpected error occurred.
+          detail: {}
+          timestamp: '2020-05-03T13:21:35.938Z'
+    EntityNotFoundErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/RestError'
+      - example:
+          message: Entity Not Found Error
+          statusCode: 404
+          status: Not found
+          detail: {}
+          timestamp: '2020-05-03T13:21:35.938Z'
+    UserNotFoundErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+      - example:
+          message: A user with id 4 doesn't exist
+          detail:
+            userId: 4
+    UsernameNotFoundErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+      - example:
+          message: A user with then name "test-user" doesn't exist
+          detail:
+            username: 'test-user'
+    GroupNotFoundErrorSchema:
+      allOf:
+      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+      - example:
+          message: A group with id 4 doesn't exist
+          detail:
+            groupId: 4
+    InviteNotFoundSchema:
+      allOf:
+      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+      - example:
+          message: An invite for the group doesn't exist
+          detail:
+            groupId: 4
+            userId: 2
+    MembershipNotFoundSchema:
+      allOf:
+        - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+        - example:
+            message: Membership of user 2 for group 4 doesn't exist
+            detail:
+              groupId: 4
+              userId: 2
+  # Responses
+  responses:
+    # Error
+    BadRequestErrorResponse:
+      description: The sent request is malformed or missing required attributes.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestErrorSchema'
+    UnauthorizedErrorResponse:
+      description: The user who sent the request in not authorized for the requested action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedErrorSchema'
+    InternalServerErrorResponse:
+      description: The server encountered an unexpected error while handling the request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerErrorSchema'
+    UserNotFoundErrorResponse:
+      description: A user with the given userId doesn't exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserNotFoundErrorSchema'
+    UsernameNotFoundErrorResponse:
+      description: A user with the given username doesn't exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsernameNotFoundErrorSchema'
+    GroupNotFoundErrorResponse:
+      description: A group with the given groupId doesn't exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupNotFoundErrorSchema'
+
+  # Parameter
+  parameters:
+    GroupId:
+      name: groupId
+      in: path
+      schema:
+        type: integer
+      required: true
+
+  # Security Definitions
+  securitySchemes:
+    csrfToken:
+      type: apiKey
+      name: XSRF-TOKEN
+      in: header
 
 # External docs
 externalDocs:

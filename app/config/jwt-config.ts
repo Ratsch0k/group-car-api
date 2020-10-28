@@ -1,4 +1,4 @@
-type Request = import('express').Request;
+import {Request} from 'express';
 
 export interface JWTOptions {
   algorithm: 'HS512' | 'HS384' | 'HS256';
@@ -44,11 +44,12 @@ if (secret === undefined) {
 const name = 'jwt';
 
 /**
- * Gets the token from a request.\
+ * Gets the token from a request.
+ *
  * The token should be stored in a cookie with
  * the name "jwt"
  */
-const getToken = (req: Request) => {
+const getToken = (req: Request): string | null => {
   if (req.cookies[name]) {
     return req.cookies[name];
   } else {

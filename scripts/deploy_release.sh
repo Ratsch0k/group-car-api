@@ -36,6 +36,16 @@ echo -e "$SERVICE_CONTENT" > my-group-car.de.service
 # Create new folder to use as repository, copy data and remove unnecessary files
 chmod +x scripts/remote_install_release.sh
 chmod +x build/group-car.js
+
+# Test for coverage badge
+yarn coverage
+
+node scripts/create-coverage-badge.js -c statements -o 'static'
+
+# Create licenses disclaimer
+yarn generate-disclaimer
+
+rm -r static/test
  
 # Delete node_modules for faster file transfer
 rm -r node_modules

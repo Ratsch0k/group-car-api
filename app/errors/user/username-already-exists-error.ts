@@ -11,10 +11,10 @@ class UsernameAlreadyExistsError extends BadRequestError {
 
   /**
    * Creates an instance of this class.
-   * @param username Username which already exists
+   * @param username - Username which already exists
    */
-  constructor(username: string, detail?: any) {
-    super(`The username "${username}" already exists`, detail);
+  constructor(username: string) {
+    super(`The username "${username}" already exists`, {username});
 
     this.username = username;
   }
