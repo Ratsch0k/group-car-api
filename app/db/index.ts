@@ -51,6 +51,9 @@ if (config.database.withFlush) {
   httpLog('Flush');
   syncPromise = database.sync({force: true, logging: false}).then(() => {
     httpLog('Flushed database');
+  }).catch((err) => {
+    console.log(err);
+    throw err;
   });
 } else {
   httpLog('No flush');
