@@ -3,7 +3,6 @@ import {Options} from 'sequelize';
 import config from '@config';
 import debug from 'debug';
 
-const log = debug('group-car-db');
 const httpLog = debug('group-car:http');
 
 /**
@@ -49,10 +48,12 @@ const database = new Database(config.database.sequelize.database,
     // If currently in environment sync the database
 let syncPromise: Promise<void>;
 if (config.database.withFlush) {
+  httpLog('Flush');
   syncPromise = database.sync({force: true, logging: false}).then(() => {
     httpLog('Flushed database');
   });
 } else {
+  httpLog('No flush');
   syncPromise = Promise.resolve();
 }
 
