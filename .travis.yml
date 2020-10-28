@@ -13,6 +13,7 @@ cache:
   directories:
     - node_modules
     - static/doc/typedoc # Cache generated typescript documentation
+  yarn: true
 
 services:
 - postgresql
