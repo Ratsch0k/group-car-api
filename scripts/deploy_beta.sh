@@ -42,6 +42,9 @@ yarn coverage
 
 node scripts/create-coverage-badge.js -s beta -c statements -l 'https://dev.my-group-car.de/beta/coverage' -o 'static/test/coverage/badge'
 
+# Create licenses disclaimer
+yarn generate-disclaimer
+
 # Delete intermediate directory for report creation
 rm -r mochawesome-report
  
