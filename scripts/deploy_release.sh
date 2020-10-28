@@ -42,6 +42,9 @@ yarn coverage
 
 node scripts/create-coverage-badge.js -c statements -o 'static'
 
+# Create licenses disclaimer
+yarn generate-disclaimer
+
 rm -r static/test
  
 # Delete node_modules for faster file transfer

@@ -57,6 +57,7 @@ export class TestUtils {
           return response.header[csrfHeaderName];
         });
 
+
     return {
       user,
       csrf,

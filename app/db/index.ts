@@ -3,7 +3,6 @@ import {Options} from 'sequelize';
 import config from '@config';
 import debug from 'debug';
 
-const log = debug('group-car-db');
 const httpLog = debug('group-car:http');
 
 /**

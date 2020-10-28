@@ -13,6 +13,7 @@ cache:
   directories:
     - node_modules
     - static/doc/typedoc # Cache generated typescript documentation
+  yarn: true
 
 services:
 - postgresql
@@ -24,8 +25,10 @@ install:
 
 before_script:
   # Install postgres, create test user and test database for integration tests
+- cd ~postgres/
 - sudo -u postgres createuser groupcarapitest
 - sudo -u postgres psql -c "CREATE DATABASE groupcartest WITH OWNER groupcarapitest;"
+- cd ~travis/build/Ratsch0k/group-car-api
 
 jobs:
   include:

@@ -170,7 +170,7 @@ const mail: MailConfig = {
 
 const database: DBConfig = {
   sequelize,
-  withFlush: Boolean(argv.flush),
+  withFlush: environment === 'test' ? true : Boolean(argv.flush),
 };
 
 const user: UserConfig = {
