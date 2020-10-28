@@ -25,6 +25,7 @@ install:
 
 before_script:
   # Install postgres, create test user and test database for integration tests
+- cd ~postgres/
 - sudo -u postgres createuser groupcarapitest
 - sudo -u postgres psql -c "CREATE DATABASE groupcartest WITH OWNER groupcarapitest;"
 
