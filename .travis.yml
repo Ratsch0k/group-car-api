@@ -50,7 +50,6 @@ jobs:
       script: yarn test:integration
       env:
       - NODE_ENV=test
-      - DEBUG=group-car*
       name: "Integration Tests"
 
       # Deploy jobs

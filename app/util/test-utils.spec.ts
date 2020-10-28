@@ -41,8 +41,6 @@ export class TestUtils {
           return response.header[csrfHeaderName];
         });
 
-    console.log('GOT CSRF TOKEN');
-
     // Sign up to access api and set new jwt
     await agent
         .post('/auth/sign-up')
@@ -52,7 +50,6 @@ export class TestUtils {
         .then((response) => {
           user = response.body;
         });
-    console.log('SIGNED UP');
 
     csrf = await agent.head('/auth')
         .then((response) => {
@@ -60,7 +57,6 @@ export class TestUtils {
           return response.header[csrfHeaderName];
         });
 
-    console.log('GOT CSRF TOKEN AGAIN');
 
     return {
       user,

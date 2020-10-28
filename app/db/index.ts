@@ -48,18 +48,10 @@ const database = new Database(config.database.sequelize.database,
     // If currently in environment sync the database
 let syncPromise: Promise<void>;
 if (config.database.withFlush) {
-  httpLog('Flush');
-  database.authenticate().then(() => {
-    httpLog('DB Available');
-  });
   syncPromise = database.sync({force: true, logging: false}).then(() => {
     httpLog('Flushed database');
-  }).catch((err) => {
-    console.log(err);
-    throw err;
   });
 } else {
-  httpLog('No flush');
   syncPromise = Promise.resolve();
 }
 

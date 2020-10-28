@@ -15,11 +15,8 @@ describe('post /api/group/:groupId/leave', function() {
   let csrf: string;
 
   beforeEach(async function() {
-    console.log('BEFORE EACH');
     await syncPromise;
-    console.log('SYNC PROMISE');
     await db.sync({force: true});
-    console.log('DB SYNC');
 
     const response = await TestUtils.signUp();
 

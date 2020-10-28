@@ -71,6 +71,7 @@ export const createValidationResultHandler:
 
     log('IP %s requested: %s', req.ip, requestName);
     const errors = validationResult(req);
+    console.dir(errors);
     if (!errors.isEmpty()) {
       error('Request of IP %s failed validation for: %s',
           req.ip, requestName);
