@@ -28,6 +28,7 @@ before_script:
 - cd ~postgres/
 - sudo -u postgres createuser groupcarapitest
 - sudo -u postgres psql -c "CREATE DATABASE groupcartest WITH OWNER groupcarapitest;"
+- cd ~travis/build/Ratsch0k/group-car-api
 
 jobs:
   include:
