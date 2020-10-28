@@ -47,7 +47,7 @@ jobs:
     - stage: "Test"
       name: "Unit Tests"
       script: yarn test:unit
-      script: yarn test:integration
+    - script: yarn test:integration
       env:
       - NODE_ENV=test
       name: "Integration Tests"
