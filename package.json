@@ -1,6 +1,6 @@
 {
   "name": "group-car-api",
-  "version": "0.4.0-alpha.16",
+  "version": "0.4.1",
   "private": true,
   "config": {
     "port": "8080",
@@ -48,6 +48,9 @@
     "postcoverage": "yarn marge",
     "marge": "marge -f index.html -o static/test/ -p Report mochawesome-report/mochawesome.json",
     "generate-disclaimer": "yarn licenses generate-disclaimer >> static/license-disclaimer"
+  },
+  "resolutions": {
+    "lodash": ">=4.17.19"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
