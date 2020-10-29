@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {GroupService} from '../../../../../../models';
+import {GroupService} from '../../../../../../../models';
 import sinon, {assert, match} from 'sinon';
 import {expect} from 'chai';
 import {kickUserController} from './kick-user-controller';
-import {BadRequestError} from '../../../../../../errors';
+import {BadRequestError} from '../../../../../../../errors';
 
 describe('kickUserController', function() {
   let req: any;

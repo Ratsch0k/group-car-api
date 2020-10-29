@@ -1,8 +1,8 @@
 import {expect} from 'chai';
 import {grantUserAdminController} from './grant-user-admin-controller';
 import sinon, {assert, match} from 'sinon';
-import {BadRequestError} from '../../../../../../../errors';
-import {MembershipService} from '../../../../../../../models';
+import {BadRequestError} from '../../../../../../../../errors';
+import {MembershipService} from '../../../../../../../../models';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 describe('GrantUserAdminController', function() {

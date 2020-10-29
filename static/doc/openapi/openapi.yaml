@@ -464,7 +464,7 @@ paths:
           $ref: '#/components/responses/BadRequestErrorResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
-  /api/group/{groupId}/members:
+  /api/group/{groupId}/member:
     parameters:
       - $ref: '#/components/parameters/GroupId'
     get:
@@ -488,7 +488,7 @@ paths:
           $ref: '#/components/responses/BadRequestErrorResponse'
         401:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
-  /api/group/{groupId}/{userId}/kick:
+  /api/group/{groupId}/member/{userId}/kick:
     parameters:
       - name: groupId
         in: path
@@ -532,7 +532,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MembershipNotFoundSchema'
-  /api/group/{groupId}/{userId}/admin/grant:
+  /api/group/{groupId}/member/{userId}/admin/grant:
     put:
       summary: Grants a user admin permissions
       description: Grants the specified user admin permissions.
@@ -564,7 +564,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
-  /api/group/{groupId}/{userId}/admin/revoke:
+  /api/group/{groupId}/member/{userId}/admin/revoke:
     parameters:
       - name: groupId
         in: path
@@ -596,7 +596,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
-  /api/group/{groupId}/{userId}/admin/transfer-ownership:
+  /api/group/{groupId}/member/{userId}/admin/transfer-ownership:
     parameters:
       - name: groupId
         in: path
