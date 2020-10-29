@@ -7,6 +7,7 @@ import leaveGroupRouter from './leave';
 import {groupIdValidation} from '@app/validators';
 import groupGroupIdInvitesRouter from './invites';
 import groupMemberRouter from './member';
+import groupCarRouter from './car';
 
 const groupGroupIdRouter = Router({mergeParams: true});
 
@@ -18,6 +19,7 @@ groupGroupIdRouter.use('/invites', groupGroupIdInvitesRouter);
 groupGroupIdRouter.use('/member', groupMemberRouter);
 groupGroupIdRouter.use('/invite', inviteUserToGroupRouter);
 groupGroupIdRouter.use('/leave', leaveGroupRouter);
+groupGroupIdRouter.use('/car', groupCarRouter);
 
 export default groupGroupIdRouter;
 
@@ -28,3 +30,4 @@ export * from './invite';
 export * from './member/user-id';
 export * from './invites';
 export * from './member';
+export * from './car';

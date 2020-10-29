@@ -2,6 +2,9 @@ import {
   Group,
   GroupRepository,
   InviteService,
+  MembershipService,
+  Membership,
+  MembershipRepository,
 } from '@models';
 import {
   UnauthorizedError,
@@ -12,10 +15,8 @@ import {
   CannotKickSelfError,
   NotAdminOfGroupError,
   NotMemberOfGroupError,
-} from '@app/errors';
-import {MembershipService} from '../membership/membership-service';
+} from '@errors';
 import debug from 'debug';
-import {Membership, MembershipRepository} from '../membership';
 
 const log = debug('group-car:group:service');
 const error = debug('group-car:group:service:error');
