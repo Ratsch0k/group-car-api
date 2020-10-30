@@ -1,7 +1,7 @@
 import config from '@config';
 import jwt from 'jsonwebtoken';
 import {User} from '@models';
-import {NotLoggedInError, UnauthorizedError} from '@errors';
+import {NotLoggedInError} from '@errors';
 import {RequestHandler} from 'express';
 
 /**

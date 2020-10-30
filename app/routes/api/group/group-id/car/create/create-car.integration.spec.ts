@@ -1,10 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import db, {syncPromise} from '../../../../../../db';
 import config from '../../../../../../config';
 import supertest from 'supertest';
 import {TestUtils} from '../../../../../../util/test-utils.spec';
 import app from '../../../../../../app';
 import {expect} from 'chai';
-import {NotAdminOfGroupError, UnauthorizedError} from '../../../../../../errors';
+import {
+  NotAdminOfGroupError,
+  UnauthorizedError,
+} from '../../../../../../errors';
 import {Group, User} from '../../../../../../models';
 
 describe('post /api/group/:groupId/car', function() {
