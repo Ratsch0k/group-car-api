@@ -63,7 +63,7 @@ export class Car extends Model {
 
 Car.init(
     {
-      carId: {
+      id: {
         allowNull: false,
         type: DataTypes.INTEGER,
         autoIncrement: true,

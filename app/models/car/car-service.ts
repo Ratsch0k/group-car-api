@@ -1,5 +1,4 @@
 import {
-  InternalError,
   MembershipNotFoundError,
   NotAdminOfGroupError,
 } from '@app/errors';
