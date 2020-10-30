@@ -2,6 +2,7 @@ import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 import {RepositoryQueryOptions} from 'typings';
 import {Group, User, Car, CarColor} from '@models';
 import debug from 'debug';
+import {InternalError} from '@app/errors';
 
 
 /**
@@ -54,19 +55,32 @@ export class CarRepository {
       color: CarColor,
       options?: Partial<CarQueryOptions>,
   ): Promise<Car> {
+    this.log('Create car %s for group %d', name, groupId);
+
     const buildOptions = this.queryBuildOptions(options);
 
-    return Car.create(
-        {
-          groupId,
-          color,
+    try {
+      const car = await Car.create(
+          {
+            groupId,
+            color,
+            name,
+          },
+          {
+            include: buildOptions.include,
+            ...options,
+          },
+      );
+      return car;
+    } catch (e) {
+      this.error(
+          'Error occurred while creating car %s for group %d',
           name,
-        },
-        {
-          include: buildOptions.include,
-          ...options,
-        },
-    );
+          groupId,
+          e,
+      );
+      throw new InternalError('Could not create car');
+    }
   }
 
   /**

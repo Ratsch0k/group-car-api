@@ -1,4 +1,8 @@
-import {MembershipNotFoundError, NotAdminOfGroupError} from '@app/errors';
+import {
+  InternalError,
+  MembershipNotFoundError,
+  NotAdminOfGroupError,
+} from '@app/errors';
 import {
   Car,
   CarQueryOptions,
@@ -68,8 +72,10 @@ export class CarService {
         groupId,
         name,
     );
+
     // Create car
-    return CarRepository.create(groupId, name, color, options);
+    const car = await CarRepository.create(groupId, name, color, options);
+    return car.get({plain: true}) as Car;
   }
 }
 
