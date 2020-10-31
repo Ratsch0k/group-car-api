@@ -2,13 +2,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
 import supertest from 'supertest';
-import app from '../../../../../app';
-import config from '../../../../../config';
-import db, {syncPromise} from '../../../../../db';
-import {Group, Membership, User} from '../../../../../models';
-import {TestUtils} from '../../../../../util/test-utils.spec';
+import app from '../../../../../../app';
+import config from '../../../../../../config';
+import db, {syncPromise} from '../../../../../../db';
+import {Group, Membership, User} from '../../../../../../models';
+import {TestUtils} from '../../../../../../util/test-utils.spec';
 
-describe('get /api/group/{groupId}/members', function() {
+describe('get /api/group/:groupId/member', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
   let agent: supertest.SuperTest<supertest.Test>;
   let user: any;
@@ -27,7 +27,7 @@ describe('get /api/group/{groupId}/members', function() {
   describe('if user is not logged in', function() {
     it('responses with 401', function() {
       return supertest(app)
-          .get('/api/group/1/members')
+          .get('/api/group/1/member')
           .set(csrfHeaderName, csrf)
           .send()
           .expect(401);
@@ -38,7 +38,7 @@ describe('get /api/group/{groupId}/members', function() {
     describe('throws BadRequestError(400) if', function() {
       it('groupId is not numeric', function() {
         return agent
-            .get('/api/group/test/members')
+            .get('/api/group/test/member')
             .set(csrfHeaderName, csrf)
             .send()
             .expect(400)
@@ -97,7 +97,7 @@ describe('get /api/group/{groupId}/members', function() {
       });
 
       const response = await agent
-          .get(`/api/group/${group.id}/members`)
+          .get(`/api/group/${group.id}/member`)
           .set(csrfHeaderName, csrf)
           .send()
           .then((res) => res.body);

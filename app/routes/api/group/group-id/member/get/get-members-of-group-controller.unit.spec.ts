@@ -2,8 +2,8 @@
 import {expect} from 'chai';
 import Sinon, {assert, match} from 'sinon';
 import sinon from 'sinon';
-import {BadRequestError} from '../../../../../errors';
-import {MembershipService} from '../../../../../models/membership';
+import {BadRequestError} from '../../../../../../errors';
+import {MembershipService} from '../../../../../../models/membership';
 import {getMembersOfGroupController} from './get-members-of-group-controller';
 
 describe('getMembersOfGroupController', function() {

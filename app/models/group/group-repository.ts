@@ -1,5 +1,5 @@
 import {RepositoryQueryOptions} from 'typings';
-import {GroupNotFoundError} from '@app/errors';
+import {GroupNotFoundError} from '@errors';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 import {Group, User} from '@models';
 import debug from 'debug';

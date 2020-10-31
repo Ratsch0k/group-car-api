@@ -10,11 +10,10 @@ import {
   MembershipNotFoundError,
   NotMemberOfGroupError,
   UnauthorizedError,
+  CouldNotAssignToGroupError,
 } from '@errors';
 import debug from 'debug';
-import {
-  CouldNotAssignToGroupError,
-} from '@app/errors/user/could-not-assign-to-group-error';
+
 
 /**
  * Service for invites.

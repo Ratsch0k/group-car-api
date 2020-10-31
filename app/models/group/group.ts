@@ -10,13 +10,14 @@ import {
   HasManyCreateAssociationMixin,
 } from 'sequelize';
 import {default as sequelize} from '@db';
-import {InternalError} from '@app/errors';
+import {InternalError} from '@errors';
 import debug from 'debug';
 import {ModelHooks} from 'sequelize/types/lib/hooks';
 import {User, Membership, UserDto} from '@models';
 
 const error = debug('group-car:group:error');
 const log = debug('group-car:group');
+
 
 /**
  * Model for groups.
@@ -186,5 +187,6 @@ Group.init(
       hooks: hooks,
     },
 );
+
 
 export default Group;

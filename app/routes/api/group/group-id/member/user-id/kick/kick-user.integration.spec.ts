@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import db, {syncPromise} from '../../../../../../db';
-import {TestUtils} from '../../../../../../util/test-utils.spec';
-import config from '../../../../../../config';
+import db, {syncPromise} from '../../../../../../../db';
+import {TestUtils} from '../../../../../../../util/test-utils.spec';
+import config from '../../../../../../../config';
 import supertest from 'supertest';
-import app from '../../../../../../app';
+import app from '../../../../../../../app';
 import {expect} from 'chai';
 import {
   UnauthorizedError,
@@ -12,8 +12,8 @@ import {
   NotOwnerOfGroupError,
   MembershipNotFoundError,
   CannotKickSelfError,
-} from '../../../../../../errors';
-import {Group, User, Membership} from '../../../../../../models';
+} from '../../../../../../../errors';
+import {Group, User, Membership} from '../../../../../../../models';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
@@ -23,10 +23,10 @@ const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
  * @param userId  - The user id of the request
  */
 const createTestUrl = (groupId: any, userId: any) => {
-  return `/api/group/${groupId}/${userId}/kick`;
+  return `/api/group/${groupId}/member/${userId}/kick`;
 };
 
-describe('post /api/group/{groupId}/{userId}/kick', function() {
+describe('post /api/group/:groupId/member/:userId/kick', function() {
   let agent: supertest.SuperTest<supertest.Test>;
   let user: any;
   let csrf: string;

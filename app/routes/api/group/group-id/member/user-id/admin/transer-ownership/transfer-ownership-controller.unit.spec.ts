@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {GroupService} from '../../../../../../../models';
+import {GroupService} from '../../../../../../../../models';
 import sinon, {assert} from 'sinon';
 import {transferOwnershipController} from './transfer-ownership-controller';
-import {BadRequestError} from '../../../../../../../errors';
+import {BadRequestError} from '../../../../../../../../errors';
 import {expect} from 'chai';
 
 describe('TransferOwnershipController', function() {

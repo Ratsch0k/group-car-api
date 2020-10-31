@@ -1,21 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import supertest from 'supertest';
-import {TestUtils} from '../../../../../../../util/test-utils.spec';
-import db, {syncPromise} from '../../../../../../../db';
-import app from '../../../../../../../app';
-import config from '../../../../../../../config';
+import {TestUtils} from '../../../../../../../../util/test-utils.spec';
+import db, {syncPromise} from '../../../../../../../../db';
+import app from '../../../../../../../../app';
+import config from '../../../../../../../../config';
 import {expect} from 'chai';
 import {
   UnauthorizedError,
   NotOwnerOfGroupError,
   UserNotMemberOfGroupError,
   UserNotAdminOfGroupError,
-} from '../../../../../../../errors';
-import {Group, Invite, Membership, User} from '../../../../../../../models';
+} from '../../../../../../../../errors';
+import {Group, Invite, Membership, User} from '../../../../../../../../models';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
 
-describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
+describe('post /api/group/:groupId/member/' +
+':userId/admin/transfer-ownership', function() {
   let agent: supertest.SuperTest<supertest.Test>;
   let user: any;
   let csrf: string;
@@ -34,7 +35,7 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
   describe('if user not logged in', function() {
     it('responses with UnauthorizedError', function() {
       return supertest(app)
-          .post('/api/group/1/1/admin/transfer-ownership')
+          .post('/api/group/1/member/1/admin/transfer-ownership')
           .send()
           .set(csrfHeaderName, csrf)
           .expect(401);
@@ -44,7 +45,7 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
   describe('if user logged in', function() {
     describe('response with', function() {
       it('BadRequestError if groupId is not a number', function() {
-        return agent.post('/api/group/test/5/admin/transfer-ownership')
+        return agent.post('/api/group/test/member/5/admin/transfer-ownership')
             .set(csrfHeaderName, csrf)
             .send()
             .expect(400)
@@ -54,7 +55,7 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
       });
 
       it('BadRequestError if userId is not a number', function() {
-        return agent.post('/api/group/1/test/admin/transfer-ownership')
+        return agent.post('/api/group/1/member/test/admin/transfer-ownership')
             .set(csrfHeaderName, csrf)
             .send()
             .expect(400)
@@ -65,7 +66,7 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
 
       it('UnauthorizedError if current user is ' +
       'not a member of the group and has no invite for it', function() {
-        return agent.post('/api/group/1/1/admin/transfer-ownership')
+        return agent.post('/api/group/1/member/1/admin/transfer-ownership')
             .set(csrfHeaderName, csrf)
             .send()
             .expect(401)
@@ -103,7 +104,8 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
           });
 
           // Try to transfer ownership
-          await agent.post(`/api/group/${group.id}/6/admin/transfer-ownership`)
+          await agent
+              .post(`/api/group/${group.id}/member/6/admin/transfer-ownership`)
               .set(csrfHeaderName, csrf)
               .send()
               .expect(401)
@@ -122,7 +124,8 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
           });
 
           // Try to transfer ownership
-          await agent.post(`/api/group/${group.id}/6/admin/transfer-ownership`)
+          await agent
+              .post(`/api/group/${group.id}/member/6/admin/transfer-ownership`)
               .set(csrfHeaderName, csrf)
               .send()
               .expect(401)
@@ -141,7 +144,8 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
           });
 
           // Try to transfer ownership
-          await agent.post(`/api/group/${group.id}/6/admin/transfer-ownership`)
+          await agent
+              .post(`/api/group/${group.id}/member/6/admin/transfer-ownership`)
               .set(csrfHeaderName, csrf)
               .send()
               .expect(401)
@@ -170,7 +174,7 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
         });
 
         // Try to transfer ownership
-        await agent.post(`/api/group/${group.id}/${toUser.id}/` +
+        await agent.post(`/api/group/${group.id}/member/${toUser.id}/` +
         'admin/transfer-ownership')
             .set(csrfHeaderName, csrf)
             .send()
@@ -206,7 +210,7 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
         });
 
         // Try to transfer ownership
-        await agent.post(`/api/group/${group.id}/${toUser.id}/` +
+        await agent.post(`/api/group/${group.id}/member/${toUser.id}/` +
                 'admin/transfer-ownership')
             .set(csrfHeaderName, csrf)
             .send()
@@ -241,7 +245,7 @@ describe('post /api/group/groupId/userId/admin/transfer-ownership', function() {
         });
 
         // Try to transfer ownership
-        await agent.post(`/api/group/${group.id}/${toUser.id}/` +
+        await agent.post(`/api/group/${group.id}/member/${toUser.id}/` +
                         'admin/transfer-ownership')
             .set(csrfHeaderName, csrf)
             .send()

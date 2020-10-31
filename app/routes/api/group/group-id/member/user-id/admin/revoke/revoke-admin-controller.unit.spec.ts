@@ -1,8 +1,8 @@
 import {expect} from 'chai';
 import {revokeAdminController} from './revoke-admin-controller';
 import sinon, {assert, match} from 'sinon';
-import {BadRequestError} from '../../../../../../../errors';
-import {MembershipService} from '../../../../../../../models';
+import {BadRequestError} from '../../../../../../../../errors';
+import {MembershipService} from '../../../../../../../../models';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 describe('RevokeAdminController', function() {
