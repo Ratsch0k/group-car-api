@@ -942,6 +942,10 @@ components:
         - 'Blue'
         - 'Black'
         - 'Yellow'
+        - 'White'
+        - 'Purple'
+        - 'Brown'
+        - 'Orange'
 
     # Error
     RestError:

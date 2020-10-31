@@ -19,7 +19,7 @@ module.exports = {
       color: {
         type: Sequelize.ENUM,
         allowNull: false,
-        values: ['Red', 'Green', 'Blue', 'Black', 'Yellow'],
+        values: ['Red', 'Green', 'Blue', 'Black', 'Yellow', 'White', 'Purple', 'Brown', 'Orange'],
       },
       groupId: {
         allowNull: false,
