@@ -50,6 +50,18 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
+    }).then(() => {
+      return queryInterface.addIndex('cars', {
+        fields: ['groupId', 'name'],
+        unique: true,
+        name: 'unique_name_per_group',
+      });
+    }).then(() => {
+      return queryInterface.addIndex('cars', {
+        fields: ['groupId', 'color'],
+        unique: true,
+        name: 'unique_color_per_group',
+      });
     });
   },
 

@@ -88,6 +88,23 @@ Car.init(
     {
       sequelize,
       modelName: 'car',
+      indexes: [
+        /* Index which enforces that each car in a group has a unique name */
+        {
+          name: 'unique_name_per_group',
+          unique: true,
+          fields: ['groupId', 'name'],
+        },
+        /*
+         * Index which enforces that a color
+         * is only used one time within a group
+         */
+        {
+          name: 'unique_color_per_group',
+          unique: true,
+          fields: ['groupId', 'color'],
+        },
+      ],
     },
 );
 

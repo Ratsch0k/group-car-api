@@ -1,4 +1,8 @@
+import config from '@app/config';
 import {
+  CarColorAlreadyInUseError,
+  CarNameAlreadyInUserError,
+  MaxCarAmountReachedError,
   MembershipNotFoundError,
   NotAdminOfGroupError,
   NotMemberOfGroupError,
@@ -32,6 +36,10 @@ export class CarService {
    *
    * Throws {@link NotAdminOfGroup} if the current user is not an
    * admin of the specified group.
+   * Throws {@link CarNameAlreadyInUseError} if a car with the specified
+   * name already exists for the specified group.
+   * Throws {@link CarColorAlreadyInUseError} if the color is already used
+   * for a car in the group.
    * @param groupId - Id of the group this car belongs to
    * @param name    - Name of the car
    * @param color   - Color of the car
@@ -67,6 +75,26 @@ export class CarService {
     if (!membership.isAdmin) {
       this.error('User %d: Not admin of group %d', currentUser.id, groupId);
       throw new NotAdminOfGroupError();
+    }
+
+    // Check if group has less than max-amount of cars
+    const cars = await CarRepository.findByGroup(groupId);
+    if (cars.length >= config.group.maxCars) {
+      throw new MaxCarAmountReachedError(cars.length);
+    }
+
+    // Check if name already used.
+    const nameUsed = cars.some((car) => car.name === name);
+    if (nameUsed) {
+      throw new CarNameAlreadyInUserError(name);
+    }
+
+    /**
+     * Check if color already used.
+     */
+    const colorUsed = cars.some((car) => car.color === color);
+    if (colorUsed) {
+      throw new CarColorAlreadyInUseError(color);
     }
 
     this.log(
