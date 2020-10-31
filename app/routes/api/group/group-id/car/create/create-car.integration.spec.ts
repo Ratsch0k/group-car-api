@@ -28,7 +28,7 @@ describe('post /api/group/:groupId/car', function() {
   });
 
   describe('if user not logged in', function() {
-    it('responses with 401 NotLoggedInError', function() {
+    it('responses with 401 UnauthorizedError', function() {
       return supertest(app).post('/api/group/4/car')
           .set(csrfHeaderName, csrf)
           .send()
