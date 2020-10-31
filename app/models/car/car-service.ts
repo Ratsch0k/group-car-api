@@ -1,6 +1,7 @@
 import {
   MembershipNotFoundError,
   NotAdminOfGroupError,
+  NotMemberOfGroupError,
 } from '@app/errors';
 import {
   Car,
@@ -28,6 +29,9 @@ export class CarService {
 
   /**
    * Create a new car.
+   *
+   * Throws {@link NotAdminOfGroup} if the current user is not an
+   * admin of the specified group.
    * @param groupId - Id of the group this car belongs to
    * @param name    - Name of the car
    * @param color   - Color of the car
@@ -75,6 +79,34 @@ export class CarService {
     // Create car
     const car = await CarRepository.create(groupId, name, color, options);
     return car.get({plain: true}) as Car;
+  }
+
+  /**
+   * Find all cars of the specified group.
+   *
+   * Throws {@link NotMemberOfGroupError} if the current user is not
+   * a member of the specified group.
+   * @param currentUser   - The currently logged in user
+   * @param groupId       - The id of the group
+   * @param options       - Query options
+   */
+  public static async findByGroup(
+      currentUser: Express.User,
+      groupId: number,
+      options?: Partial<CarQueryOptions>,
+  ): Promise<Car[]> {
+    // Check if current user is a member of the group
+    try {
+      await MembershipRepository.findById({groupId, userId: currentUser.id});
+    } catch (e) {
+      if (e instanceof MembershipNotFoundError) {
+        throw new NotMemberOfGroupError();
+      } else {
+        throw e;
+      }
+    }
+
+    return CarRepository.findByGroup(groupId, options);
   }
 }
 
