@@ -2,6 +2,8 @@
 import {expect} from 'chai';
 import sinon, {assert, match} from 'sinon';
 import {
+  CarNameAlreadyInUserError,
+  MaxCarAmountReachedError,
   MembershipNotFoundError,
   NotAdminOfGroupError,
   NotMemberOfGroupError,
@@ -9,6 +11,7 @@ import {
 import {MembershipRepository} from '../membership';
 import CarRepository from './car-repository';
 import CarService from './car-service';
+import config from '../../config';
 
 describe('CarService', function() {
   const user: any = {
@@ -33,10 +36,12 @@ describe('CarService', function() {
   describe('create', function() {
     let membershipRepFindStub: sinon.SinonStub;
     let carRepCreateStub: sinon.SinonStub;
+    let carRepFindByGroup: sinon.SinonStub;
 
     beforeEach(function() {
       membershipRepFindStub = sinon.stub(MembershipRepository, 'findById');
       carRepCreateStub = sinon.stub(CarRepository, 'create');
+      carRepFindByGroup = sinon.stub(CarRepository, 'findByGroup');
     });
 
     describe('throws NotAdminOfGroup', function() {
@@ -56,6 +61,7 @@ describe('CarService', function() {
             membershipRepFindStub,
             match({groupId: fakeCar.groupId, userId: user.id}),
         );
+        assert.notCalled(carRepFindByGroup);
         assert.notCalled(carRepCreateStub);
       });
 
@@ -79,8 +85,95 @@ describe('CarService', function() {
             membershipRepFindStub,
             match({groupId: fakeCar.groupId, userId: user.id}),
         );
+        assert.notCalled(carRepFindByGroup);
         assert.notCalled(carRepCreateStub);
       });
+    });
+
+    it('throws MaxCarAmountReachedError if group already ' +
+    'has max amount of cars', async function() {
+      const fakeMembership = {
+        groupId: fakeCar.groupId,
+        userId: user.id,
+        isAdmin: false,
+      };
+
+      membershipRepFindStub.resolves(fakeMembership as any);
+
+      const maxAmount = config.group.maxCars;
+      const cars = Array(maxAmount).fill({name: 'TEST'});
+      carRepFindByGroup.resolves(cars);
+
+      await expect(CarService.create(
+          user,
+          fakeCar.groupId,
+          fakeCar.name,
+        fakeCar.color as any,
+      )).to.be.rejectedWith(MaxCarAmountReachedError);
+
+      assert.calledOnceWithExactly(
+          membershipRepFindStub,
+          match({groupId: fakeCar.groupId, userId: user.id}),
+      );
+      assert.calledOnceWithExactly(carRepFindByGroup, fakeCar.groupId);
+      assert.notCalled(carRepCreateStub);
+    });
+
+    it('throws CarNameAlreadyInUserError if a car with the ' +
+    'name already exists in that group', async function() {
+      const fakeMembership = {
+        groupId: fakeCar.groupId,
+        userId: user.id,
+        isAdmin: false,
+      };
+
+      membershipRepFindStub.resolves(fakeMembership as any);
+
+      carRepFindByGroup.resolves([{name: fakeCar.name}]);
+
+      await expect(CarService.create(
+          user,
+          fakeCar.groupId,
+          fakeCar.name,
+        fakeCar.color as any,
+      )).to.be.rejectedWith(CarNameAlreadyInUserError);
+
+      assert.calledOnceWithExactly(
+          membershipRepFindStub,
+          match({groupId: fakeCar.groupId, userId: user.id}),
+      );
+      assert.calledOnceWithExactly(carRepFindByGroup, fakeCar.groupId);
+      assert.notCalled(carRepCreateStub);
+    });
+
+    it('throws CarColorAlreadyInUseError if a car with the '+
+    'color already exists in that group', async function() {
+      const fakeMembership = {
+        groupId: fakeCar.groupId,
+        userId: user.id,
+        isAdmin: false,
+      };
+
+      membershipRepFindStub.resolves(fakeMembership as any);
+
+      carRepFindByGroup.resolves([{
+        name: fakeCar.name + ' more',
+        color: fakeCar.color,
+      }]);
+
+      await expect(CarService.create(
+          user,
+          fakeCar.groupId,
+          fakeCar.name,
+        fakeCar.color as any,
+      )).to.be.rejectedWith(CarNameAlreadyInUserError);
+
+      assert.calledOnceWithExactly(
+          membershipRepFindStub,
+          match({groupId: fakeCar.groupId, userId: user.id}),
+      );
+      assert.calledOnceWithExactly(carRepFindByGroup, fakeCar.groupId);
+      assert.notCalled(carRepCreateStub);
     });
 
     it('creates the car and returns the plain object', async function() {
@@ -91,6 +184,7 @@ describe('CarService', function() {
       };
 
       membershipRepFindStub.resolves(fakeMembership as any);
+      carRepFindByGroup.resolves([]);
       carRepCreateStub.resolves(fakeCar);
 
       await expect(CarService.create(
@@ -112,6 +206,7 @@ describe('CarService', function() {
           match.falsy,
       );
       assert.calledOnceWithExactly(fakeCar.get, match({plain: true}));
+      assert.calledOnceWithExactly(carRepFindByGroup, fakeCar.groupId);
     });
   });
 

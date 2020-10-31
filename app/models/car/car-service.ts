@@ -2,6 +2,7 @@ import config from '@app/config';
 import {
   CarColorAlreadyInUseError,
   CarNameAlreadyInUserError,
+  InternalError,
   MaxCarAmountReachedError,
   MembershipNotFoundError,
   NotAdminOfGroupError,
@@ -78,7 +79,13 @@ export class CarService {
     }
 
     // Check if group has less than max-amount of cars
-    const cars = await CarRepository.findByGroup(groupId);
+    let cars;
+    try {
+      cars = await CarRepository.findByGroup(groupId);
+    } catch (e) {
+      this.log('Error while getting cars of group %d: ', groupId, e);
+      throw new InternalError('Couldn\'t create car');
+    }
     if (cars.length >= config.group.maxCars) {
       throw new MaxCarAmountReachedError(cars.length);
     }
