@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
-import sinon, {match} from 'sinon';
+import sinon, {assert, match} from 'sinon';
 import {Car} from './car';
 import {CarRepository} from './car-repository';
 import {InternalError} from '../../errors';
@@ -49,7 +49,7 @@ describe('CarRepository', function() {
         fakeCar.color as any,
       )).to.be.rejectedWith(InternalError);
 
-      sinon.assert.calledOnceWithExactly(
+      assert.calledOnceWithExactly(
           createStub,
           match({
             groupId: fakeCar.groupId,
@@ -57,6 +57,55 @@ describe('CarRepository', function() {
             color: fakeCar.color,
           }),
           match.any,
+      );
+    });
+  });
+
+  describe('findByGroup', function() {
+    it('throws InternalError error if find throws an error', async function() {
+      const findAllStub = sinon.stub(Car, 'findAll');
+      findAllStub.rejects(new Error('Should not be thrown'));
+
+      await expect(CarRepository.findByGroup(1))
+          .to.eventually.be.rejectedWith(InternalError);
+
+      assert.calledOnceWithExactly(
+          findAllStub,
+          match({
+            where: {
+              groupId: 1,
+            },
+          }),
+      );
+    });
+
+    it('calls findAll with the correct parameters', async function() {
+      const cars = [
+        {
+          groupId: 1,
+          id: 1,
+          name: 'FIRST',
+        },
+        {
+          groupId: 1,
+          id: 2,
+          name: 'SECOND',
+        },
+      ];
+
+      const findAllStub = sinon.stub(Car, 'findAll');
+      findAllStub.resolves(cars as any);
+
+      await expect(CarRepository.findByGroup(1))
+          .to.eventually.be.equal(cars);
+
+      assert.calledOnceWithExactly(
+          findAllStub,
+          match({
+            where: {
+              groupId: 1,
+            },
+          }),
       );
     });
   });

@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
 import sinon, {assert, match} from 'sinon';
-import {MembershipNotFoundError, NotAdminOfGroupError} from '../../errors';
+import {
+  MembershipNotFoundError,
+  NotAdminOfGroupError,
+  NotMemberOfGroupError,
+} from '../../errors';
 import {MembershipRepository} from '../membership';
 import CarRepository from './car-repository';
 import CarService from './car-service';
@@ -108,6 +112,89 @@ describe('CarService', function() {
           match.falsy,
       );
       assert.calledOnceWithExactly(fakeCar.get, match({plain: true}));
+    });
+  });
+
+  describe('findByGroup', function() {
+    let membershipFindByIdStub: sinon.SinonStub;
+    let carRepFindByGroup: sinon.SinonStub;
+
+    beforeEach(function() {
+      membershipFindByIdStub = sinon.stub(MembershipRepository, 'findById');
+      carRepFindByGroup = sinon.stub(CarRepository, 'findByGroup');
+    });
+
+    it('throws NotMemberOfGroup if user is not ' +
+    'member of the group', async function() {
+      const user: any = {
+        id: 1,
+      };
+      const groupId = 10;
+
+      membershipFindByIdStub.rejects(
+          new MembershipNotFoundError({groupId, userId: user.id}));
+
+      await expect(CarService.findByGroup(user, groupId))
+          .to.eventually.be.rejectedWith(NotMemberOfGroupError);
+
+      assert.calledOnceWithExactly(
+          membershipFindByIdStub,
+          match({groupId, userId: user.id}),
+      );
+      assert.notCalled(carRepFindByGroup);
+    });
+
+    it('if checking membership throws an error, ' +
+    'it will be rethrown', async function() {
+      const user: any = {
+        id: 1,
+      };
+      const groupId = 10;
+
+      const error = new Error('Should be forwarded');
+      membershipFindByIdStub.rejects(error);
+
+      await expect(CarService.findByGroup(user, groupId))
+          .to.eventually.be.rejectedWith(error);
+
+      assert.calledOnceWithExactly(
+          membershipFindByIdStub,
+          match({groupId, userId: user.id}),
+      );
+      assert.notCalled(carRepFindByGroup);
+    });
+
+    it('calls CarRepository.findByGroup with ' +
+    'the correct arguments', async function() {
+      const user: any = {
+        id: 1,
+      };
+      const groupId = 10;
+
+      membershipFindByIdStub.resolves();
+
+      const cars = [
+        {
+          groupId: 10,
+          id: 1,
+          name: 'CAR-1',
+        },
+        {
+          groupId: 10,
+          id: 2,
+          name: 'CAR-2',
+        },
+      ];
+      carRepFindByGroup.resolves(cars);
+
+      await expect(CarService.findByGroup(user, groupId))
+          .to.eventually.be.equal(cars);
+
+      assert.calledOnceWithExactly(
+          membershipFindByIdStub,
+          match({groupId, userId: user.id}),
+      );
+      assert.calledOnceWithExactly(carRepFindByGroup, groupId, match.any);
     });
   });
 });
