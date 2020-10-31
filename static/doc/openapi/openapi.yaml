@@ -646,6 +646,32 @@ paths:
         required: true
         schema:
           type: integer
+    get:
+      summary: Get all cars
+      tags:
+        - Group
+        - Car
+      description: Get a list of all cars for the specified group
+      responses:
+        200:
+          description: List of all cars.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cars:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Car'
+                        - $ref: '#/components/schemas/CarDriver'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       summary: Create a car
       tags:
@@ -891,6 +917,16 @@ components:
           $ref: '#/components/schemas/CarColor'
         driverId:
           type: integer
+    CarDriver:
+      type: object
+      properties:
+        Driver:
+          $ref: '#/components/schemas/UserSimple'
+    CarGroup:
+      type: object
+      properties:
+        Group:
+          $ref: '#/components/schemas/GroupWithOwner'
     CarRequest:
       type: object
       properties:
@@ -906,6 +942,10 @@ components:
         - 'Blue'
         - 'Black'
         - 'Yellow'
+        - 'White'
+        - 'Purple'
+        - 'Brown'
+        - 'Orange'
 
     # Error
     RestError:

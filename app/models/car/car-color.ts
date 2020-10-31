@@ -5,9 +5,13 @@
  * parked.
  */
 export enum CarColor {
-  Red,
-  Green,
-  Blue,
-  Black,
-  Yellow,
+  Red = 'Red',
+  Green = 'Green',
+  Blue = 'Blue',
+  Black = 'Black',
+  Yellow = 'Yellow',
+  White = 'White',
+  Purple = 'Purple',
+  Brown = 'Brown',
+  Orange = 'Orange',
 }

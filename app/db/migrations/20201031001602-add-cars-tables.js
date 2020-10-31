@@ -19,7 +19,7 @@ module.exports = {
       color: {
         type: Sequelize.ENUM,
         allowNull: false,
-        values: ['Red', 'Green', 'Blue', 'Black', 'Yellow'],
+        values: ['Red', 'Green', 'Blue', 'Black', 'Yellow', 'White', 'Purple', 'Brown', 'Orange'],
       },
       groupId: {
         allowNull: false,
@@ -50,6 +50,18 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
+    }).then(() => {
+      return queryInterface.addIndex('cars', {
+        fields: ['groupId', 'name'],
+        unique: true,
+        name: 'unique_name_per_group',
+      });
+    }).then(() => {
+      return queryInterface.addIndex('cars', {
+        fields: ['groupId', 'color'],
+        unique: true,
+        name: 'unique_color_per_group',
+      });
     });
   },
 

@@ -60,6 +60,7 @@ export interface UserConfig {
 
 export interface GroupConfig {
   maxMembers: number;
+  maxCars: number;
 }
 
 export interface MailConfig {
@@ -190,6 +191,7 @@ const user: UserConfig = {
 
 const group: GroupConfig = {
   maxMembers: 25,
+  maxCars: 8,
 };
 
 const config: Config = {

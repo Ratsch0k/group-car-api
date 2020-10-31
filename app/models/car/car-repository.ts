@@ -11,11 +11,15 @@ import {InternalError} from '@app/errors';
 export interface CarQueryOptions extends RepositoryQueryOptions {
   /**
    * Whether or not the data of the group should be included.
+   *
+   * Default value: `false`
    */
   withGroupData: boolean;
 
   /**
    * Whether or no the user data of the driver should be included.
+   *
+   * Default value: `true`
    */
   withDriverData: boolean;
 }
@@ -80,6 +84,36 @@ export class CarRepository {
           e,
       );
       throw new InternalError('Could not create car');
+    }
+  }
+
+  /**
+   * Find all cars for the specified group.
+   * @param groupId   - Id of the group
+   * @param options   - Query options.
+   */
+  public static async findByGroup(
+      groupId: number,
+      options?: Partial<CarQueryOptions>,
+  ): Promise<Car[]> {
+    this.log('Find all cars for group %d', groupId);
+
+    const queryOptions = this.queryBuildOptions(options);
+
+    try {
+      const cars = await Car.findAll(
+          {
+            where: {
+              groupId,
+            },
+            include: queryOptions.include,
+            ...options,
+          },
+      );
+      return cars;
+    } catch (e) {
+      this.error('Error while getting cars for group %d', groupId, e);
+      throw new InternalError('Couldn\'t get cars');
     }
   }
 
