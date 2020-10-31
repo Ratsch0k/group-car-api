@@ -2,6 +2,7 @@
 import {expect} from 'chai';
 import sinon, {assert, match} from 'sinon';
 import {
+  CarColorAlreadyInUseError,
   CarNameAlreadyInUserError,
   MaxCarAmountReachedError,
   MembershipNotFoundError,
@@ -95,7 +96,7 @@ describe('CarService', function() {
       const fakeMembership = {
         groupId: fakeCar.groupId,
         userId: user.id,
-        isAdmin: false,
+        isAdmin: true,
       };
 
       membershipRepFindStub.resolves(fakeMembership as any);
@@ -124,7 +125,7 @@ describe('CarService', function() {
       const fakeMembership = {
         groupId: fakeCar.groupId,
         userId: user.id,
-        isAdmin: false,
+        isAdmin: true,
       };
 
       membershipRepFindStub.resolves(fakeMembership as any);
@@ -151,7 +152,7 @@ describe('CarService', function() {
       const fakeMembership = {
         groupId: fakeCar.groupId,
         userId: user.id,
-        isAdmin: false,
+        isAdmin: true,
       };
 
       membershipRepFindStub.resolves(fakeMembership as any);
@@ -166,7 +167,7 @@ describe('CarService', function() {
           fakeCar.groupId,
           fakeCar.name,
         fakeCar.color as any,
-      )).to.be.rejectedWith(CarNameAlreadyInUserError);
+      )).to.be.rejectedWith(CarColorAlreadyInUseError);
 
       assert.calledOnceWithExactly(
           membershipRepFindStub,

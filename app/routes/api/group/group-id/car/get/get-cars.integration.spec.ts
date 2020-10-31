@@ -7,7 +7,7 @@ import db, {syncPromise} from '../../../../../../db';
 import {
   NotMemberOfGroupError,
 } from '../../../../../../errors';
-import {Car, Group} from '../../../../../../models';
+import {Car, CarColor, Group} from '../../../../../../models';
 import {TestUtils} from '../../../../../../util/test-utils.spec';
 
 describe('get /api/group/:groupId/car', function() {
@@ -74,7 +74,7 @@ describe('get /api/group/:groupId/car', function() {
         const car = await Car.create({
           groupId: group.id,
           name: `CAR-${i}`,
-          color: 'Red',
+          color: Object.values(CarColor)[i],
         });
 
         const carObject = car.get({plain: true}) as any;
@@ -111,7 +111,7 @@ describe('get /api/group/:groupId/car', function() {
         const car = await Car.create({
           groupId: group.id,
           name: `CAR-${i}`,
-          color: 'Red',
+          color: Object.values(CarColor)[i],
         });
 
         const carObject = car.get({plain: true}) as any;

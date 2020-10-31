@@ -6,10 +6,13 @@ import {TestUtils} from '../../../../../../util/test-utils.spec';
 import app from '../../../../../../app';
 import {expect} from 'chai';
 import {
+  CarColorAlreadyInUseError,
+  CarNameAlreadyInUserError,
+  MaxCarAmountReachedError,
   NotAdminOfGroupError,
   UnauthorizedError,
 } from '../../../../../../errors';
-import {Group, User} from '../../../../../../models';
+import {Car, CarColor, Group, User} from '../../../../../../models';
 
 describe('post /api/group/:groupId/car', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
@@ -127,6 +130,101 @@ describe('post /api/group/:groupId/car', function() {
                   .to.equal(new NotAdminOfGroupError().message);
             });
       });
+    });
+
+    it('responses with 400 MaxCarAmountReachedError if group ' +
+    'has max amount of cars', async function() {
+      // Create group
+      const group = await Group.create({
+        name: 'GROUP',
+        description: 'TEST',
+        ownerId: user.id,
+      });
+
+      // Create cars for the group
+      for (let i = 0; i < config.group.maxCars; i++) {
+        await Car.create({
+          groupId: group.id,
+          name: `CAR-${i}`,
+          color: Object.values(CarColor).filter((color) =>
+            isNaN(Number(color)))[i],
+        });
+      }
+
+      return agent.post(`/api/group/${group.id}/car`)
+          .set(csrfHeaderName, csrf)
+          .send({
+            name: `CAR-${config.group.maxCars}`,
+            color: Object.values(CarColor).filter((color) =>
+              isNaN(Number(color)))[config.group.maxCars],
+          })
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message)
+                .to.equal(new MaxCarAmountReachedError(
+                    config.group.maxCars).message);
+          });
+    });
+
+    it('responses with 400 CarNameAlreadyInUserError ' +
+    'if car with name already exists in group', async function() {
+      // Create group
+      const group = await Group.create({
+        name: 'GROUP',
+        description: 'TEST',
+        ownerId: user.id,
+      });
+
+      // Create cars for the group
+      await Car.create({
+        groupId: group.id,
+        name: 'CAR',
+        color: Object.values(CarColor).filter((color) =>
+          isNaN(Number(color)))[0],
+      });
+
+      return agent.post(`/api/group/${group.id}/car`)
+          .set(csrfHeaderName, csrf)
+          .send({
+            name: 'CAR',
+            color: Object.values(CarColor).filter((color) =>
+              isNaN(Number(color)))[1],
+          })
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message)
+                .to.equal(new CarNameAlreadyInUserError('CAR').message);
+          });
+    });
+
+    it('responses with 400 CarColorAlreadyInUseError if ' +
+    'car with color already exists in group', async function() {
+      // Create group
+      const group = await Group.create({
+        name: 'GROUP',
+        description: 'TEST',
+        ownerId: user.id,
+      });
+
+      // Create cars for the group
+      await Car.create({
+        groupId: group.id,
+        name: 'CAR-1',
+        color: CarColor.Black,
+      });
+
+      return agent.post(`/api/group/${group.id}/car`)
+          .set(csrfHeaderName, csrf)
+          .send({
+            name: 'CAR-2',
+            color: CarColor.Black,
+          })
+          .expect(400)
+          .then((res) => {
+            expect(res.body.message)
+                .to.equal(new CarColorAlreadyInUseError(CarColor.Black)
+                    .message);
+          });
     });
 
     it('creates car and returns it', async function() {
