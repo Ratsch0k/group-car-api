@@ -3,6 +3,8 @@ import {RepositoryQueryOptions} from 'typings';
 import {Group, User, Car, CarColor} from '@models';
 import debug from 'debug';
 import {InternalError} from '@app/errors';
+import sequelize from '@db';
+import Sequelize from 'sequelize';
 
 
 /**
@@ -64,17 +66,37 @@ export class CarRepository {
     const buildOptions = this.queryBuildOptions(options);
 
     try {
-      const car = await Car.create(
-          {
+      const car = await sequelize.transaction(async (t) => {
+        const nextId = await Car.findOne({
+          attributes: [[Sequelize.fn('MAX', Sequelize.col('carId')), 'max_id']],
+          where: {
             groupId,
-            color,
-            name,
           },
-          {
-            include: buildOptions.include,
-            ...options,
-          },
-      );
+          transaction: t,
+          ...options,
+        }).then((res) => {
+          if (res && res.get('max_id')) {
+            return res.get('max_id') as number + 1;
+          } else {
+            return 1;
+          }
+        });
+
+        return Car.create(
+            {
+              groupId,
+              color,
+              name,
+              carId: nextId,
+            },
+            {
+              include: buildOptions.include,
+              transaction: t,
+              ...options,
+            },
+        );
+      });
+
       return car;
     } catch (e) {
       this.error(

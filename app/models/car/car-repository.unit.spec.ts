@@ -4,11 +4,13 @@ import sinon, {assert, match} from 'sinon';
 import {Car} from './car';
 import {CarRepository} from './car-repository';
 import {InternalError} from '../../errors';
+import sequelize from '../../db';
+import Sequelize from 'sequelize';
 
 describe('CarRepository', function() {
   const fakeCar = {
     groupId: 1,
-    carId: 1,
+    carId: 6,
     name: 'CAR',
     color: 'Green',
   };
@@ -18,30 +20,62 @@ describe('CarRepository', function() {
   });
 
   describe('create', function() {
-    it('creates car with specified values', async function() {
-      const createStub = sinon.stub(Car, 'create');
-      createStub.resolves(fakeCar as any);
+    let createStub: sinon.SinonStub;
+    let findOneStub: sinon.SinonStub;
+    let transactionStub: sinon.SinonStub;
 
-      await CarRepository.create(
+    beforeEach(function() {
+      createStub = sinon.stub(Car, 'create');
+      findOneStub = sinon.stub(Car, 'findOne');
+      transactionStub = sinon.stub(sequelize, 'transaction');
+    });
+
+    it('creates car with specified values', async function() {
+      createStub.resolves(fakeCar as any);
+      findOneStub.resolves({get: () => fakeCar.carId - 1});
+      const transaction = {field: 'TEST FIELD'};
+      transactionStub.callsFake((fn) => {
+        return fn(transaction);
+      });
+
+      await expect(CarRepository.create(
           fakeCar.groupId,
           fakeCar.name,
           fakeCar.color as any,
-      );
+      )).to.eventually.equal(fakeCar);
 
+      sinon.assert.calledOnceWithExactly(transactionStub, match.func);
+      sinon.assert.calledOnceWithExactly(
+          findOneStub,
+          match({
+            attributes: [[
+              Sequelize.fn('MAX', Sequelize.col('carId')), 'max_id',
+            ]],
+            where: {
+              groupId: fakeCar.groupId,
+            },
+            transaction: transaction,
+          }),
+      );
       sinon.assert.calledOnceWithExactly(
           createStub,
           match({
             groupId: fakeCar.groupId,
             name: fakeCar.name,
             color: fakeCar.color,
+            carId: fakeCar.carId,
           }),
           match.any,
       );
     });
 
     it('catches error and throws InternalError instead', async function() {
-      const createStub = sinon.stub(Car, 'create');
       createStub.rejects(new Error('Should not be thrown'));
+      findOneStub.rejects(new Error('Should not be thrown'));
+      const transaction = {field: 'TEST FIELD'};
+      transactionStub.callsFake((fn) => {
+        return fn(transaction);
+      });
 
       await expect(CarRepository.create(
           fakeCar.groupId,
@@ -49,15 +83,20 @@ describe('CarRepository', function() {
         fakeCar.color as any,
       )).to.be.rejectedWith(InternalError);
 
-      assert.calledOnceWithExactly(
-          createStub,
+      sinon.assert.calledOnceWithExactly(transactionStub, match.func);
+      sinon.assert.calledOnceWithExactly(
+          findOneStub,
           match({
-            groupId: fakeCar.groupId,
-            name: fakeCar.name,
-            color: fakeCar.color,
+            attributes: [[
+              Sequelize.fn('MAX', Sequelize.col('carId')), 'max_id',
+            ]],
+            where: {
+              groupId: fakeCar.groupId,
+            },
+            transaction: transaction,
           }),
-          match.any,
       );
+      assert.notCalled(createStub);
     });
   });
 

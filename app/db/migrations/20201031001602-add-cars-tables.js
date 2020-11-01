@@ -3,11 +3,19 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('cars', {
-      id: {
+      carId: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
+      },
+      groupId: {
+        allowNull: false,
+        primaryKey: true,
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'groups',
+          key: 'id',
+        },
       },
       name: {
         type: Sequelize.STRING(30),
@@ -20,21 +28,6 @@ module.exports = {
         type: Sequelize.ENUM,
         allowNull: false,
         values: ['Red', 'Green', 'Blue', 'Black', 'Yellow', 'White', 'Purple', 'Brown', 'Orange'],
-      },
-      groupId: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'groups',
-          key: 'id',
-        },
-      },
-      driverId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
       },
       latitude: {
         type: Sequelize.FLOAT,
@@ -49,6 +42,13 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      driverId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
     }).then(() => {
       return queryInterface.addIndex('cars', {
