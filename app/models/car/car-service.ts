@@ -1,7 +1,9 @@
 import config from '@app/config';
 import {
   CarColorAlreadyInUseError,
+  CarInUseError,
   CarNameAlreadyInUserError,
+  CarNotFoundError,
   InternalError,
   MaxCarAmountReachedError,
   MembershipNotFoundError,
@@ -15,8 +17,10 @@ import {
   CarRepository,
   CarColor,
   Membership,
+  MembershipService,
 } from '@models';
 import debug from 'debug';
+import sequelize from '@db';
 
 /**
  * Service for all car operations.
@@ -142,6 +146,58 @@ export class CarService {
     }
 
     return CarRepository.findByGroup(groupId, options);
+  }
+
+  /**
+   * Try to register the current user
+   * as driver of the specified car.
+   *
+   * A user can only be registered if
+   * the user is not the driver of any
+   * other car and if the car doesn't currently
+   * have another driver.
+   * @param currentUser - The currently logged in user
+   * @param groupId     - The id of the group
+   * @param carId       - The id of the car
+   */
+  public static async registerDriver(
+      currentUser: Express.User,
+      groupId: number,
+      carId: number,
+  ): Promise<void> {
+    if (!await MembershipService.isMember(currentUser, groupId)) {
+      throw new NotMemberOfGroupError();
+    }
+
+    // Start transaction
+    const t = await sequelize.transaction();
+    try {
+      // Check if user is driver of any other car
+      const car = await CarRepository.findByPk(
+          {groupId, carId},
+          {transaction: t},
+      );
+
+      if (car.driverId !== null) {
+        throw new CarInUseError();
+      }
+
+      await car.update({driverId: currentUser.id}, {transaction: t});
+
+      await t.commit();
+    } catch (e) {
+      await t.rollback();
+      if (e instanceof CarNotFoundError || e instanceof CarInUseError) {
+        throw e;
+      } else {
+        this.error(
+            'Error while registering user %d as driver for car %o: ',
+            currentUser.id,
+            {groupId, carId},
+            e,
+        );
+      }
+    }
   }
 }
 
