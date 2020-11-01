@@ -2,10 +2,23 @@ import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 import {RepositoryQueryOptions} from 'typings';
 import {Group, User, Car, CarColor} from '@models';
 import debug from 'debug';
-import {InternalError} from '@app/errors';
+import {CarNotFoundError, InternalError} from '@app/errors';
 import sequelize from '@db';
 import Sequelize from 'sequelize';
 
+/**
+ * Primary key for a car.
+ */
+export interface CarPk {
+  /**
+   * The id of the group which the car belongs to.
+   */
+  groupId: number;
+  /**
+   * The id of the car.
+   */
+  carId: number;
+}
 
 /**
  * Query options for car queries.
@@ -137,6 +150,43 @@ export class CarRepository {
       this.error('Error while getting cars for group %d', groupId, e);
       throw new InternalError('Couldn\'t get cars');
     }
+  }
+
+  /**
+   * Find the car by the specified pk (primary key) or
+   * throws {@link CarNotFoundError}.
+   * @param pk      - The pk to search for
+   * @param options - Query options
+   */
+  public static async findByPk(
+      pk: CarPk,
+      options?: Partial<CarQueryOptions>,
+  ): Promise<Car> {
+    this.log('Search for car with pk %o', pk);
+    const queryOptions = this.queryBuildOptions(options);
+
+    let car;
+    try {
+      car = await Car.findOne({
+        where: {
+          carId: pk.carId,
+          groupId: pk.groupId,
+        },
+        include: queryOptions.include,
+        ...options,
+      });
+    } catch (e) {
+      this.error('Error while finding car with pk %o: ', pk, e);
+      throw new InternalError('An error occurred while searching for the car');
+    }
+
+    if (car === null) {
+      this.log('Car with pk %o doesn\'t exist');
+      throw new CarNotFoundError(pk.groupId, pk.carId);
+    }
+
+    this.log('Found car with pk %o', pk);
+    return car;
   }
 
   /**
