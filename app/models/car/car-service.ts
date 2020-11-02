@@ -173,7 +173,7 @@ export class CarService {
     const t = await sequelize.transaction();
     try {
       // Check if user is driver of any other car
-      const car = await CarRepository.findByPk(
+      const car = await CarRepository.findById(
           {groupId, carId},
           {transaction: t},
       );
@@ -196,6 +196,7 @@ export class CarService {
             {groupId, carId},
             e,
         );
+        throw new InternalError('Error while registering a driver');
       }
     }
   }

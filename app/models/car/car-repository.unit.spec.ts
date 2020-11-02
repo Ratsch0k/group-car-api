@@ -3,7 +3,7 @@ import {expect} from 'chai';
 import sinon, {assert, match} from 'sinon';
 import {Car} from './car';
 import {CarRepository} from './car-repository';
-import {InternalError} from '../../errors';
+import {CarNotFoundError, InternalError} from '../../errors';
 import sequelize from '../../db';
 import Sequelize from 'sequelize';
 
@@ -145,6 +145,61 @@ describe('CarRepository', function() {
               groupId: 1,
             },
           }),
+      );
+    });
+  });
+
+  describe('findById', function() {
+    let findOneStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      findOneStub = sinon.stub(Car, 'findOne');
+    });
+
+    const id = {
+      groupId: 1,
+      carId: 1,
+    };
+
+    it('throws CarNotFoundError if car doesn\'t exist', async function() {
+      findOneStub.resolves(null);
+
+      await expect(CarRepository.findById(id))
+          .to.eventually.be.rejectedWith(CarNotFoundError);
+
+      assert.calledOnceWithExactly(
+          findOneStub,
+          match({where: id, include: match.any}),
+      );
+    });
+
+    it('catches error of query and throws InternalError instead',
+        async function() {
+          findOneStub.rejects(new Error('Should not be thrown'));
+
+          await expect(CarRepository.findById(id))
+              .to.eventually.be.rejectedWith(InternalError);
+
+          assert.calledOnceWithExactly(
+              findOneStub,
+              match({where: id, include: match.any}),
+          );
+        });
+
+    it('gets car with the specified id', async function() {
+      const car = {
+        name: 'Car',
+        groupId: 1,
+        carId: 1,
+      };
+      findOneStub.resolves(car as any);
+
+      await expect(CarRepository.findById(id))
+          .to.eventually.equal(car);
+
+      assert.calledOnceWithExactly(
+          findOneStub,
+          match({where: id, include: match.any}),
       );
     });
   });

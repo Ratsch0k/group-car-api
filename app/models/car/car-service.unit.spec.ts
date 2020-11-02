@@ -3,16 +3,19 @@ import {expect} from 'chai';
 import sinon, {assert, match} from 'sinon';
 import {
   CarColorAlreadyInUseError,
+  CarInUseError,
   CarNameAlreadyInUserError,
+  InternalError,
   MaxCarAmountReachedError,
   MembershipNotFoundError,
   NotAdminOfGroupError,
   NotMemberOfGroupError,
 } from '../../errors';
-import {MembershipRepository} from '../membership';
+import {MembershipRepository, MembershipService} from '../membership';
 import CarRepository from './car-repository';
 import CarService from './car-service';
 import config from '../../config';
+import sequelize from '../../db';
 
 describe('CarService', function() {
   const user: any = {
@@ -291,6 +294,110 @@ describe('CarService', function() {
           match({groupId, userId: user.id}),
       );
       assert.calledOnceWithExactly(carRepFindByGroup, groupId, match.any);
+    });
+  });
+
+  describe('registerDriver', function() {
+    let membershipServiceIsMember: sinon.SinonStub;
+    let transactionStub: sinon.SinonStub;
+    let carRepFindById: sinon.SinonStub;
+    let t: {commit: sinon.SinonStub, rollback: sinon.SinonStub};
+    const user: any = {
+      id: 1,
+    };
+
+    beforeEach(function() {
+      t = {
+        commit: sinon.stub(),
+        rollback: sinon.stub(),
+      };
+      membershipServiceIsMember = sinon.stub(MembershipService, 'isMember');
+      transactionStub = sinon.stub(sequelize, 'transaction').resolves(t as any);
+      carRepFindById = sinon.stub(CarRepository, 'findById');
+    });
+
+    it('throws NotMemberOfGroupError if current ' +
+    'user is not a member of the group', async function() {
+      membershipServiceIsMember.resolves(false);
+
+      await expect(CarService.registerDriver(user, 2, 3))
+          .to.eventually.be.rejectedWith(NotMemberOfGroupError);
+
+      assert.notCalled(transactionStub);
+      assert.notCalled(carRepFindById);
+      assert.notCalled(t.commit);
+      assert.notCalled(t.rollback);
+    });
+
+    it('throws CarInUseError if user has already a driver', async function() {
+      membershipServiceIsMember.resolves(true);
+      const car = {
+        groupId: 2,
+        carId: 3,
+        name: 'Car',
+        driverId: 4,
+        update: sinon.stub(),
+      };
+      carRepFindById.resolves(car as any);
+
+      await expect(CarService.registerDriver(user, car.groupId, car.carId))
+          .to.eventually.be.rejectedWith(CarInUseError);
+
+      assert.calledOnceWithExactly(
+          carRepFindById,
+          match({carId: car.carId, groupId: car.groupId}),
+          match({transaction: t}),
+      );
+      assert.calledOnce(transactionStub);
+      assert.calledOnce(t.rollback);
+      assert.notCalled(car.update);
+      assert.notCalled(t.commit);
+    });
+
+    it('throws InternalError if error occurred while registering ' +
+    'which is not CarInUseError or NotMemberOfGroupError', async function() {
+      membershipServiceIsMember.resolves(true);
+      carRepFindById.rejects(new Error('Should not be thrown'));
+
+      await expect(CarService.registerDriver(user, 1, 2))
+          .to.eventually.be.rejectedWith(InternalError);
+
+      assert.calledOnceWithExactly(
+          carRepFindById,
+          match({carId: 2, groupId: 1}),
+          match({transaction: t}),
+      );
+      assert.calledOnce(t.rollback);
+      assert.calledOnce(transactionStub);
+    });
+
+    it('sets driverId to id of current user', async function() {
+      membershipServiceIsMember.resolves(true);
+      const car = {
+        groupId: 2,
+        carId: 3,
+        name: 'Car',
+        driverId: null,
+        update: sinon.stub().resolvesThis(),
+      };
+      carRepFindById.resolves(car as any);
+
+      await expect(CarService.registerDriver(user, car.groupId, car.carId))
+          .to.eventually.be.fulfilled;
+
+      assert.calledOnceWithExactly(
+          carRepFindById,
+          match({carId: car.carId, groupId: car.groupId}),
+          match({transaction: t}),
+      );
+      assert.calledOnce(transactionStub);
+      assert.calledOnce(t.commit);
+      assert.calledOnceWithMatch(
+          car.update,
+          match({driverId: user.id}),
+          match({transaction: t}),
+      );
+      assert.notCalled(t.rollback);
     });
   });
 });

@@ -158,7 +158,7 @@ export class CarRepository {
    * @param pk      - The pk to search for
    * @param options - Query options
    */
-  public static async findByPk(
+  public static async findById(
       pk: CarPk,
       options?: Partial<CarQueryOptions>,
   ): Promise<Car> {

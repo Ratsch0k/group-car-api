@@ -10,6 +10,7 @@ import {
   CannotChangeOwnerMembershipError,
   NotAdminOfGroupError,
   NotMemberOfGroupError,
+  InternalError,
 } from '@errors';
 import debug from 'debug';
 
@@ -215,7 +216,7 @@ export class MembershipService {
       if (e instanceof MembershipNotFoundError) {
         return false;
       } else {
-        throw e;
+        throw new InternalError('Couldn\'t check membership');
       }
     }
   }
