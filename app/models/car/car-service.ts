@@ -156,6 +156,11 @@ export class CarService {
    * the user is not the driver of any
    * other car and if the car doesn't currently
    * have another driver.
+   *
+   * Throws {@link NotMemberOfGroupError} if the current user
+   * is not a member of the group with the specified `groupId`.
+   * Throws {@link CarInUserError} if the specified car is
+   * used by a user. (`driverId` is not `null`)
    * @param currentUser - The currently logged in user
    * @param groupId     - The id of the group
    * @param carId       - The id of the car
