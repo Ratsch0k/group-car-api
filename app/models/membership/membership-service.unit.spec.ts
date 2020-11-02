@@ -8,6 +8,7 @@ import {
   NotMemberOfGroupError,
   NotAdminOfGroupError,
   CannotChangeOwnerMembershipError,
+  InternalError,
 } from '../../errors';
 import {GroupService} from '../group';
 
@@ -349,6 +350,55 @@ describe('MembershipService', function() {
           findAllForUserStub,
           currentUser.id,
           match({withUserData: true}),
+      );
+    });
+  });
+
+  describe('isMember', function() {
+    let findByIdStub: sinon.SinonStub;
+    const user: any = {
+      id: 6,
+    };
+
+    beforeEach(function() {
+      findByIdStub = sinon.stub(MembershipRepository, 'findById');
+    });
+
+    it('returns true if a membership could be found ' +
+    'for the current user and the groupId', async function() {
+      findByIdStub.resolves();
+
+      await expect(MembershipService.isMember(user, 5)).to.eventually.be.true;
+
+      assert.calledOnceWithExactly(
+          findByIdStub,
+          match({groupId: 5, userId: user.id}),
+      );
+    });
+
+    it('returns false if MembershipRepository.findById call ' +
+    'throws MembershipNotFoundError', async function() {
+      findByIdStub.rejects(
+          new MembershipNotFoundError({userId: user.id, groupId: 5}));
+
+      await expect(MembershipService.isMember(user, 5)).to.eventually.be.false;
+
+      assert.calledOnceWithExactly(
+          findByIdStub,
+          match({groupId: 5, userId: user.id}),
+      );
+    });
+
+    it('throws InternalError if query throws any error ' +
+    'besides MembershipNotFoundError', async function() {
+      findByIdStub.rejects(new Error('Any other error'));
+
+      await expect(MembershipService.isMember(user, 5))
+          .to.eventually.be.rejectedWith(InternalError);
+
+      assert.calledOnceWithExactly(
+          findByIdStub,
+          match({groupId: 5, userId: user.id}),
       );
     });
   });

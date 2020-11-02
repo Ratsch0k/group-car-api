@@ -18,7 +18,7 @@ export class Car extends Model {
   /**
    * Id of the car.
    */
-  public readonly id!: number;
+  public readonly carId!: number;
 
   /**
    * Name of the car.
@@ -63,10 +63,14 @@ export class Car extends Model {
 
 Car.init(
     {
-      id: {
+      carId: {
         allowNull: false,
         type: DataTypes.INTEGER,
-        autoIncrement: true,
+        primaryKey: true,
+      },
+      groupId: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
         primaryKey: true,
       },
       name: {

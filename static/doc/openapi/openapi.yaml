@@ -697,6 +697,36 @@ paths:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/group/{groupId}/car/{carId}/drive:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: The id of the group
+      - name: carId
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: The id of the car
+    put:
+      summary: Drive a car
+      description: Request to drive the specified car. A user can only drive a
+        car if they are not currently driving another car and the car is available.
+      tags:
+        - Group
+        - Car
+      responses:
+        204:
+          description: The request was successfull and the user is now registered as driver.
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
 # Components
 components:

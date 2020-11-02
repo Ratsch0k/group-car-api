@@ -148,6 +148,7 @@ describe('post /api/group/:groupId/car', function() {
           name: `CAR-${i}`,
           color: Object.values(CarColor).filter((color) =>
             isNaN(Number(color)))[i],
+          carId: i + 1,
         });
       }
 
@@ -181,6 +182,7 @@ describe('post /api/group/:groupId/car', function() {
         name: 'CAR',
         color: Object.values(CarColor).filter((color) =>
           isNaN(Number(color)))[0],
+        carId: 1,
       });
 
       return agent.post(`/api/group/${group.id}/car`)
@@ -211,6 +213,7 @@ describe('post /api/group/:groupId/car', function() {
         groupId: group.id,
         name: 'CAR-1',
         color: CarColor.Black,
+        carId: 1,
       });
 
       return agent.post(`/api/group/${group.id}/car`)
@@ -251,12 +254,52 @@ describe('post /api/group/:groupId/car', function() {
             expect(new Date(body.updatedAt)).to.be.a('date');
             expect(body.name).to.equal(car.name);
             expect(body.color).to.equal(car.color);
-            expect(body.id).to.be.a('number');
+            expect(body.carId).to.be.a('number');
             expect(body.groupId).to.equal(group.id);
             expect(body.driverId).to.be.null;
             expect(body.latitude).to.be.null;
             expect(body.longitude).to.be.null;
           });
+    });
+
+    it('increments carId within group', async function() {
+      const group1 = await Group.create({
+        ownerId: user.id,
+        name: 'GROUP 1',
+        description: 'Group 1',
+      });
+
+      for (let i = 0; i < config.group.maxCars; i++) {
+        const res = await agent.post(`/api/group/${group1.id}/car`)
+            .set(csrfHeaderName, csrf)
+            .send({
+              name: `Car ${i+1}`,
+              color: Object.values(CarColor).filter((color) =>
+                isNaN(Number(color)))[i],
+            })
+            .expect(201);
+
+        expect(res.body.carId).to.equal(i + 1);
+      }
+
+      const group2 = await Group.create({
+        ownerId: user.id,
+        name: 'GROUP 2',
+        description: 'Group 2',
+      });
+
+      for (let i = 0; i < config.group.maxCars; i++) {
+        const res = await agent.post(`/api/group/${group2.id}/car`)
+            .set(csrfHeaderName, csrf)
+            .send({
+              name: `Car ${i+1}`,
+              color: Object.values(CarColor).filter((color) =>
+                isNaN(Number(color)))[i],
+            })
+            .expect(201);
+
+        expect(res.body.carId).to.equal(i + 1);
+      }
     });
   });
 });

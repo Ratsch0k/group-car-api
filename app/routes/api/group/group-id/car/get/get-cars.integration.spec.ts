@@ -75,6 +75,7 @@ describe('get /api/group/:groupId/car', function() {
           groupId: group.id,
           name: `CAR-${i}`,
           color: Object.values(CarColor)[i],
+          carId: i + 1,
         });
 
         const carObject = car.get({plain: true}) as any;
@@ -112,6 +113,7 @@ describe('get /api/group/:groupId/car', function() {
           groupId: group.id,
           name: `CAR-${i}`,
           color: Object.values(CarColor)[i],
+          carId: i + 1,
         });
 
         const carObject = car.get({plain: true}) as any;
@@ -132,6 +134,7 @@ describe('get /api/group/:groupId/car', function() {
         groupId: otherGroup.id,
         name: 'OTHER-CAR',
         color: 'Blue',
+        carId: 1,
       });
 
       const response = await agent.get(`/api/group/${group.id}/car`)
@@ -145,7 +148,7 @@ describe('get /api/group/:groupId/car', function() {
       expect(response.cars).to.have.length(expectedCars.length);
       expect(response.cars).to.eql(expectedCars);
       expect(response.cars.some((car: any) =>
-        car.id === otherCar.id)).to.be.false;
+        car == otherCar)).to.be.false;
     });
   });
 });
