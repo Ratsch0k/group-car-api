@@ -297,7 +297,7 @@ describe('CarService', function() {
     });
   });
 
-  describe('registerDriver', function() {
+  describe('driveCar', function() {
     let membershipServiceIsMember: sinon.SinonStub;
     let transactionStub: sinon.SinonStub;
     let carRepFindById: sinon.SinonStub;
@@ -320,7 +320,7 @@ describe('CarService', function() {
     'user is not a member of the group', async function() {
       membershipServiceIsMember.resolves(false);
 
-      await expect(CarService.registerDriver(user, 2, 3))
+      await expect(CarService.driveCar(user, 2, 3))
           .to.eventually.be.rejectedWith(NotMemberOfGroupError);
 
       assert.notCalled(transactionStub);
@@ -340,7 +340,7 @@ describe('CarService', function() {
       };
       carRepFindById.resolves(car as any);
 
-      await expect(CarService.registerDriver(user, car.groupId, car.carId))
+      await expect(CarService.driveCar(user, car.groupId, car.carId))
           .to.eventually.be.rejectedWith(CarInUseError);
 
       assert.calledOnceWithExactly(
@@ -359,7 +359,7 @@ describe('CarService', function() {
       membershipServiceIsMember.resolves(true);
       carRepFindById.rejects(new Error('Should not be thrown'));
 
-      await expect(CarService.registerDriver(user, 1, 2))
+      await expect(CarService.driveCar(user, 1, 2))
           .to.eventually.be.rejectedWith(InternalError);
 
       assert.calledOnceWithExactly(
@@ -382,7 +382,7 @@ describe('CarService', function() {
       };
       carRepFindById.resolves(car as any);
 
-      await expect(CarService.registerDriver(user, car.groupId, car.carId))
+      await expect(CarService.driveCar(user, car.groupId, car.carId))
           .to.eventually.be.fulfilled;
 
       assert.calledOnceWithExactly(

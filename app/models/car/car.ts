@@ -86,8 +86,8 @@ Car.init(
             .filter((value) => isNaN(Number(value))) as string[],
         allowNull: false,
       },
-      latitude: DataTypes.FLOAT,
-      longitude: DataTypes.FLOAT,
+      latitude: DataTypes.DOUBLE,
+      longitude: DataTypes.DOUBLE,
     },
     {
       sequelize,
