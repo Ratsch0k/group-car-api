@@ -10,7 +10,7 @@ import {UserService} from '@models';
  * @param next  - Next
  */
 export const leaveGroupController: RequestHandler = async (req, res, next) => {
-  const groupId = parseInt(req.params.groupId);
+  const groupId = parseInt(req.params.groupId, 10);
   const user = req.user;
 
   if (!isNaN(groupId) && user !== undefined) {

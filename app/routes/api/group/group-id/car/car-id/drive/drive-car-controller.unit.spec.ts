@@ -18,7 +18,7 @@ describe('driveCarController', function() {
     };
     next = sinon.stub();
 
-    carServiceRegisterStub = sinon.stub(CarService, 'registerDriver');
+    carServiceRegisterStub = sinon.stub(CarService, 'driveCar');
   });
 
   afterEach(function() {
@@ -81,7 +81,7 @@ describe('driveCarController', function() {
     });
   });
 
-  it('calls CarService.registerDriver with correct ' +
+  it('calls CarService.driveCar with correct ' +
   'parameters', async function() {
     req = {
       user: {

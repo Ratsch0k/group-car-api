@@ -727,6 +727,50 @@ paths:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/group/{groupId}/car/{carId}/park:
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: The id of the group
+      - name: carId
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: The id of the car
+    put:
+      summary: Park the car
+      description: Park the specified car at the specified location. Only the driver
+        of a car can park a car. After this action the car will have no driver.
+      tags:
+        - Group
+        - Car
+      requestBody:
+        description: The request body has to include the latitude and longitude of the location.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+              required:
+                - latitude
+                - longitude
+      responses:
+        204:
+          description: The car was parked sucessfully
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
 # Components
 components:

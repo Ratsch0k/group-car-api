@@ -9,6 +9,7 @@ import {
   MaxCarAmountReachedError,
   MembershipNotFoundError,
   NotAdminOfGroupError,
+  NotDriverOfCarError,
   NotMemberOfGroupError,
 } from '../../errors';
 import {MembershipRepository, MembershipService} from '../membership';
@@ -297,7 +298,7 @@ describe('CarService', function() {
     });
   });
 
-  describe('registerDriver', function() {
+  describe('driveCar', function() {
     let membershipServiceIsMember: sinon.SinonStub;
     let transactionStub: sinon.SinonStub;
     let carRepFindById: sinon.SinonStub;
@@ -320,7 +321,7 @@ describe('CarService', function() {
     'user is not a member of the group', async function() {
       membershipServiceIsMember.resolves(false);
 
-      await expect(CarService.registerDriver(user, 2, 3))
+      await expect(CarService.driveCar(user, 2, 3))
           .to.eventually.be.rejectedWith(NotMemberOfGroupError);
 
       assert.notCalled(transactionStub);
@@ -340,7 +341,7 @@ describe('CarService', function() {
       };
       carRepFindById.resolves(car as any);
 
-      await expect(CarService.registerDriver(user, car.groupId, car.carId))
+      await expect(CarService.driveCar(user, car.groupId, car.carId))
           .to.eventually.be.rejectedWith(CarInUseError);
 
       assert.calledOnceWithExactly(
@@ -359,7 +360,7 @@ describe('CarService', function() {
       membershipServiceIsMember.resolves(true);
       carRepFindById.rejects(new Error('Should not be thrown'));
 
-      await expect(CarService.registerDriver(user, 1, 2))
+      await expect(CarService.driveCar(user, 1, 2))
           .to.eventually.be.rejectedWith(InternalError);
 
       assert.calledOnceWithExactly(
@@ -382,7 +383,7 @@ describe('CarService', function() {
       };
       carRepFindById.resolves(car as any);
 
-      await expect(CarService.registerDriver(user, car.groupId, car.carId))
+      await expect(CarService.driveCar(user, car.groupId, car.carId))
           .to.eventually.be.fulfilled;
 
       assert.calledOnceWithExactly(
@@ -398,6 +399,167 @@ describe('CarService', function() {
           match({transaction: t}),
       );
       assert.notCalled(t.rollback);
+    });
+  });
+
+  describe('parkCar', function() {
+    let isMemberStub: sinon.SinonStub;
+    let transactionStub: sinon.SinonStub;
+    let findByIdStub: sinon.SinonStub;
+    let t: {commit: sinon.SinonStub, rollback: sinon.SinonStub};
+    const user: any = {
+      id: 10,
+    };
+
+    beforeEach(function() {
+      isMemberStub = sinon.stub(MembershipService, 'isMember');
+      t = {
+        commit: sinon.stub(),
+        rollback: sinon.stub(),
+      };
+      transactionStub = sinon.stub(sequelize, 'transaction')
+          .resolves(t as any);
+      findByIdStub = sinon.stub(CarRepository, 'findById');
+    });
+
+    it('throws NotMemberOfGroupError if user ' +
+    'is not member of the specified group', async function() {
+      isMemberStub.resolves(false);
+
+      const groupId = 5;
+      const carId = 6;
+      const latitude = 1.2;
+      const longitude = 89.53;
+
+      await expect(CarService.parkCar(
+          user,
+          groupId,
+          carId,
+          latitude,
+          longitude,
+      )).to.eventually.be.rejectedWith(NotMemberOfGroupError);
+
+      assert.calledOnceWithExactly(isMemberStub, user, groupId);
+      assert.notCalled(transactionStub);
+      assert.notCalled(findByIdStub);
+    });
+
+    it('throws NotDriverOfCarError if user is ' +
+    'not the driver of the car', async function() {
+      const groupId = 5;
+      const carId = 6;
+      const latitude = 1.2;
+      const longitude = 89.53;
+      const car = {
+        carId,
+        groupId,
+        name: 'Car',
+        driverId: user.id + 2,
+        update: sinon.stub().resolves(),
+      };
+
+      isMemberStub.resolves(true);
+      findByIdStub.resolves(car as any);
+
+      await expect(CarService.parkCar(
+          user,
+          groupId,
+          carId,
+          latitude,
+          longitude,
+      )).to.eventually.be.rejectedWith(NotDriverOfCarError);
+
+      assert.calledOnceWithExactly(isMemberStub, user, groupId);
+      assert.calledOnce(transactionStub);
+      assert.calledOnceWithExactly(
+          findByIdStub,
+          match({carId, groupId}),
+          match({transaction: t}),
+      );
+      assert.calledOnce(t.rollback);
+      assert.notCalled(car.update);
+    });
+
+    it('if user is driver of car, sets driverId to null '+
+    'and sets latitude and longitude', async function() {
+      const groupId = 5;
+      const carId = 6;
+      const latitude = 1.2;
+      const longitude = 89.53;
+      const car = {
+        carId,
+        groupId,
+        name: 'Car',
+        driverId: user.id,
+        update: sinon.stub().resolves(),
+      };
+
+      isMemberStub.resolves(true);
+      findByIdStub.resolves(car as any);
+
+      await expect(CarService.parkCar(
+          user,
+          groupId,
+          carId,
+          latitude,
+          longitude,
+      )).to.eventually.be.fulfilled;
+
+      assert.calledOnceWithExactly(isMemberStub, user, groupId);
+      assert.calledOnce(transactionStub);
+      assert.calledOnceWithExactly(
+          findByIdStub,
+          match({carId, groupId}),
+          match({transaction: t}),
+      );
+      assert.calledOnceWithExactly(
+          car.update,
+          match({driverId: null, latitude, longitude}),
+          match({transaction: t}),
+      );
+      assert.calledOnce(t.commit);
+      assert.notCalled(t.rollback);
+    });
+
+    it('throws InternalError instead of any error other than ' +
+    'NotMemberOfGroupError or NotDriverOfCarError', async function() {
+      const groupId = 5;
+      const carId = 6;
+      const latitude = 1.2;
+      const longitude = 89.53;
+      const car = {
+        carId,
+        groupId,
+        name: 'Car',
+        driverId: user.id,
+        update: sinon.stub().rejects(new Error('Should not be thrown')),
+      };
+
+      isMemberStub.resolves(true);
+      findByIdStub.resolves(car as any);
+
+      await expect(CarService.parkCar(
+          user,
+          groupId,
+          carId,
+          latitude,
+          longitude,
+      )).to.eventually.be.rejectedWith(InternalError);
+
+      assert.calledOnceWithExactly(isMemberStub, user, groupId);
+      assert.calledOnce(transactionStub);
+      assert.calledOnceWithExactly(
+          findByIdStub,
+          match({carId, groupId}),
+          match({transaction: t}),
+      );
+      assert.calledOnceWithExactly(
+          car.update,
+          match({driverId: null, latitude, longitude}),
+          match({transaction: t}),
+      );
+      assert.calledOnce(t.rollback);
+      assert.notCalled(t.commit);
     });
   });
 });

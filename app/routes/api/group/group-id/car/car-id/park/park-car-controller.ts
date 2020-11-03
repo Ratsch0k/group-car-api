@@ -3,18 +3,25 @@ import {CarService} from '@app/models';
 import {RequestHandler} from 'express';
 
 /**
- * Controller for a user to request to drive the specified car.
+ * Controller for handling parking of the specified car.
  * @param req   - Request
  * @param res   - Response
  * @param next  - Next
  */
-export const driveCarController: RequestHandler = async (req, res, next) => {
+export const parkCarController: RequestHandler = async (req, res, next) => {
   const user = req.user;
   const groupId = parseInt(req.params.groupId, 10);
   const carId = parseInt(req.params.carId, 10);
+  const lat = parseFloat(req.body.latitude);
+  const lon = parseFloat(req.body.longitude);
 
-  if (typeof user === 'object' && !isNaN(groupId) && !isNaN(carId)) {
-    await CarService.driveCar(user, groupId, carId);
+  if (typeof user === 'object' &&
+      !isNaN(groupId) &&
+      !isNaN(carId) &&
+      !isNaN(lat) &&
+      !isNaN(lon)) {
+    await CarService.parkCar(user, groupId, carId, lat, lon);
+
     res.status(204).send();
   } else {
     throw new BadRequestError('Missing parameter');

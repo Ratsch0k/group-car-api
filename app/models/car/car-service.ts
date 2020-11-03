@@ -8,6 +8,7 @@ import {
   MaxCarAmountReachedError,
   MembershipNotFoundError,
   NotAdminOfGroupError,
+  NotDriverOfCarError,
   NotMemberOfGroupError,
 } from '@app/errors';
 import {
@@ -165,7 +166,7 @@ export class CarService {
    * @param groupId     - The id of the group
    * @param carId       - The id of the car
    */
-  public static async registerDriver(
+  public static async driveCar(
       currentUser: Express.User,
       groupId: number,
       carId: number,
@@ -187,7 +188,11 @@ export class CarService {
         throw new CarInUseError();
       }
 
-      await car.update({driverId: currentUser.id}, {transaction: t});
+      await car.update({
+        driverId: currentUser.id,
+        latitude: null,
+        longitude: null,
+      }, {transaction: t});
 
       await t.commit();
     } catch (e) {
@@ -202,6 +207,81 @@ export class CarService {
             e,
         );
         throw new InternalError('Error while registering a driver');
+      }
+    }
+  }
+
+  /**
+   * Parks the car at the specified location if the
+   * user is the current driver.
+   *
+   * Throws {@link NotMemberOfGroupError} if the current
+   * user is not a member of the group with the
+   * specified `groupId`.
+   * Throws {@link NotDriverOfCarError} if the current
+   * user is not the driver of the car.
+   * @param currentUser - The logged in user
+   * @param groupId     - Id of the group
+   * @param carId       - Id of the car
+   * @param latitude    - Latitude of the location
+   * @param longitude   - Longitude of the location
+   */
+  public static async parkCar(
+      currentUser: Express.User,
+      groupId: number,
+      carId: number,
+      latitude: number,
+      longitude: number,
+  ): Promise<void> {
+    const carPk = {carId, groupId};
+    this.log(
+        'User %d: request to park car %o to location %o',
+        currentUser.id,
+        carPk,
+        {latitude, longitude},
+    );
+    // Check if user is member of group
+    if (!(await MembershipService.isMember(currentUser, groupId))) {
+      this.error(
+          'User %d: can\'t park car %o, user not member of group %d',
+          currentUser.id,
+          carPk,
+          groupId,
+      );
+      throw new NotMemberOfGroupError();
+    }
+
+    // Get car and check driver
+    const t = await sequelize.transaction();
+    try {
+      const car = await CarRepository
+          .findById(carPk, {transaction: t});
+
+      if (car.driverId !== currentUser.id) {
+        this.error(
+            'User %d: can\'t park car %o, user is not driver of car',
+            currentUser.id,
+            carPk,
+        );
+        throw new NotDriverOfCarError();
+      }
+
+      await car.update({driverId: null, latitude, longitude}, {transaction: t});
+      this.log(
+          'User %d: Successfully parked car %o at location %o',
+          currentUser.id,
+          carPk,
+          {latitude, longitude},
+      );
+      t.commit();
+    } catch (e) {
+      t.rollback();
+
+      if (e instanceof NotDriverOfCarError) {
+        throw e;
+      } else {
+        this.error('Error while parking car %o', carPk);
+        throw new InternalError('Couldn\'t park car');
       }
     }
   }

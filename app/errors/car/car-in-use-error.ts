@@ -10,6 +10,6 @@ export class CarInUseError extends BadRequestError {
    * Creates an instance of this class.
    */
   constructor() {
-    super('The car is already used by another member');
+    super('The car is already in use');
   }
 }
