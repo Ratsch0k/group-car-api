@@ -266,13 +266,14 @@ export class CarService {
         throw new NotDriverOfCarError();
       }
 
-      await car.update({driverId: null, latitude, longitude});
+      await car.update({driverId: null, latitude, longitude}, {transaction: t});
       this.log(
           'User %d: Successfully parked car %o at location %o',
           currentUser.id,
           carPk,
           {latitude, longitude},
       );
+      t.commit();
     } catch (e) {
       t.rollback();
 

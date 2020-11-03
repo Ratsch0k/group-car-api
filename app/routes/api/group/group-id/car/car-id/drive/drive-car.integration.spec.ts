@@ -122,6 +122,8 @@ describe('put /api/group/:groupId/car/:carId/drive', function() {
         carId: 1,
         groupId: group.id,
         color: CarColor.Black,
+        latitude: 1.2,
+        longitude: 6.4,
       });
 
       await agent
@@ -140,6 +142,8 @@ describe('put /api/group/:groupId/car/:carId/drive', function() {
 
       expect(updatedCar).to.not.be.null;
       expect(updatedCar!.driverId).to.equal(user.id);
+      expect(updatedCar!.latitude).to.be.null;
+      expect(updatedCar!.longitude).to.be.null;
     });
   });
 });
