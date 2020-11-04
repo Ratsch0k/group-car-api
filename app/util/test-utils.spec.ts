@@ -5,7 +5,7 @@ import config from '../config';
 import initSocketIoServer from '../socket';
 import express from 'express';
 import http from 'http';
-import { Server } from 'socket.io';
+import {Server} from 'socket.io';
 
 export interface SignUpReturn {
   user: any;
@@ -16,6 +16,7 @@ export interface SignUpReturn {
     password: string;
     email: string;
   };
+  jwtValue: string;
 }
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
@@ -46,13 +47,15 @@ export class TestUtils {
         });
 
     // Sign up to access api and set new jwt
-    await agent
+    const jwtValue = await agent
         .post('/auth/sign-up')
         .set(csrfHeaderName, csrf)
         .send(signUpBody)
         .expect(201)
         .then((response) => {
           user = response.body;
+          const jwtCookie = response.header['set-cookie'][0] as string;
+          return jwtCookie.split(';')[0].replace('jwt=', '');
         });
 
     csrf = await agent.head('/auth')
@@ -67,6 +70,7 @@ export class TestUtils {
       csrf,
       agent,
       signUpBody,
+      jwtValue,
     };
   }
 

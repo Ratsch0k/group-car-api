@@ -12,20 +12,28 @@ import {
   NotAdminOfGroupError,
   UnauthorizedError,
 } from '../../../../../../errors';
-import {Car, CarColor, Group, User} from '../../../../../../models';
+import {
+  Car,
+  CarColor,
+  Group,
+  GroupCarAction,
+  User,
+} from '../../../../../../models';
 import {Server} from 'socket.io';
+import ioClient from 'socket.io-client';
 
 describe('post /api/group/:groupId/car', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
   let agent: supertest.SuperTest<supertest.Test>;
   let csrf: string;
   let user: any;
-  let socketPort: number;
+  let port: number;
   let io: Server;
+  let jwtValue: string;
 
   before(async function() {
     const socket = await TestUtils.startSocketIo();
-    socketPort = socket.port;
+    port = socket.port;
     io = socket.io;
   });
 
@@ -37,6 +45,7 @@ describe('post /api/group/:groupId/car', function() {
     agent = response.agent;
     csrf = response.csrf;
     user = response. user;
+    jwtValue = response.jwtValue;
   });
 
   after(function() {
@@ -313,6 +322,60 @@ describe('post /api/group/:groupId/car', function() {
 
         expect(res.body.carId).to.equal(i + 1);
       }
+    });
+
+    it('emits update event in group namespace with new car', function() {
+      return new Promise(async (resolve, reject) => {
+        try {
+          // Create group
+          const group = await Group.create({
+            name: 'TEST',
+            description: 'DESC',
+            ownerId: user.id,
+          });
+
+          const car = {
+            name: 'TEST',
+            color: 'Red',
+          };
+
+          const socket = ioClient(`http://127.0.0.1:${port}/group/${group.id}`, {
+            path: '/socket',
+            forceNew: true,
+            reconnectionDelay: 0,
+            transportOptions: {
+              polling: {
+                extraHeaders: {
+                  'Cookie': 'jwt=' + jwtValue,
+                },
+              },
+            },
+          });
+
+          socket.on('update', async (res: any) => {
+            try {
+              expect(res.action).to.equal(GroupCarAction.Add);
+              const actualCar = res.car;
+              expect(actualCar.groupId).to.equal(group.id);
+              expect(actualCar.driverId).to.be.null;
+              expect(actualCar.latitude).to.be.null;
+              expect(actualCar.longitude).to.be.null;
+              expect(actualCar.color).to.equal(car.color);
+              expect(actualCar.name).to.equal(car.name);
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          });
+
+          return agent.post(`/api/group/${group.id}/car`)
+              .set(csrfHeaderName, csrf)
+              .send({name: car.name, color: car.color})
+              .expect(201);
+        } catch (e) {
+          reject(e);
+        }
+      });
     });
   });
 });
