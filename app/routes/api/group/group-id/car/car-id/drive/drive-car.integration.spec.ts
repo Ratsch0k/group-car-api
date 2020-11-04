@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
+import {Server} from 'socket.io';
 import supertest from 'supertest';
 import config from '../../../../../../../config';
 import db, {syncPromise} from '../../../../../../../db';
@@ -17,6 +18,18 @@ describe('put /api/group/:groupId/car/:carId/drive', function() {
   let user: any;
   let agent: supertest.SuperTest<supertest.Test>;
   let csrf: string;
+  let port: number;
+  let io: Server;
+
+  before(async function() {
+    const socketIo = await TestUtils.startSocketIo();
+    port = socketIo.port;
+    io = socketIo.io;
+  });
+
+  after(function() {
+    io.close();
+  });
 
   beforeEach(async function() {
     await syncPromise;

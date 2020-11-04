@@ -10,12 +10,25 @@ import {
 } from '../../../../../../../errors';
 import {TestUtils} from '../../../../../../../util/test-utils.spec';
 import {Car, CarColor, Group} from '../../../../../../../models';
+import { Server } from 'socket.io';
 
 describe('put /api/group/:groupId/car/:carId/park', function() {
   const csrfName = config.jwt.securityOptions.tokenName.toLowerCase();
   let user: any;
   let csrf: string;
   let agent: supertest.SuperTest<supertest.Test>;
+  let port: number;
+  let io: Server;
+
+  before(async function() {
+    const socketIo = await TestUtils.startSocketIo();
+    port = socketIo.port;
+    io = socketIo.io;
+  });
+
+  after(function() {
+    io.close();
+  });
 
   beforeEach(async function() {
     await syncPromise;

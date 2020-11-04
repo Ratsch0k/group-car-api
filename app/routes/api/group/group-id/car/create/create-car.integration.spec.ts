@@ -13,12 +13,21 @@ import {
   UnauthorizedError,
 } from '../../../../../../errors';
 import {Car, CarColor, Group, User} from '../../../../../../models';
+import {Server} from 'socket.io';
 
 describe('post /api/group/:groupId/car', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
   let agent: supertest.SuperTest<supertest.Test>;
   let csrf: string;
   let user: any;
+  let socketPort: number;
+  let io: Server;
+
+  before(async function() {
+    const socket = await TestUtils.startSocketIo();
+    socketPort = socket.port;
+    io = socket.io;
+  });
 
   beforeEach(async function() {
     await syncPromise;
@@ -28,6 +37,10 @@ describe('post /api/group/:groupId/car', function() {
     agent = response.agent;
     csrf = response.csrf;
     user = response. user;
+  });
+
+  after(function() {
+    io.close();
   });
 
   describe('if user not logged in', function() {

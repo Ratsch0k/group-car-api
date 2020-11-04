@@ -2,6 +2,10 @@
 import request from 'supertest';
 import app from '../app';
 import config from '../config';
+import initSocketIoServer from '../socket';
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
 
 export interface SignUpReturn {
   user: any;
@@ -64,5 +68,24 @@ export class TestUtils {
       agent,
       signUpBody,
     };
+  }
+
+  /**
+   * Starts a test instance of the socket.io server.
+   * Creates an empty express app, a server instance
+   * and then initialize socket.io.
+   */
+  public static startSocketIo(): Promise<{port: number, io: Server}> {
+    return new Promise((resolve, reject) => {
+      const app = express();
+      const server = http.createServer(app);
+      const io = initSocketIoServer(server);
+      const port = 9999;
+      server.listen(port);
+      server.on('listening', () => resolve({port, io}));
+      server.on('error', (e) => {
+        reject(e);
+      });
+    });
   }
 }
