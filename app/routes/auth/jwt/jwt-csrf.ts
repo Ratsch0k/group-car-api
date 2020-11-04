@@ -53,7 +53,7 @@ const jwtCsrf: () => RequestHandler = () =>
           ' Jwt will be replaced with pre-login jwt');
         secret = setSecret(tokens, res);
       } else {
-        log('Ignored method with jwt and secret');
+        log('Ignored method %s with jwt and secret', req.method);
         secret = _secret;
       }
     } else if (jwt && !isIgnoredMethod(req)) {
