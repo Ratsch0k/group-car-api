@@ -362,6 +362,7 @@ describe('post /api/group/:groupId/car', function() {
               expect(actualCar.longitude).to.be.null;
               expect(actualCar.color).to.equal(car.color);
               expect(actualCar.name).to.equal(car.name);
+              socket.close();
               resolve();
             } catch (e) {
               reject(e);

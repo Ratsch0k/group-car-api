@@ -212,6 +212,7 @@ describe('put /api/group/:groupId/car/:carId/drive', function() {
               expect(actualCar.latitude).to.be.null;
               expect(actualCar.longitude).to.be.null;
               expect(actualCar.driverId).to.equal(user.id);
+              socket.close();
               resolve();
             } catch (e) {
               reject(e);
