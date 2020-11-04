@@ -79,7 +79,7 @@ export const postLoginJwtValidator: RequestHandler = (req, res, next) => {
       if (user !== null &&
           (user.deletedAt === null ||
             user.deletedAt >= new Date())) {
-        req.user = user;
+        req.user = user.get({plain: true}) as Express.User;
         next();
       } else {
         next(new NotLoggedInError());
