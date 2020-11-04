@@ -67,6 +67,7 @@
     "@types/nodemailer": "^6.4.0",
     "@types/sequelize": "^4.28.8",
     "@types/sinon": "^9.0.0",
+    "@types/socket.io": "^2.1.11",
     "@types/supertest": "^2.0.8",
     "@types/validator": "^13.0.0",
     "@types/yargs": "^15.0.5",
@@ -91,6 +92,7 @@
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.6",
     "sinon": "^9.0.2",
+    "socket.io": "^2.3.0",
     "supports-color": "^7.1.0",
     "typescript": "^3.8.3",
     "yargs": "^16.0.3"
