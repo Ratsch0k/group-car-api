@@ -61,7 +61,7 @@ export class GroupNotificationService {
    * Setter of io server.
    * @param io - io server
    */
-  static setIo(io: socketIo.Server): void {
+  public static setIo(io: socketIo.Server): void {
     this.io = io;
     this.nsp = io.of(/^\/group\/\w+/);
     this.nsp.use(this.logConnection.bind(this));
@@ -156,7 +156,7 @@ export class GroupNotificationService {
    * @param type      - The type of update
    * @param car       - Data of the car
    */
-  static notifyCarUpdate(
+  public static notifyCarUpdate(
       groupId: number,
       carId: number,
       type: GroupCarAction,

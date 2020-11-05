@@ -339,18 +339,11 @@ describe('post /api/group/:groupId/car', function() {
             color: 'Red',
           };
 
-          const socket = ioClient(`http://127.0.0.1:${port}/group/${group.id}`, {
-            path: '/socket',
-            forceNew: true,
-            reconnectionDelay: 0,
-            transportOptions: {
-              polling: {
-                extraHeaders: {
-                  'Cookie': 'jwt=' + jwtValue,
-                },
-              },
-            },
-          });
+          const socket = TestUtils.createSocket(
+              port,
+              `/group/${group.id}`,
+              jwtValue,
+          );
 
           socket.on('update', async (res: any) => {
             try {

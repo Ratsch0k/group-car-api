@@ -188,18 +188,11 @@ describe('put /api/group/:groupId/car/:carId/drive', function() {
             longitude: 6.4,
           });
 
-          const socket = ioClient(`http://127.0.0.1:${port}/group/${group.id}`, {
-            path: '/socket',
-            forceNew: true,
-            reconnectionDelay: 0,
-            transportOptions: {
-              polling: {
-                extraHeaders: {
-                  'Cookie': 'jwt=' + jwtValue,
-                },
-              },
-            },
-          });
+          const socket = TestUtils.createSocket(
+              port,
+              `/group/${group.id}`,
+              jwtValue,
+          );
 
           socket.on('update', async (res: any) => {
             try {
