@@ -72,7 +72,7 @@ export function convertUserToJwtPayload(user: User): UserJwtPayload {
  */
 export const postLoginJwtValidator: RequestHandler = (req, res, next) => {
   if (!req.auth || !req.auth.loggedIn || !req.auth.id) {
-    throw new NotLoggedInError();
+    next(new NotLoggedInError());
   } else {
     // Check if a user with the user id exists
     User.findByPk(req.auth.id).then((user) => {
