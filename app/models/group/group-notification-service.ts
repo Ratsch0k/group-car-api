@@ -136,7 +136,7 @@ export class GroupNotificationService {
       next: NextFunction,
   ): Promise<void> {
     // Get groupId from namespace
-    const groupId = parseInt(socket.nsp.name.replace('/group/', ''));
+    const groupId = parseInt(socket.nsp.name.replace('/group/', ''), 10);
 
     if (isNaN(groupId)) {
       next(new InternalError('Couldn\'t parse namespace'));
