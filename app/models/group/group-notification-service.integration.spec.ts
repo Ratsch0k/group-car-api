@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {expect, use} from 'chai';
+import {expect} from 'chai';
 import {Server} from 'socket.io';
 import supertest from 'supertest';
 import config from '../../config';
-import jwt from '../../config/jwt-config';
 import db, {syncPromise} from '../../db';
 import {NotLoggedInError, NotMemberOfGroupError} from '../../errors';
 import {TestUtils} from '../../util/test-utils.spec';

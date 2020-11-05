@@ -17,7 +17,6 @@ import {
   GroupCarAction,
 } from '../../../../../../../models';
 import {Server} from 'socket.io';
-import ioClient from 'socket.io-client';
 
 describe('put /api/group/:groupId/car/:carId/park', function() {
   const csrfName = config.jwt.securityOptions.tokenName.toLowerCase();

@@ -9,7 +9,7 @@ import {
   postLoginJwtValidator,
 } from './jwt-util';
 import {expect} from 'chai';
-import {NotLoggedInError, UnauthorizedError} from '../../../errors';
+import {NotLoggedInError} from '../../../errors';
 import Bluebird from 'bluebird';
 
 const sandbox = sinon.createSandbox();

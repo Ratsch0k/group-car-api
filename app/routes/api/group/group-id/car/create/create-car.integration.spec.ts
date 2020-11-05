@@ -20,7 +20,6 @@ import {
   User,
 } from '../../../../../../models';
 import {Server} from 'socket.io';
-import ioClient from 'socket.io-client';
 
 describe('post /api/group/:groupId/car', function() {
   const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();

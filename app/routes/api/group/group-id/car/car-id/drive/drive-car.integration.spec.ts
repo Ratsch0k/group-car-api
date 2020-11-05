@@ -18,7 +18,6 @@ import {
   User,
 } from '../../../../../../../models';
 import {TestUtils} from '../../../../../../../util/test-utils.spec';
-import ioClient from 'socket.io-client';
 
 describe('put /api/group/:groupId/car/:carId/drive', function() {
   const csrfName = config.jwt.securityOptions.tokenName.toLowerCase();
