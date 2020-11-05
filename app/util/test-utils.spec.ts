@@ -6,6 +6,7 @@ import initSocketIoServer from '../socket';
 import express from 'express';
 import http from 'http';
 import {Server} from 'socket.io';
+import ioClient from 'socket.io-client';
 
 export interface SignUpReturn {
   user: any;
@@ -54,8 +55,7 @@ export class TestUtils {
         .expect(201)
         .then((response) => {
           user = response.body;
-          const jwtCookie = response.header['set-cookie'][0] as string;
-          return jwtCookie.split(';')[0].replace('jwt=', '');
+          return this.extractJwtValue(response.header['set-cookie']);
         });
 
     csrf = await agent.head('/auth')
@@ -90,6 +90,43 @@ export class TestUtils {
       server.on('error', (e) => {
         reject(e);
       });
+    });
+  }
+
+  /**
+   * Extract the value of the jwt cookie from a set-cookie header.
+   * @param setCookie - The string of the set-cookie header
+   */
+  public static extractJwtValue(setCookie: string[]): string {
+    const jwtCookie = setCookie.find((el) => el.includes('jwt='));
+    if (!jwtCookie) {
+      throw new Error('Cannot extract jwt cookie');
+    }
+    return jwtCookie.split(';')[0].replace('jwt=', '');
+  }
+
+  /**
+   * Creates a socket with the specified port to the specified namespace.
+   * @param port  - The port to the socket server
+   * @param nsp   - The namespace
+   * @param jwt   - Value for the jwt cookie
+   */
+  public static createSocket(
+      port: number,
+      nsp: string,
+      jwt: string,
+  ): SocketIOClient.Socket {
+    return ioClient(`http://127.0.0.1:${port}${nsp}`, {
+      forceNew: true,
+      reconnectionDelay: 0,
+      path: '/socket',
+      transportOptions: {
+        polling: {
+          extraHeaders: {
+            'Cookie': 'jwt=' + jwt,
+          },
+        },
+      },
     });
   }
 }
