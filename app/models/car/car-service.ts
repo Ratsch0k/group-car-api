@@ -19,6 +19,8 @@ import {
   CarColor,
   Membership,
   MembershipService,
+  GroupNotificationService,
+  GroupCarAction,
 } from '@models';
 import debug from 'debug';
 import sequelize from '@db';
@@ -118,6 +120,14 @@ export class CarService {
 
     // Create car
     const car = await CarRepository.create(groupId, name, color, options);
+
+    GroupNotificationService.notifyCarUpdate(
+        groupId,
+        car.carId,
+        GroupCarAction.Add,
+        car,
+    );
+
     return car.get({plain: true}) as Car;
   }
 
@@ -188,11 +198,18 @@ export class CarService {
         throw new CarInUseError();
       }
 
-      await car.update({
+      const updatedCar = await car.update({
         driverId: currentUser.id,
         latitude: null,
         longitude: null,
       }, {transaction: t});
+
+      GroupNotificationService.notifyCarUpdate(
+          groupId,
+          carId,
+          GroupCarAction.Drive,
+          updatedCar.get({plain: true}) as Car,
+      );
 
       await t.commit();
     } catch (e) {
@@ -266,13 +283,30 @@ export class CarService {
         throw new NotDriverOfCarError();
       }
 
-      await car.update({driverId: null, latitude, longitude}, {transaction: t});
+      const updatedCar = await car.update(
+          {
+            driverId: null,
+            latitude,
+            longitude,
+          },
+          {
+            transaction: t,
+          },
+      );
       this.log(
           'User %d: Successfully parked car %o at location %o',
           currentUser.id,
           carPk,
           {latitude, longitude},
       );
+
+      GroupNotificationService.notifyCarUpdate(
+          groupId,
+          carId,
+          GroupCarAction.Park,
+          updatedCar.get({plain: true}) as Car,
+      );
+
       t.commit();
     } catch (e) {
       t.rollback();

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
 import supertest from 'supertest';
@@ -9,13 +10,32 @@ import {
   NotMemberOfGroupError,
 } from '../../../../../../../errors';
 import {TestUtils} from '../../../../../../../util/test-utils.spec';
-import {Car, CarColor, Group} from '../../../../../../../models';
+import {
+  Car,
+  CarColor,
+  Group,
+  GroupCarAction,
+} from '../../../../../../../models';
+import {Server} from 'socket.io';
 
 describe('put /api/group/:groupId/car/:carId/park', function() {
   const csrfName = config.jwt.securityOptions.tokenName.toLowerCase();
   let user: any;
   let csrf: string;
   let agent: supertest.SuperTest<supertest.Test>;
+  let port: number;
+  let io: Server;
+  let jwtValue: string;
+
+  before(async function() {
+    const socketIo = await TestUtils.startSocketIo();
+    port = socketIo.port;
+    io = socketIo.io;
+  });
+
+  after(function() {
+    io.close();
+  });
 
   beforeEach(async function() {
     await syncPromise;
@@ -25,6 +45,7 @@ describe('put /api/group/:groupId/car/:carId/park', function() {
     csrf = response.csrf;
     user = response.user;
     agent = response.agent;
+    jwtValue = response.jwtValue;
   });
 
   describe('if user not logged in', function() {
@@ -244,6 +265,61 @@ describe('put /api/group/:groupId/car/:carId/park', function() {
       expect(updatedCar.driverId).to.be.null;
       expect(updatedCar.latitude).to.equal(latitude);
       expect(updatedCar.longitude).to.equal(longitude);
+    });
+
+    it('emits update event in group namespace ' +
+    'with park action', function() {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const group = await Group.create({
+            name: 'Group',
+            ownerId: user.id,
+          });
+
+          const car = await Car.create({
+            name: 'Car',
+            groupId: group.id,
+            color: CarColor.Black,
+            driverId: user.id,
+            carId: 1,
+          });
+
+          const socket = TestUtils.createSocket(
+              port,
+              `/group/${group.id}`,
+              jwtValue,
+          );
+
+          const latitude = 65;
+          const longitude = 41;
+
+          socket.on('update', async (res: any) => {
+            try {
+              expect(res.action).to.equal(GroupCarAction.Park);
+              const actualCar = res.car;
+              expect(actualCar).to.be.an('object');
+              expect(actualCar.color).to.equal(car.color);
+              expect(actualCar.carId).to.equal(car.carId);
+              expect(actualCar.groupId).to.equal(car.groupId);
+              expect(actualCar.latitude).to.equal(latitude);
+              expect(actualCar.longitude).to.equal(longitude);
+              expect(actualCar.driverId).to.be.null;
+              socket.close();
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          });
+
+          await agent
+              .put(`/api/group/${group.id}/car/${car.carId}/park`)
+              .set(csrfName, csrf)
+              .send({latitude, longitude})
+              .expect(204);
+        } catch (e) {
+          reject(e);
+        }
+      });
     });
   });
 });

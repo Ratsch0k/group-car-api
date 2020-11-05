@@ -17,6 +17,7 @@ import CarRepository from './car-repository';
 import CarService from './car-service';
 import config from '../../config';
 import sequelize from '../../db';
+import {GroupCarAction, GroupNotificationService} from '../group';
 
 describe('CarService', function() {
   const user: any = {
@@ -42,11 +43,13 @@ describe('CarService', function() {
     let membershipRepFindStub: sinon.SinonStub;
     let carRepCreateStub: sinon.SinonStub;
     let carRepFindByGroup: sinon.SinonStub;
+    let groupNotifStub: sinon.SinonStub;
 
     beforeEach(function() {
       membershipRepFindStub = sinon.stub(MembershipRepository, 'findById');
       carRepCreateStub = sinon.stub(CarRepository, 'create');
       carRepFindByGroup = sinon.stub(CarRepository, 'findByGroup');
+      groupNotifStub = sinon.stub(GroupNotificationService, 'notifyCarUpdate');
     });
 
     describe('throws NotAdminOfGroup', function() {
@@ -68,6 +71,7 @@ describe('CarService', function() {
         );
         assert.notCalled(carRepFindByGroup);
         assert.notCalled(carRepCreateStub);
+        assert.notCalled(groupNotifStub);
       });
 
       it('if user is a member but not an admin of the group', async function() {
@@ -92,6 +96,7 @@ describe('CarService', function() {
         );
         assert.notCalled(carRepFindByGroup);
         assert.notCalled(carRepCreateStub);
+        assert.notCalled(groupNotifStub);
       });
     });
 
@@ -122,6 +127,7 @@ describe('CarService', function() {
       );
       assert.calledOnceWithExactly(carRepFindByGroup, fakeCar.groupId);
       assert.notCalled(carRepCreateStub);
+      assert.notCalled(groupNotifStub);
     });
 
     it('throws CarNameAlreadyInUserError if a car with the ' +
@@ -149,6 +155,7 @@ describe('CarService', function() {
       );
       assert.calledOnceWithExactly(carRepFindByGroup, fakeCar.groupId);
       assert.notCalled(carRepCreateStub);
+      assert.notCalled(groupNotifStub);
     });
 
     it('throws CarColorAlreadyInUseError if a car with the '+
@@ -179,6 +186,7 @@ describe('CarService', function() {
       );
       assert.calledOnceWithExactly(carRepFindByGroup, fakeCar.groupId);
       assert.notCalled(carRepCreateStub);
+      assert.notCalled(groupNotifStub);
     });
 
     it('creates the car and returns the plain object', async function() {
@@ -212,6 +220,13 @@ describe('CarService', function() {
       );
       assert.calledOnceWithExactly(fakeCar.get, match({plain: true}));
       assert.calledOnceWithExactly(carRepFindByGroup, fakeCar.groupId);
+      assert.calledOnceWithExactly(
+          groupNotifStub,
+          fakeCar.groupId,
+          fakeCar.carId,
+          GroupCarAction.Add,
+          fakeCar,
+      );
     });
   });
 
@@ -303,6 +318,7 @@ describe('CarService', function() {
     let transactionStub: sinon.SinonStub;
     let carRepFindById: sinon.SinonStub;
     let t: {commit: sinon.SinonStub, rollback: sinon.SinonStub};
+    let groupNotifStub: sinon.SinonStub;
     const user: any = {
       id: 1,
     };
@@ -315,6 +331,7 @@ describe('CarService', function() {
       membershipServiceIsMember = sinon.stub(MembershipService, 'isMember');
       transactionStub = sinon.stub(sequelize, 'transaction').resolves(t as any);
       carRepFindById = sinon.stub(CarRepository, 'findById');
+      groupNotifStub = sinon.stub(GroupNotificationService, 'notifyCarUpdate');
     });
 
     it('throws NotMemberOfGroupError if current ' +
@@ -328,6 +345,7 @@ describe('CarService', function() {
       assert.notCalled(carRepFindById);
       assert.notCalled(t.commit);
       assert.notCalled(t.rollback);
+      assert.notCalled(groupNotifStub);
     });
 
     it('throws CarInUseError if user has already a driver', async function() {
@@ -353,6 +371,7 @@ describe('CarService', function() {
       assert.calledOnce(t.rollback);
       assert.notCalled(car.update);
       assert.notCalled(t.commit);
+      assert.notCalled(groupNotifStub);
     });
 
     it('throws InternalError if error occurred while registering ' +
@@ -370,6 +389,7 @@ describe('CarService', function() {
       );
       assert.calledOnce(t.rollback);
       assert.calledOnce(transactionStub);
+      assert.notCalled(groupNotifStub);
     });
 
     it('sets driverId to id of current user', async function() {
@@ -380,6 +400,7 @@ describe('CarService', function() {
         name: 'Car',
         driverId: null,
         update: sinon.stub().resolvesThis(),
+        get: sinon.stub().returnsThis(),
       };
       carRepFindById.resolves(car as any);
 
@@ -398,6 +419,14 @@ describe('CarService', function() {
           match({driverId: user.id}),
           match({transaction: t}),
       );
+      assert.calledOnceWithExactly(car.get, match({plain: true}));
+      assert.calledOnceWithExactly(
+          groupNotifStub,
+          car.groupId,
+          car.carId,
+          GroupCarAction.Drive,
+          car,
+      );
       assert.notCalled(t.rollback);
     });
   });
@@ -407,6 +436,7 @@ describe('CarService', function() {
     let transactionStub: sinon.SinonStub;
     let findByIdStub: sinon.SinonStub;
     let t: {commit: sinon.SinonStub, rollback: sinon.SinonStub};
+    let groupNotifStub: sinon.SinonStub;
     const user: any = {
       id: 10,
     };
@@ -420,6 +450,7 @@ describe('CarService', function() {
       transactionStub = sinon.stub(sequelize, 'transaction')
           .resolves(t as any);
       findByIdStub = sinon.stub(CarRepository, 'findById');
+      groupNotifStub = sinon.stub(GroupNotificationService, 'notifyCarUpdate');
     });
 
     it('throws NotMemberOfGroupError if user ' +
@@ -442,6 +473,7 @@ describe('CarService', function() {
       assert.calledOnceWithExactly(isMemberStub, user, groupId);
       assert.notCalled(transactionStub);
       assert.notCalled(findByIdStub);
+      assert.notCalled(groupNotifStub);
     });
 
     it('throws NotDriverOfCarError if user is ' +
@@ -491,7 +523,8 @@ describe('CarService', function() {
         groupId,
         name: 'Car',
         driverId: user.id,
-        update: sinon.stub().resolves(),
+        update: sinon.stub().resolvesThis(),
+        get: sinon.stub().returnsThis(),
       };
 
       isMemberStub.resolves(true);
@@ -516,6 +549,14 @@ describe('CarService', function() {
           car.update,
           match({driverId: null, latitude, longitude}),
           match({transaction: t}),
+      );
+      assert.calledOnceWithExactly(car.get, match({plain: true}));
+      assert.calledOnceWithExactly(
+          groupNotifStub,
+          car.groupId,
+          car.carId,
+          GroupCarAction.Park,
+          car,
       );
       assert.calledOnce(t.commit);
       assert.notCalled(t.rollback);
@@ -560,6 +601,7 @@ describe('CarService', function() {
       );
       assert.calledOnce(t.rollback);
       assert.notCalled(t.commit);
+      assert.notCalled(groupNotifStub);
     });
   });
 });
