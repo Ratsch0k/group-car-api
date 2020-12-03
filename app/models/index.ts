@@ -46,5 +46,18 @@ Invite.belongsTo(User, {as: 'InviteSender', foreignKey: 'invitedBy'});
 /**
  * Make associations for cars.
  */
-Car.belongsTo(Group, {as: 'Group', foreignKey: 'groupId'});
-Car.belongsTo(User, {as: 'Driver', foreignKey: 'driverId'});
+Car.belongsTo(
+    Group,
+    {
+      as: 'Group',
+      foreignKey: 'groupId',
+      onDelete: 'CASCADE',
+    },
+);
+Car.belongsTo(
+    User,
+    {
+      as: 'Driver',
+      foreignKey: 'driverId',
+    },
+);
