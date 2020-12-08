@@ -82,6 +82,10 @@ jobs:
     services:
       postgres:
         image: postgres
+        env:
+          POSTGRES_DB: groupcartest
+          POSTGRES_PASSWORD: groupcarapitest
+          POSTGRES_USER: groupcarapitest
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -114,6 +118,10 @@ jobs:
     services:
       postgres:
         image: postgres
+        env:
+          POSTGRES_DB: groupcartest
+          POSTGRES_PASSWORD: groupcarapitest
+          POSTGRES_USER: groupcarapitest
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -151,6 +159,10 @@ jobs:
     services:
       postgres:
         image: postgres
+        env:
+          POSTGRES_DB: groupcartest
+          POSTGRES_PASSWORD: groupcarapitest
+          POSTGRES_USER: groupcarapitest
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -188,6 +200,10 @@ jobs:
     services:
       postgres:
         image: postgres
+        env:
+          POSTGRES_DB: groupcartest
+          POSTGRES_PASSWORD: groupcarapitest
+          POSTGRES_USER: groupcarapitest
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
