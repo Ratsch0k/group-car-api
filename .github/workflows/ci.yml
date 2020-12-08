@@ -137,7 +137,7 @@ jobs:
           node-version: '14.x'
       - run: yarn install
       - name: Generate documentation
-        run: yarn doc
+        run: yarn typedoc
       - name: Build
         run: yarn build --prod
       - name: Configure ssh
@@ -178,7 +178,7 @@ jobs:
           node-version: '14.x'
       - run: yarn install
       - name: Generate documentation
-        run: yarn doc
+        run: yarn typedoc
       - name: Build
         run: yarn build --prod
       - name: Configure ssh
@@ -219,7 +219,7 @@ jobs:
           node-version: '14.x'
       - run: yarn install
       - name: Generate documentation
-        run: yarn doc
+        run: yarn typedoc
       - name: Build
         run: yarn build --prod
       - name: Configure ssh
