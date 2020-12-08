@@ -2,9 +2,6 @@
 # crash if any error occurs
 set -ev
  
-# Build code
-yarn tsc
- 
 # Create service file
 SERVICE_CONTENT=$"[Unit]\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Description=Api server for group-car. Handles api requests and serves frontend\n"

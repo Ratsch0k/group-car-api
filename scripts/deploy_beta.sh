@@ -1,10 +1,6 @@
 #!/bin/bash
 # crash if any error occurs
 set -ev
- 
-# Build code
-yarn tsc
-
 
 # Create service file
 SERVICE_CONTENT=$"[Unit]\n"

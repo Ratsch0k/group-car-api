@@ -139,7 +139,7 @@ jobs:
       - name: Generate documentation
         run: yarn typedoc
       - name: Build
-        run: yarn build --prod
+        run: yarn tsc
       - name: Configure ssh
         run: bash scripts/configure_ssh.sh
       - name: Deploy
@@ -180,7 +180,7 @@ jobs:
       - name: Generate documentation
         run: yarn typedoc
       - name: Build
-        run: yarn build --prod
+        run: yarn tsc
       - name: Configure ssh
         run: bash scripts/configure_ssh.sh
       - name: Deploy
@@ -221,7 +221,7 @@ jobs:
       - name: Generate documentation
         run: yarn typedoc
       - name: Build
-        run: yarn build --prod
+        run: yarn tsc
       - name: Configure ssh
         run: bash scripts/configure_ssh.sh
       - name: Deploy
