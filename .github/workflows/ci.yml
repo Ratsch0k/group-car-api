@@ -20,7 +20,7 @@ env:
   SERVER_IP: 206.189.63.151
   POSTGRES_DB: groupcartest
   POSTGRES_PASSWORD: groupcarapitest
-  POSTGRES_USER: groupcarapitest
+  POSTGRES_USERNAME: groupcarapitest
 
 jobs:
   lint:
