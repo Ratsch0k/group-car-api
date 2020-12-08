@@ -60,7 +60,7 @@ jobs:
           node-version: '14.x'
       - run: yarn install
       - name: Building
-        run: yarn build
+        run: yarn tsc
 
   unit-test:
     name: Unit tests
