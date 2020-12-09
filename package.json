@@ -31,7 +31,7 @@
   "scripts": {
     "start": "nodemon --exec ts-node -r tsconfig-paths/register --transpile-only app/group-car.ts",
     "dev": "env-cmd cross-env JWT_SECRET=secret yarn start",
-    "dev:log": "env-cmd cross-env DEBUG=group-car* yarn dev",
+    "dev:log": "env-cmd cross-env DEBUG=group-car*,-group-car-db* yarn dev",
     "dev:log:all": "env-cmd cross-env DEBUG=* yarn dev",
     "dev:beta:log": "env-cmd cross-env DEBUG=group-car* SERVER_TYPE=beta yarn dev",
     "eslint": "./node_modules/.bin/eslint . --ext .js,.ts",
@@ -93,7 +93,7 @@
     "sequelize": "^5.21.6",
     "sinon": "^9.0.2",
     "socket.io": "^2.3.0",
-    "supports-color": "^7.1.0",
+    "supports-color": "^8.0.0",
     "typescript": "^3.8.3",
     "yargs": "^16.0.3"
   },
