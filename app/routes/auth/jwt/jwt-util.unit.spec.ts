@@ -9,7 +9,7 @@ import {
   postLoginJwtValidator,
 } from './jwt-util';
 import {expect} from 'chai';
-import {UnauthorizedError} from '../../../errors';
+import {NotLoggedInError} from '../../../errors';
 import Bluebird from 'bluebird';
 
 const sandbox = sinon.createSandbox();
@@ -224,31 +224,43 @@ describe('jwt-util', function() {
       postLoginJwtValidator(request, response, next);
     });
 
-    it('throws UnauthorizedError if jwt doesn\'t exist on request', function() {
+    it('calls next with NotLoggedInError if jwt doesn\'t ' +
+    'exist on request', function(done) {
       const request: any = sandbox.stub();
-      const next: any = sandbox.stub();
       const response: any = sandbox.stub();
+      const userFindStub = sandbox.stub(User, 'findByPk');
+      userFindStub.usingPromise(Bluebird).resolves(null as any);
 
-      expect(() => postLoginJwtValidator(request, response, next))
-          .to.throw(UnauthorizedError);
-      sandbox.assert.notCalled(next);
+      const next: any = sandbox.stub().callsFake(() => {
+        sandbox.assert.notCalled(userFindStub);
+        sandbox.assert
+            .calledOnceWithExactly(next, match.instanceOf(NotLoggedInError));
+        done();
+      });
+      postLoginJwtValidator(request, response, next);
     });
 
-    it('throws UnauthorizedError if subject ' +
-        'of jwt is pre-login subject', function() {
+    it('calls next with NotLoggedInError if ' +
+    'loggedIn is false on auth', function(done) {
       const request: any = sandbox.stub();
       request.user = {
         loggedIn: false,
       };
-      const next: any = sandbox.stub();
-      const response: any = sandbox.stub();
+      const userFindStub = sandbox.stub(User, 'findByPk');
+      userFindStub.usingPromise(Bluebird).resolves(null as any);
 
-      expect(() => postLoginJwtValidator(request, response, next))
-          .to.throw(UnauthorizedError);
-      sandbox.assert.notCalled(next);
+      const response: any = sandbox.stub();
+      const next: any = sandbox.stub().callsFake(() => {
+        sandbox.assert.notCalled(userFindStub);
+        sandbox.assert
+            .calledOnceWithExactly(next, match.instanceOf(NotLoggedInError));
+        done();
+      });
+
+      postLoginJwtValidator(request, response, next);
     });
 
-    it('throws UnauthorizedError if no ' +
+    it('calls next with NotLoggedInError if no ' +
       'user with the user id exists', function(done) {
       const request: any = sandbox.stub();
       request.auth = {
@@ -263,7 +275,7 @@ describe('jwt-util', function() {
         sandbox.assert.calledOnce(userFindStub);
         (sandbox.assert.calledWith as any)(userFindStub, request.auth.id);
         sandbox.assert.calledOnce(next);
-        sandbox.assert.calledWith(next, match.instanceOf(UnauthorizedError));
+        sandbox.assert.calledWith(next, match.instanceOf(NotLoggedInError));
         done();
       });
       const response: any = sandbox.stub();

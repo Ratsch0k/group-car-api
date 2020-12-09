@@ -1,6 +1,10 @@
-import {GroupService, MembershipRepository, User} from '@models';
+import {
+  GroupService,
+  MembershipRepository,
+  User,
+  UserRepository,
+} from '@models';
 import {OwnerCannotLeaveError, NotLoggedInError} from '@errors';
-import {UserRepository} from './user-repository';
 import config from '@app/config';
 import debug from 'debug';
 

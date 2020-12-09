@@ -1,6 +1,6 @@
 {
   "name": "group-car-api",
-  "version": "0.4.1",
+  "version": "0.5.1",
   "private": true,
   "config": {
     "port": "8080",
@@ -49,9 +49,6 @@
     "marge": "marge -f index.html -o static/test/ -p Report mochawesome-report/mochawesome.json",
     "generate-disclaimer": "yarn licenses generate-disclaimer >> static/license-disclaimer"
   },
-  "resolutions": {
-    "lodash": ">=4.17.19"
-  },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.30",
@@ -70,6 +67,7 @@
     "@types/nodemailer": "^6.4.0",
     "@types/sequelize": "^4.28.8",
     "@types/sinon": "^9.0.0",
+    "@types/socket.io": "^2.1.11",
     "@types/supertest": "^2.0.8",
     "@types/validator": "^13.0.0",
     "@types/yargs": "^15.0.5",
@@ -94,6 +92,7 @@
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.6",
     "sinon": "^9.0.2",
+    "socket.io": "^2.3.0",
     "supports-color": "^7.1.0",
     "typescript": "^3.8.3",
     "yargs": "^16.0.3"
@@ -102,6 +101,7 @@
     "@types/chai": "^4.2.11",
     "@types/cookie": "^0.3.3",
     "@types/mocha": "^7.0.2",
+    "@types/socket.io-client": "^1.4.34",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/parser": "^2.27.0",
     "chai": "^4.2.0",
@@ -116,6 +116,7 @@
     "nodemon": "^2.0.4",
     "nyc": "^15.0.1",
     "sequelize-cli": "^5.5.1",
+    "socket.io-client": "^2.3.1",
     "source-map-support": "^0.5.16",
     "supertest": "^4.0.2",
     "ts-node": "^8.8.2",

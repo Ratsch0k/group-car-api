@@ -2,15 +2,6 @@
 # crash if any error occurs
 set -ev
  
-# Build code
-yarn tsc
- 
-# encrypt key
-openssl aes-256-cbc -K $encrypted_c28e77baa059_key -iv $encrypted_c28e77baa059_iv -in deploy-key.enc -out deploy-key -d
-rm deploy-key.enc
-chmod 600 deploy-key
-mv deploy-key ~/.ssh/id_rsa
- 
 # Create service file
 SERVICE_CONTENT=$"[Unit]\n"
 SERVICE_CONTENT=$"${SERVICE_CONTENT}Description=Api server for group-car. Handles api requests and serves frontend\n"

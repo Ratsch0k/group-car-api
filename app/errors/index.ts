@@ -13,3 +13,4 @@ export {default} from './error-handler';
 export * from './group';
 export * from './membership';
 export * from './auth';
+export * from './car';

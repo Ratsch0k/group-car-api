@@ -10,6 +10,7 @@ import {
   CannotChangeOwnerMembershipError,
   NotAdminOfGroupError,
   NotMemberOfGroupError,
+  InternalError,
 } from '@errors';
 import debug from 'debug';
 
@@ -196,5 +197,27 @@ export class MembershipService {
           withUserData: true,
         },
     );
+  }
+
+  /**
+   * Checks if the current user is a member
+   * of the specified group.
+   * @param currentUser - The currently logged in user
+   * @param groupId     - The if of the group.
+   */
+  public static async isMember(
+      currentUser: Express.User,
+      groupId: number,
+  ): Promise<boolean> {
+    try {
+      await MembershipRepository.findById({groupId, userId: currentUser.id});
+      return true;
+    } catch (e) {
+      if (e instanceof MembershipNotFoundError) {
+        return false;
+      } else {
+        throw new InternalError('Couldn\'t check membership');
+      }
+    }
   }
 }

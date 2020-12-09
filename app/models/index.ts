@@ -1,8 +1,16 @@
+export * from './user';
+export * from './group';
+export * from './car';
+export * from './membership';
+export * from './profile-picture';
+export * from './invite';
+
 import {User} from './user/user';
 import {Group} from './group/group';
 import {Membership} from './membership/membership';
 import {ProfilePic} from './profile-picture/profile-pic';
 import {Invite} from './invite/invite';
+import {Car} from './car';
 
 /*
  * Add n:m association "Membership" between group and user
@@ -35,8 +43,21 @@ Invite.belongsTo(User, {as: 'User', foreignKey: 'userId'});
  */
 Invite.belongsTo(User, {as: 'InviteSender', foreignKey: 'invitedBy'});
 
-export * from './user';
-export * from './group';
-export * from './membership';
-export * from './profile-picture';
-export * from './invite';
+/**
+ * Make associations for cars.
+ */
+Car.belongsTo(
+    Group,
+    {
+      as: 'Group',
+      foreignKey: 'groupId',
+      onDelete: 'CASCADE',
+    },
+);
+Car.belongsTo(
+    User,
+    {
+      as: 'Driver',
+      foreignKey: 'driverId',
+    },
+);

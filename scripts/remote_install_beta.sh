@@ -8,7 +8,7 @@ npm_config_build_from_source=true npx yarn add canvas
 npx yarn install
 
 # Change owner of node_modules to deploy. Necessary for deploy user to update server
-sudo chown -R deploy node_modules
+sudo chown -R deploy-beta node_modules
 
 # Get secrets from environment file
 source $2 >/dev/null
