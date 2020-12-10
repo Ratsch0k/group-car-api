@@ -36,6 +36,7 @@ describe('jwt-csrf', function() {
 
     response = sandbox.stub();
     request = sandbox.stub();
+    request.cookies = {};
     next = sandbox.stub();
   });
 
