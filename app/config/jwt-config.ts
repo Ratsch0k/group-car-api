@@ -52,6 +52,8 @@ const name = 'jwt';
 const getToken = (req: Request): string | null => {
   if (req.cookies[name]) {
     return req.cookies[name];
+  } else if (req.jwtToken) {
+    return req.jwtToken;
   } else {
     return null;
   }
@@ -66,7 +68,7 @@ const jwt: JWTConfig = {
   getToken,
   getOptions: (username: string = notLoggedInSubject) => ({
     algorithm: 'HS512',
-    expiresIn: '15m', // 15 minutes
+    expiresIn: '30m', // 15 minutes
     issuer: 'my-group-car.de',
     subject: username,
   }),
@@ -75,7 +77,7 @@ const jwt: JWTConfig = {
     sameSite: process.env.NODE_ENV === 'production',
     secure: process.env.NODE_ENV === 'production',
     signed: false,
-    maxAge: 1000 * 60 * 15, // 15 minutes
+    maxAge: 1000 * 60 * 30, // 30 minutes
   },
   securityOptions: {
     ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
