@@ -20,6 +20,7 @@ declare namespace Express {
     getSecret(): string;
     user?: User;
     auth: Auth;
+    jwtToken: string | undefined;
   }
 
   export interface Response {

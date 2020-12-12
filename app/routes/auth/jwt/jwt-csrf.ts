@@ -51,7 +51,7 @@ const jwtCsrf: () => RequestHandler = () =>
       if (_secret === null) {
         warn('Misconfigured jwt on ignored method.' +
           ' Jwt will be replaced with pre-login jwt');
-        secret = setSecret(tokens, res);
+        secret = setSecret(tokens, req, res);
       } else {
         log('Ignored method %s with jwt and secret', req.method);
         secret = _secret;
@@ -90,15 +90,19 @@ const jwtCsrf: () => RequestHandler = () =>
       }
     } else if (!jwt && isIgnoredMethod(req)) {
       /*
-       * If the method is an ignored method and the jwt doesn't exist on i
+       * If the method is an ignored method and the jwt doesn't exist on it
        * a new secret will be generated and a jwt token will be set as cookie.
        */
       log('Ignored method without jwt. Pre-login jwt will be set');
-      secret = setSecret(tokens, res);
+      secret = setSecret(tokens, req, res);
     } else {
       error('Missing jwt');
       throw new UnauthorizedError();
     }
+
+    req.jwtToken = req.cookies['jwt'] ?
+      req.cookies['jwt'] :
+      req.jwtToken;
 
     /**
      * Add function to request which gets the csrf token for
@@ -130,9 +134,13 @@ const jwtCsrf: () => RequestHandler = () =>
         [secretName]: secret,
       }, payload);
 
+      const jwtToken = generateToken(_payload, subject);
+
+      req.jwtToken = jwtToken;
+
       // Set the cookie on the response
       res.cookie(config.jwt.name,
-          generateToken(_payload, subject),
+          jwtToken,
           cookieOptions);
     };
 
@@ -209,13 +217,16 @@ const isIgnoredMethod = (req: Request): boolean => {
  * @param req - The http request
  * @returns   The new secret
  */
-const setSecret = (tokens: Tokens, res: Response): string => {
+const setSecret = (tokens: Tokens, req: Request, res: Response): string => {
   // Generate new secret
   const secret = tokens.secretSync();
 
+  const jwtToken = generateToken({[secretName]: secret});
+  req.jwtToken = jwtToken;
+
   res.cookie(
       config.jwt.name,
-      generateToken({[secretName]: secret}),
+      jwtToken,
       {
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production',
