@@ -16,7 +16,7 @@ yarn generate-disclaimer
 
 # Get tag from reference
 REF=$"${GITHUB_REF}"
-version="${REF/refs\/tag\//}"
+version="${REF/refs\/tags\//}"
 
 # Build and tag images
 echo "Build image docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:$version"
