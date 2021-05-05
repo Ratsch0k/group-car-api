@@ -39,9 +39,9 @@ envsubst < $COMPOSE_CONFIG > config.yml
 cat config.yml
 
 echo "Upload compose configs"
-rsync --compress --delete --quit docker-compose.yml $SERVER_USER@$SERVER_IP:/tmp/docker-compose.yml
-rsync --compress --delete --quit config.yml $SERVER_USER@$SERVER_IP:/tmp/config.yml
-rsync --compress --delete --quit ./scripts/update_server.sh $SERVER_USER@$SERVER_IP:/tmp/update_server.sh
+rsync --compress --delete --quiet docker-compose.yml $SERVER_USER@$SERVER_IP:/tmp/docker-compose.yml
+rsync --compress --delete --quiet config.yml $SERVER_USER@$SERVER_IP:/tmp/config.yml
+rsync --compress --delete --quiet ./scripts/update_server.sh $SERVER_USER@$SERVER_IP:/tmp/update_server.sh
 
 
 echo "Update remote container"
