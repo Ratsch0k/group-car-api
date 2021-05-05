@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ev
 
+echo $2
+
 PASSWORD=$(<$2)
 
 echo "Login to docker"
