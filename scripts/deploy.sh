@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ed
 
 chmod +x build/group-car.js
 chmod +x scripts/update_server.sh
