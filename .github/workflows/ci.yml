@@ -115,7 +115,7 @@ jobs:
       PASSWORD: ${{secrets.GITHUB_TOKEN}}
       COMPOSE_CONFIG: alpha.yml
       PORT: 8080
-      FRONTEND_PATH: ../html/
+      FRONTEND_PATH: /var/www/dev.my-group-car.de/html
     services:
       postgres:
         image: postgres
