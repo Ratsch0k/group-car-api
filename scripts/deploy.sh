@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ed
+set -ev
 
 chmod +x build/group-car.js
 chmod +x scripts/update_server.sh
@@ -45,4 +45,4 @@ rsync --compress --quiet ./scripts/update_server.sh $SERVER_USER@$SERVER_IP:/tmp
 
 
 echo "Update remote container"
-ssh $SERVER_USER@$SERVER_IP /bin/bash /tmp/update_server.sh $SERVER_TYPE
+ssh $SERVER_USER@$SERVER_IP /bin/bash /tmp/update_server.sh $SERVER_TYPE $ACCESS_PATH
