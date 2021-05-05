@@ -2,6 +2,7 @@
 set -e
 
 chmod +x build/group-car.js
+chmod +x scripts/update_server.sh
 
 # Create test report
 echo "Run tests to get test coverage"
@@ -37,5 +38,11 @@ docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:latest
 envsubst < $COMPOSE_CONFIG > config.yml
 cat config.yml
 
+echo "Upload compose configs"
+rsync --compress --delete --quit docker-compose.yml $SERVER_USER@$SERVER_IP:/tmp/docker-compose.yml
+rsync --compress --delete --quit config.yml $SERVER_USER@$SERVER_IP:/tmp/config.yml
+rsync --compress --delete --quit ./scripts/update_server.sh $SERVER_USER@$SERVER_IP:/tmp/update_server.sh
+
+
 echo "Update remote container"
-docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" -f docker-compose.yml -f config.yml up -d --build --no-deps $SERVER_NAME
+ssh $SERVER_USER@$SERVER_IP /bin/bash /tmp/update-server.sh $SERVER_TYPE
