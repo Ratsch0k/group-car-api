@@ -43,6 +43,6 @@ rsync --compress --quiet docker-compose.yml $SERVER_USER@$SERVER_IP:/tmp/docker-
 rsync --compress --quiet config.yml $SERVER_USER@$SERVER_IP:/tmp/config.yml
 rsync --compress --quiet ./scripts/update_server.sh $SERVER_USER@$SERVER_IP:/tmp/update_server.sh
 
-
+echo $ACCESS_PATH
 echo "Update remote container"
 ssh $SERVER_USER@$SERVER_IP /bin/bash /tmp/update_server.sh $SERVER_TYPE $ACCESS_PATH
