@@ -1,0 +1,13 @@
+services: 
+  group-car-alpha:
+    container_name: group-car-alpha
+    image: docker.pkg.github.com/ratsch0k/group-car-api/group-car-alpha:latest
+    ports:
+      - $PORT:8080
+    volumes: 
+      - $FRONTEND_PATH:/home/node/group-car-api/static
+    env_file: 
+      - $SERVER_ENV_FILE_PATH
+    working_dir: /home/node/group-car-api
+    restart: always
+    command: /bin/bash -c "yarn sequelize-cli db:migrate && node -r tsconfig-paths/register ./build/group-car.js"
