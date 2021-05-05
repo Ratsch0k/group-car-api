@@ -114,6 +114,8 @@ jobs:
       SERVER_NAME: 'group-car-dev'
       PASSWORD: ${{secrets.GITHUB_TOKEN}}
       COMPOSE_CONFIG: alpha.yml
+      PORT: 8080
+      FRONTEND_PATH: ../html/
     services:
       postgres:
         image: postgres
