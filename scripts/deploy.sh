@@ -34,7 +34,7 @@ echo "Push images"
 docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:$version
 docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:latest
 
-echo docker-compose config >> $COMPOSE_CONFIG
+docker-compose config >> $COMPOSE_CONFIG
 cat $COMPOSE_CONFIG
 
 echo "Update remote container"
