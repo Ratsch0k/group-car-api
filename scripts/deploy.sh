@@ -34,5 +34,8 @@ echo "Push images"
 docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:$version
 docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:latest
 
+$COMPOSE_CONFIG << docker-compose config
+cat $COMPOSE_CONFIG
+
 echo "Update remote container"
-docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" -e PORT=$PORT -e FRONTEND_PATH=$FRONTEND_PATH -e SERVER_ENV_FILE_PATH=$SERVER_ENV_FILE_PATH -f docker-compose.yml -f $COMPOSE_CONFIG up -d --build --no-deps $SERVER_NAME
+docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" -f docker-compose.yml -f $COMPOSE_CONFIG up -d --build --no-deps $SERVER_NAME
