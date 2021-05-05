@@ -35,4 +35,4 @@ docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:$version
 docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:latest
 
 echo "Update remote container"
-docker -H "ssh://$SERVER_USER@$SERVER_IP" compose -f docker-compose.yml -f $COMPOSE_CONFIG up -d --build --no-deps $SERVER_NAME
+docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" -f docker-compose.yml -f $COMPOSE_CONFIG up -d --build --no-deps $SERVER_NAME
