@@ -111,7 +111,9 @@ jobs:
       SSH_KEY: ${{secrets.SSH_KEY_DEV}}
       SSH_KNOWN_HOST: ${{secrets.SSH_KNOWN_HOST_DEV}}
       SERVER_USER: 'deploy-dev'
-      SERVER_SERVICE_USER: 'group-car-dev'
+      SERVER_NAME: 'group-car-dev'
+      PASSWORD: ${{secrets.GITHUB_TOKEN}}
+      COMPOSE_CONFIG: alpha.yml
     services:
       postgres:
         image: postgres
@@ -140,7 +142,7 @@ jobs:
       - name: Configure ssh
         run: bash scripts/configure_ssh.sh
       - name: Deploy
-        run: bash scripts/deploy_dev.sh
+        run: bash scripts/deploy.sh
   deploy-beta:
     name: Deploy a beta version
     runs-on: ubuntu-latest
