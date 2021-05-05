@@ -1,13 +1,13 @@
 #!/bin/bash
 set -ev
 
-echo "$1"
-echo "$2"
+# Set environment variables to use rootles docker instance
+export PATH=/usr/bin:$PATH
+export DOCKER_HOST=unix:///run/user/1001/docker.sock
 
-PASSWORD=$(<$2)
 
 echo "Login to docker"
-docker login https://docker.pkg.github.com -u Ratsch0k -p $PASSWORD
+cat $2 | docker login https://docker.pkg.github.com -u Ratsch0k --pasword-stdin
 
 echo "Update server"
 sudo /usr/local/bin/docker-compose -f /tmp/docker-compose.yml -f /tmp/config.yml up -d --build --no-deps $1
