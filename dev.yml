@@ -5,7 +5,7 @@ services:
     ports:
       - $PORT:8080
     volumes: 
-      - $FRONTEND_PATH:/home/node/group-car-api/static
+      - $FRONTEND_PATH:/home/node/group-car-api/static:ro
     env_file: 
       - $SERVER_ENV_FILE_PATH
     working_dir: /home/node/group-car-api
