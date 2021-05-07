@@ -33,7 +33,8 @@ echo "$PASSWORD" | docker login https://docker.pkg.github.com -u Ratsch0k --pass
 # Push images
 echo "Push images"
 
-if [ "$version" != *alpha* -o "$version" != *beta* ] then
+if [ "$version" != *alpha* -o "$version" != *beta* ]
+then
   # Only push an image with the version tag if it's a release version, otherwise just update latest image
   docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:$version
 fi
