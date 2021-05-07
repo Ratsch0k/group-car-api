@@ -32,8 +32,13 @@ echo "$PASSWORD" | docker login https://docker.pkg.github.com -u Ratsch0k --pass
 
 # Push images
 echo "Push images"
-docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:$version
+
+if [ "$version" != *alpha* -o "$version" != *beta* ]
+  # Only push an image with the version tag if it's a release version, otherwise just update latest image
+  docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:$version
+fi
 docker push docker.pkg.github.com/ratsch0k/group-car-api/$SERVER_NAME:latest
+
 
 envsubst < $COMPOSE_CONFIG > config.yml
 cat config.yml
