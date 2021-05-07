@@ -205,6 +205,12 @@ jobs:
       SSH_KNOWN_HOST: ${{secrets.SSH_KNOWN_HOST}}
       SERVER_USER: 'deploy'
       SERVER_SERVICE_USER: 'group-car'
+      SERVER_NAME: 'group-car'
+      PASSWORD: ${{secrets.GITHUB_TOKEN}}
+      COMPOSE_CONFIG: prod.yml
+      PORT: 8080
+      FRONTEND_PATH: /home/deploy/my-group-car.de/html
+      ACCESS_PATH: /etc/my-group-car.de/access_token.txt
     services:
       postgres:
         image: postgres
@@ -233,5 +239,5 @@ jobs:
       - name: Configure ssh
         run: bash scripts/configure_ssh.sh
       - name: Deploy
-        run: bash scripts/deploy_release.sh
+        run: bash scripts/deploy.sh
 
