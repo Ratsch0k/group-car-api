@@ -5,5 +5,5 @@ services:
     container_name: group-car-db
     image: postgres:10-alpine
     restart: always
-    volumes: 
+    volumes:
       - $DB_DATA_PATH:/var/lib/postgresql/data
