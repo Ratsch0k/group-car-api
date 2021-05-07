@@ -45,4 +45,4 @@ rsync --compress --quiet ./scripts/update_server.sh $SERVER_USER@$SERVER_IP:/hom
 
 echo $ACCESS_PATH
 echo "Update remote container"
-ssh $SERVER_USER@$SERVER_IP sudo /home/$SERVER_USER/update_server.sh $SERVER_NAME $ACCESS_PATH
+ssh $SERVER_USER@$SERVER_IP sudo /home/$SERVER_USER/update_server.sh $ACCESS_PATH
