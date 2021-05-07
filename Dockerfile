@@ -10,7 +10,9 @@ COPY package.json ./
 COPY yarn.lock ./
 
 RUN apt-get update
-RUN apt-get install libpango1.0-dev gir1.2-pango-1.0 libcairo2-dev libcairo-gobject2 gobject-introspection libgirepository1.0-dev libxml2-dev -y
+RUN apt-get install --no-install-recommends -y libpango1.0-dev gir1.2-pango-1.0 libcairo2-dev libcairo-gobject2 gobject-introspection libgirepository1.0-dev libxml2-dev
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 
 RUN npm_config_build_from_source=true yarn add canvas
 RUN yarn install
