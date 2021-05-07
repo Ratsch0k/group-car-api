@@ -158,6 +158,12 @@ jobs:
       SSH_KNOWN_HOST: ${{secrets.SSH_KNOWN_HOST_BETA}}
       SERVER_USER: 'deploy-beta'
       SERVER_SERVICE_USER: 'group-car-beta'
+      SERVER_NAME: 'group-car-beta'
+      PASSWORD: ${{secrets.GITHUB_TOKEN}}
+      COMPOSE_CONFIG: beta.yml
+      PORT: 8081
+      FRONTEND_PATH: /home/deploy-beta/beta.my-group-car.de/html
+      ACCESS_PATH: /etc/beta.my-group-car.de/access_token.txt
     services:
       postgres:
         image: postgres
@@ -186,7 +192,7 @@ jobs:
       - name: Configure ssh
         run: bash scripts/configure_ssh.sh
       - name: Deploy
-        run: bash scripts/deploy_beta.sh
+        run: bash scripts/deploy.sh
   deploy-release:
     name: Deploy a release version
     runs-on: ubuntu-latest
