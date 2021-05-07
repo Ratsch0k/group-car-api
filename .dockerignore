@@ -1,0 +1,7 @@
+Dockerfile
+.dockerignore
+node_modules
+build
+mochawesome-report
+*.md
+data
