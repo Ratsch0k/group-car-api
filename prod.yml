@@ -3,9 +3,9 @@ version: "3.9"
 services: 
   group-car:
     container_name: group-car
-    build: .
-    ports:
-      - $PORT:8080
+    image: docker.pkg.github.com/ratsch0k/group-car-api/group-car:latest
+    user: node
+    network_mode: host
     volumes: 
       - $FRONTEND_PATH:/home/node/group-car-api/static
     env_file: 

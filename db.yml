@@ -3,9 +3,7 @@ version: "3.9"
 services:
   postgres:
     container_name: group-car-db
-    image: postgres:12-alpine
+    image: postgres:10-alpine
     restart: always
-    env_file:
-      - $ENV_FILE
     volumes: 
       - $DB_DATA_PATH:/var/lib/postgresql/data
