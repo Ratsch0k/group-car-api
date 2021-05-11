@@ -50,4 +50,4 @@ rsync --compress --quiet config.yml $SERVER_USER@$SERVER_IP:/home/$SERVER_USER/c
 rsync --compress --quiet ./scripts/update_server.sh $SERVER_USER@$SERVER_IP:/home/$SERVER_USER/update_server.sh
 
 echo "Update remote container"
-ssh $SERVER_USER@$SERVER_IP sudo /home/$SERVER_USER/update_server.sh $SERVER_USER $ACCESS_PATH
+ssh $SERVER_USER@$SERVER_IP sudo /home/$SERVER_USER/update_server.sh $SERVER_USER $ACCESS_PATH $SERVER_NAME
