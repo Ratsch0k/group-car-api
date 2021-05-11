@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  group-car:
+    container_name: group-car
+    image: docker.pkg.github.com/ratsch0k/group-car-api/group-car:latest
+    user: node
+    network_mode: host
+    volumes:
+      - $FRONTEND_PATH:/home/node/group-car-api/frontend
+    environment:
+      - HTML_STATIC=/home/node/group-car-api/frontend
+    env_file:
+      - $SERVER_ENV_FILE_PATH
+    working_dir: /home/node/group-car-api
+    restart: always
+    command: /bin/bash -c "yarn sequelize-cli db:migrate && node -r tsconfig-paths/register ./build/group-car.js"
