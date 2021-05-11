@@ -7,7 +7,9 @@ services:
     user: node
     network_mode: host
     volumes:
-      - $FRONTEND_PATH:/home/node/group-car-api/static
+      - $FRONTEND_PATH:/home/node/group-car-api/frontend
+    environment:
+      - HTML_STATIC=/home/node/group-car-api/frontend
     env_file:
       - $SERVER_ENV_FILE_PATH
     working_dir: /home/node/group-car-api
