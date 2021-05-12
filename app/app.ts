@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import errorHandler from '@errors';
 import expressJwt from 'express-jwt';
 import morganDebug from 'morgan-debug';
+import {obfuscateMetrics} from './util/obfuscateMetrics';
 
 /**
  * Import router
@@ -14,6 +15,7 @@ import jwtCsrf from './routes/auth/jwt/jwt-csrf';
 import {postLoginJwtValidator} from './routes/auth/jwt/jwt-util';
 import apiRouter from './routes/api';
 import {userRouter} from './routes/user';
+
 
 const app: express.Application = express();
 
@@ -29,6 +31,29 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
 app.use(jwtCsrf());
+
+
+import swaggerStats from 'swagger-stats';
+import fs from 'fs';
+import yaml from 'js-yaml';
+
+/*
+ * If metrics enabled, configure middleware
+ */
+if (config.metrics) {
+  try {
+    const fileContents = fs.readFileSync(
+        'static/doc/openapi/openapi.yaml', 'utf-8');
+    const spec = yaml.load(fileContents) as Record<string, unknown>;
+    app.use(swaggerStats.getMiddleware({
+      swaggerSpec: spec,
+      onResponseFinish: obfuscateMetrics,
+    }));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 
 // Adding authentication routes
 app.use('/auth', authRouter);
@@ -49,7 +74,6 @@ app.use(
     apiRouter,
 );
 
-
 /**
  * Configure serving of documentation
  */
@@ -60,14 +84,13 @@ app.use(express.static('static'));
  */
 if (!config.static.disabled) {
   app.use(express.static(config.static.path));
-  app.get('/*', (req, res) => {
+  app.get('/*', (_req, res) => {
     res.sendFile(
         path.join(
             config.static.path,
             'index.html'));
   });
 }
-
 
 // Register error handler
 app.use(errorHandler);
