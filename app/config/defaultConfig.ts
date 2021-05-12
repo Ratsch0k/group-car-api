@@ -57,9 +57,6 @@ const defaultConfig: Config = {
   },
   metrics: {
     enabled: true,
-    port: 9000,
-    path: '/metrics',
-    log: false,
   },
 };
 

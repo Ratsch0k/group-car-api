@@ -9,6 +9,7 @@ import {
   StaticConfig,
   UserConfig,
   Config,
+  MetricsConfig,
 } from './config.d';
 import _ from 'lodash';
 import defaultConfig from './defaultConfig';
@@ -101,6 +102,10 @@ const user: Partial<UserConfig> = {
     !Boolean(process.env.DISABLE_SIGN_UP_THROUGH_REQUEST),
 };
 
+const metrics: Partial<MetricsConfig> = {
+  enabled: environment !== 'test',
+};
+
 const config: DeepPartial<Config> = {
   user,
   database,
@@ -108,6 +113,7 @@ const config: DeepPartial<Config> = {
   bcrypt,
   morgan,
   error,
+  metrics,
 };
 
 export default _.merge(defaultConfig, config);

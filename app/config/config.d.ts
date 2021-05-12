@@ -58,9 +58,6 @@ export interface MailConfig {
 
 export interface MetricsConfig {
   enabled: boolean;
-  port: number;
-  path: string;
-  log: boolean;
 }
 
 export interface Config {
