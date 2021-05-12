@@ -5,6 +5,7 @@ import errorHandler from '@errors';
 import expressJwt from 'express-jwt';
 import morganDebug from 'morgan-debug';
 import {obfuscateMetrics} from './util/obfuscateMetrics';
+import debug from 'debug';
 
 /**
  * Import router
@@ -16,6 +17,7 @@ import {postLoginJwtValidator} from './routes/auth/jwt/jwt-util';
 import apiRouter from './routes/api';
 import {userRouter} from './routes/user';
 
+const log = debug('group-car:app');
 
 const app: express.Application = express();
 
@@ -42,15 +44,17 @@ import yaml from 'js-yaml';
  */
 if (config.metrics.enabled) {
   try {
+    log('Metrics enabled');
     const fileContents = fs.readFileSync(
-        'static/doc/openapi/openapi.yaml', 'utf-8');
+        'static/doc/openapi/opendapi.yaml', 'utf-8');
     const spec = yaml.load(fileContents) as Record<string, unknown>;
     app.use(swaggerStats.getMiddleware({
       swaggerSpec: spec,
       onResponseFinish: obfuscateMetrics,
     }));
+    log('Metrics initialised');
   } catch (e) {
-    console.error(e);
+    log('Could not initialise metrics: %s', e.message);
   }
 }
 

@@ -5,7 +5,7 @@ import {RequestResponseRecord} from 'swagger-stats';
  * Modifies the `RequestResponseRecord`, which is used to store metrics,
  * to obfuscate credentials and other sensitive data of the user.
  * @param req - The incoming request
- * @param res - THe outgoing response
+ * @param res - The outgoing response
  * @param rrr - The record
  */
 export function obfuscateMetrics(
