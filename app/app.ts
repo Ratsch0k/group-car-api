@@ -46,7 +46,7 @@ if (config.metrics.enabled) {
   try {
     log('Metrics enabled');
     const fileContents = fs.readFileSync(
-        'static/doc/openapi/opendapi.yaml', 'utf-8');
+        'static/doc/openapi/openapi.yaml', 'utf-8');
     const spec = yaml.load(fileContents) as Record<string, unknown>;
     app.use(swaggerStats.getMiddleware({
       swaggerSpec: spec,
