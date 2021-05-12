@@ -40,7 +40,7 @@ import yaml from 'js-yaml';
 /*
  * If metrics enabled, configure middleware
  */
-if (config.metrics) {
+if (config.metrics.enabled) {
   try {
     const fileContents = fs.readFileSync(
         'static/doc/openapi/openapi.yaml', 'utf-8');
