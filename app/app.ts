@@ -50,7 +50,6 @@ app.use(cookieParser());
 app.use(jwtCsrf());
 
 
-
 import swaggerStats from 'swagger-stats';
 import fs from 'fs';
 import yaml from 'js-yaml';
