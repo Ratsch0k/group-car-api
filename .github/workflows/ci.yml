@@ -155,7 +155,7 @@ jobs:
         with:
           environment: production
           version: ${{github.ref}}
-          sourcemaps: ''./build'
+          sourcemaps: './build'
   deploy-beta:
     name: Deploy a beta version
     runs-on: ubuntu-latest
