@@ -6,6 +6,8 @@ import expressJwt from 'express-jwt';
 import morganDebug from 'morgan-debug';
 import {obfuscateMetrics} from './util/obfuscateMetrics';
 import debug from 'debug';
+import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 
 /**
  * Import router
@@ -24,6 +26,19 @@ const app: express.Application = express();
 // Add middleware
 app.set('trust proxy', true);
 
+
+Sentry.init({
+  dsn: 'https://7d4cc992f614416abcb1007107e12c16@o656739.ingest.sentry.io/5763203',
+  integrations: [
+    new Sentry.Integrations.Http({tracing: true}),
+    new Tracing.Integrations.Express({app}),
+  ],
+  tracesSampleRate: 1.0,
+});
+
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
+
 // Only log http request if a format string is provided
 if (config.morgan.formatString !== null) {
   app.use(morganDebug('group-car-http', config.morgan.formatString));
@@ -33,6 +48,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
 app.use(jwtCsrf());
+
 
 
 import swaggerStats from 'swagger-stats';
@@ -95,6 +111,8 @@ if (!config.static.disabled) {
             'index.html'));
   });
 }
+
+app.use(Sentry.Handlers.errorHandler());
 
 // Register error handler
 app.use(errorHandler);

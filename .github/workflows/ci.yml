@@ -146,6 +146,15 @@ jobs:
         run: bash scripts/configure_ssh.sh
       - name: Deploy
         run: bash scripts/deploy.sh
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
+          SENTRY_ORG: ${{secrets.SENTRY_ORG}}
+          SENTRY_PROJECT: ${{secrets.SENTRY_PROJECT_DEV}}
+        with:
+          environment: production
+          version: ${{github.ref}}
   deploy-beta:
     name: Deploy a beta version
     runs-on: ubuntu-latest

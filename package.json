@@ -50,6 +50,8 @@
     "generate-disclaimer": "yarn licenses generate-disclaimer >> static/license-disclaimer"
   },
   "dependencies": {
+    "@sentry/node": "^6.3.6",
+    "@sentry/tracing": "^6.3.6",
     "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.30",
     "@types/chai-as-promised": "^7.1.2",
