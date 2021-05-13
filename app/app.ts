@@ -26,18 +26,23 @@ const app: express.Application = express();
 // Add middleware
 app.set('trust proxy', true);
 
+/**
+ * Initialise sentry. Don't if testing
+ */
+if (process.env.NODE_ENV !== 'test') {
+  Sentry.init({
+    dsn: 'https://7d4cc992f614416abcb1007107e12c16@o656739.ingest.sentry.io/5763203',
+    integrations: [
+      new Sentry.Integrations.Http({tracing: true}),
+      new Tracing.Integrations.Express({app}),
+    ],
+    tracesSampleRate: 1.0,
+  });
 
-Sentry.init({
-  dsn: 'https://7d4cc992f614416abcb1007107e12c16@o656739.ingest.sentry.io/5763203',
-  integrations: [
-    new Sentry.Integrations.Http({tracing: true}),
-    new Tracing.Integrations.Express({app}),
-  ],
-  tracesSampleRate: 1.0,
-});
+  app.use(Sentry.Handlers.requestHandler());
+  app.use(Sentry.Handlers.tracingHandler());
+}
 
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.tracingHandler());
 
 // Only log http request if a format string is provided
 if (config.morgan.formatString !== null) {
