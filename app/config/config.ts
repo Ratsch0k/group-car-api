@@ -104,6 +104,7 @@ const user: Partial<UserConfig> = {
 
 const metrics: Partial<MetricsConfig> = {
   enabled: environment !== 'test',
+  dsn: process.env.SENTRY_DSN || 'https://7d4cc992f614416abcb1007107e12c16@o656739.ingest.sentry.io/5763203',
 };
 
 const config: DeepPartial<Config> = {

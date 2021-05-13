@@ -58,6 +58,8 @@ export interface MailConfig {
 
 export interface MetricsConfig {
   enabled: boolean;
+  tracesSampleRate: number;
+  dsn: string;
 }
 
 export interface Config {

@@ -57,6 +57,8 @@ const defaultConfig: Config = {
   },
   metrics: {
     enabled: true,
+    tracesSampleRate: 1.0,
+    dsn: 'https://7d4cc992f614416abcb1007107e12c16@o656739.ingest.sentry.io/5763203',
   },
 };
 
