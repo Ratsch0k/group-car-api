@@ -30,13 +30,14 @@ app.set('trust proxy', true);
  * Initialise sentry. Don't if testing
  */
 if (process.env.NODE_ENV !== 'test') {
+  log('Sentry monitoring with dsn %s', config.metrics.dsn);
   Sentry.init({
-    dsn: 'https://7d4cc992f614416abcb1007107e12c16@o656739.ingest.sentry.io/5763203',
+    dsn: config.metrics.dsn,
     integrations: [
       new Sentry.Integrations.Http({tracing: true}),
       new Tracing.Integrations.Express({app}),
     ],
-    tracesSampleRate: 1.0,
+    tracesSampleRate: config.metrics.tracesSampleRate,
   });
 
   app.use(Sentry.Handlers.requestHandler());
