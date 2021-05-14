@@ -1,6 +1,6 @@
 {
   "name": "group-car-api",
-  "version": "0.6.1",
+  "version": "0.7.0-alpha.3",
   "private": true,
   "config": {
     "port": "8080",
@@ -31,7 +31,7 @@
   "scripts": {
     "start": "nodemon --exec ts-node -r tsconfig-paths/register --transpile-only app/group-car.ts",
     "dev": "env-cmd cross-env JWT_SECRET=secret yarn start",
-    "dev:log": "env-cmd cross-env DEBUG=group-car*,-group-car-db* yarn dev",
+    "dev:log": "env-cmd cross-env DEBUG=group-car*,group-car-db* yarn dev",
     "dev:log:all": "env-cmd cross-env DEBUG=* yarn dev",
     "dev:beta:log": "env-cmd cross-env DEBUG=group-car* SERVER_TYPE=beta yarn dev",
     "eslint": "./node_modules/.bin/eslint . --ext .js,.ts",
@@ -50,6 +50,8 @@
     "generate-disclaimer": "yarn licenses generate-disclaimer >> static/license-disclaimer"
   },
   "dependencies": {
+    "@sentry/node": "^6.3.6",
+    "@sentry/tracing": "^6.3.6",
     "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.30",
     "@types/chai-as-promised": "^7.1.2",
@@ -82,6 +84,7 @@
     "express-handlebars": "^4.0.4",
     "express-jwt": "^6.0.0",
     "express-validator": "^6.4.0",
+    "js-yaml": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
     "morgan": "~1.9.1",
     "morgan-debug": "^2.0.0",
@@ -94,14 +97,17 @@
     "sinon": "^9.0.2",
     "socket.io": "^2.4.0",
     "supports-color": "^8.0.0",
+    "swagger-stats": "^0.99.1",
     "typescript": "^3.8.3",
     "yargs": "^16.0.3"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/cookie": "^0.3.3",
+    "@types/js-yaml": "^4.0.1",
     "@types/mocha": "^7.0.2",
     "@types/socket.io-client": "^1.4.34",
+    "@types/swagger-stats": "^0.95.3",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/parser": "^2.27.0",
     "chai": "^4.2.0",
@@ -121,6 +127,7 @@
     "supertest": "^4.0.2",
     "ts-node": "^8.8.2",
     "tsconfig-paths": "^3.9.0",
+    "tsdef": "^0.0.14",
     "typedoc": "^0.17.4"
   },
   "resolutions": {

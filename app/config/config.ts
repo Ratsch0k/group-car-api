@@ -1,10 +1,19 @@
 import path from 'path';
 import debug from 'debug';
-import jwt from './jwt-config';
-import dbConfig from './database-config';
-import {JWTConfig} from './jwt-config';
-import {Config as SequelizeConfig} from 'sequelize/types';
 import {argv} from 'yargs';
+import {
+  BcryptConfig,
+  DBConfig,
+  ErrorConfig,
+  MorganConfig,
+  StaticConfig,
+  UserConfig,
+  Config,
+  MetricsConfig,
+} from './config.d';
+import _ from 'lodash';
+import defaultConfig from './defaultConfig';
+import {DeepPartial} from 'tsdef';
 
 const log = debug('group-car:config');
 
@@ -24,80 +33,6 @@ log('Environment: %s', environment);
  */
 const serverType = process.env.SERVER_TYPE || 'development';
 log('Server: %s', serverType);
-
-export interface BcryptConfig {
-  saltRounds: number;
-}
-
-export interface StaticConfig {
-  path: string;
-  disabled: boolean;
-}
-
-export interface ErrorConfig {
-  withStack: boolean;
-}
-
-export interface DBConfig {
-  sequelize: SequelizeConfig;
-  withFlush: boolean;
-}
-
-export interface MorganConfig {
-  formatString: string | null;
-}
-
-export interface PbConfig {
-  dimensions: number;
-}
-
-export interface UserConfig {
-  pb: PbConfig;
-  signUpThroughRequest: boolean;
-  maxLimitQuery: number;
-  maxUsernameLength: number;
-}
-
-export interface GroupConfig {
-  maxMembers: number;
-  maxCars: number;
-}
-
-export interface MailConfig {
-  accountRequest: {
-    type?: string;
-    options: {
-      service?: string;
-      host?: string;
-      port?: string;
-      auth?: {
-        user?: string;
-        pass?: string;
-      };
-    }
-    receiver?: string;
-  }
-}
-
-export interface Config {
-  database: DBConfig;
-  bcrypt: BcryptConfig;
-  static: StaticConfig;
-  error: ErrorConfig;
-  jwt: JWTConfig;
-  morgan: MorganConfig;
-  user: UserConfig;
-  serverType: string;
-  group: GroupConfig;
-  mail: MailConfig;
-}
-
-/**
- * Add database config
- */
-const sequelize: SequelizeConfig =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (dbConfig as any)[environment];
 
 /**
  * Initialize BcryptConfig with default value.
@@ -152,32 +87,12 @@ const staticConfig: StaticConfig = {
   disabled: argv.disableStaticServe ? true : false,
 };
 
-// Get the mail config from environment variables
-const mail: MailConfig = {
-  accountRequest: {
-    type: process.env.MAIL_ACCOUNT_REQUEST_TYPE,
-    receiver: process.env.MAIL_ACCOUNT_REQUEST_RECEIVER,
-    options: {
-      service: process.env.MAIL_ACCOUNT_REQUEST_SERVICE,
-      host: process.env.MAIL_ACCOUNT_REQUEST_HOST,
-      port: process.env.MAIL_ACCOUNT_REQUEST_PORT,
-      auth: {
-        user: process.env.MAIL_ACCOUNT_REQUEST_USER,
-        pass: process.env.MAIL_ACCOUNT_REQUEST_PASS,
-      },
-    },
-  },
-};
 
-const database: DBConfig = {
-  sequelize,
+const database: Partial<DBConfig> = {
   withFlush: environment === 'test' ? true : Boolean(argv.flush),
 };
 
-const user: UserConfig = {
-  pb: {
-    dimensions: 128,
-  },
+const user: Partial<UserConfig> = {
   signUpThroughRequest: environment === 'test' ?
     false :
     argv.allowSignUp ?
@@ -185,26 +100,21 @@ const user: UserConfig = {
     process.env.DISABLE_SIGN_UP_THROUGH_REQUEST === undefined ?
     true :
     !Boolean(process.env.DISABLE_SIGN_UP_THROUGH_REQUEST),
-  maxLimitQuery: 20,
-  maxUsernameLength: 25,
 };
 
-const group: GroupConfig = {
-  maxMembers: 25,
-  maxCars: 8,
+const metrics: Partial<MetricsConfig> = {
+  enabled: environment !== 'test',
+  dsn: process.env.SENTRY_DSN || 'https://7d4cc992f614416abcb1007107e12c16@o656739.ingest.sentry.io/5763203',
 };
 
-const config: Config = {
-  database,
-  bcrypt,
-  static: staticConfig,
-  error,
-  jwt,
-  morgan,
+const config: DeepPartial<Config> = {
   user,
-  serverType,
-  group,
-  mail,
+  database,
+  static: staticConfig,
+  bcrypt,
+  morgan,
+  error,
+  metrics,
 };
 
-export default config;
+export default _.merge(defaultConfig, config);
