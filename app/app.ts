@@ -40,8 +40,21 @@ if (process.env.NODE_ENV !== 'test') {
     tracesSampleRate: config.metrics.tracesSampleRate,
   });
 
+  const nonTracablePaths = [
+    '/swagger-stats/metrics',
+  ];
+
+  const tracingHandler = Sentry.Handlers.tracingHandler();
   app.use(Sentry.Handlers.requestHandler());
-  app.use(Sentry.Handlers.tracingHandler());
+  app.use((req, res, next) => {
+    // Filter out paths which should not be traced
+
+    if (!nonTracablePaths.includes(req.path)) {
+      tracingHandler(req, res, next);
+    } else {
+      next();
+    }
+  });
 }
 
 
