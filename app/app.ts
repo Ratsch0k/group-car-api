@@ -26,6 +26,10 @@ const app: express.Application = express();
 // Add middleware
 app.set('trust proxy', true);
 
+
+const nonTracablePaths = [
+  '/swagger-stats/metrics',
+];
 /**
  * Initialise sentry. Don't if testing
  */
@@ -39,10 +43,6 @@ if (process.env.NODE_ENV !== 'test') {
     ],
     tracesSampleRate: config.metrics.tracesSampleRate,
   });
-
-  const nonTracablePaths = [
-    '/swagger-stats/metrics',
-  ];
 
   const tracingHandler = Sentry.Handlers.tracingHandler();
   app.use(Sentry.Handlers.requestHandler());
@@ -60,7 +60,14 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Only log http request if a format string is provided
 if (config.morgan.formatString !== null) {
-  app.use(morganDebug('group-car-http', config.morgan.formatString));
+  app.use(morganDebug(
+      'group-car-http',
+      config.morgan.formatString,
+      {
+        skip: (req: express.Request) =>
+          nonTracablePaths.includes(req.path),
+      },
+  ));
 }
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
