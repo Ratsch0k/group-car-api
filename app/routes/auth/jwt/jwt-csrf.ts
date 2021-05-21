@@ -21,7 +21,6 @@ const secretName = config.jwt.securityOptions.secretName;
  * Expects the jwt token to in a cookie.
  */
 const jwtCsrf: () => RequestHandler = () => {
-
   return (req: Request, res: Response, next: NextFunction): void => {
     const tokens = new Tokens();
 
