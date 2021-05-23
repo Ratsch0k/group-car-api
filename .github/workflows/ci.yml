@@ -117,6 +117,7 @@ jobs:
       PORT: 8082
       FRONTEND_PATH: /home/deploy-dev/dev.my-group-car.de/html
       ACCESS_PATH: /etc/dev.my-group-car.de/access_token.txt
+      SENTRY_DSN: ${{secrets.SENTRY_DSN_DEV}}
     services:
       postgres:
         image: postgres
@@ -146,6 +147,16 @@ jobs:
         run: bash scripts/configure_ssh.sh
       - name: Deploy
         run: bash scripts/deploy.sh
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
+          SENTRY_ORG: ${{secrets.SENTRY_ORG}}
+          SENTRY_PROJECT: ${{secrets.SENTRY_PROJECT_DEV}}
+        with:
+          environment: production
+          version: ${{github.ref}}
+          sourcemaps: './build'
   deploy-beta:
     name: Deploy a beta version
     runs-on: ubuntu-latest
@@ -164,6 +175,7 @@ jobs:
       PORT: 8081
       FRONTEND_PATH: /home/deploy-beta/beta.my-group-car.de/html
       ACCESS_PATH: /etc/beta.my-group-car.de/access_token.txt
+      SENTRY_DSN: ${{secrets.SENTRY_DSN_BETA}}
     services:
       postgres:
         image: postgres
@@ -193,6 +205,16 @@ jobs:
         run: bash scripts/configure_ssh.sh
       - name: Deploy
         run: bash scripts/deploy.sh
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
+          SENTRY_ORG: ${{secrets.SENTRY_ORG}}
+          SENTRY_PROJECT: ${{secrets.SENTRY_PROJECT_BETA}}
+        with:
+          environment: production
+          version: ${{github.ref}}
+          sourcemaps: './build'
   deploy-release:
     name: Deploy a release version
     runs-on: ubuntu-latest
@@ -211,6 +233,7 @@ jobs:
       PORT: 8080
       FRONTEND_PATH: /home/deploy/my-group-car.de/html
       ACCESS_PATH: /etc/my-group-car.de/access_token.txt
+      SENTRY_DSN: ${{secrets.SENTRY_DSN}}
     services:
       postgres:
         image: postgres
@@ -240,4 +263,13 @@ jobs:
         run: bash scripts/configure_ssh.sh
       - name: Deploy
         run: bash scripts/deploy.sh
-
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{secrets.SENTRY_AUTH_TOKEN}}
+          SENTRY_ORG: ${{secrets.SENTRY_ORG}}
+          SENTRY_PROJECT: ${{secrets.SENTRY_PROJECT}}
+        with:
+          environment: production
+          version: ${{github.ref}}
+          sourcemaps: './build'

@@ -6,7 +6,6 @@ import jsonwebtoken from 'jsonwebtoken';
 import debug from 'debug';
 import {NextFunction, RequestHandler, Request, Response} from 'express';
 
-const log = debug('group-car:jwt');
 const error = debug('group-car:jwt:error');
 const warn = debug('group-car:jwt:warn');
 
@@ -15,13 +14,14 @@ const warn = debug('group-car:jwt:warn');
  */
 const secretName = config.jwt.securityOptions.secretName;
 
+
 /**
  * Creates a middleware for csrf protection with jwt tokens.
  *
  * Expects the jwt token to in a cookie.
  */
-const jwtCsrf: () => RequestHandler = () =>
-  (req: Request, res: Response, next: NextFunction): void => {
+const jwtCsrf: () => RequestHandler = () => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const tokens = new Tokens();
 
     /**
@@ -53,7 +53,6 @@ const jwtCsrf: () => RequestHandler = () =>
           ' Jwt will be replaced with pre-login jwt');
         secret = setSecret(tokens, req, res);
       } else {
-        log('Ignored method %s with jwt and secret', req.method);
         secret = _secret;
       }
     } else if (jwt && !isIgnoredMethod(req)) {
@@ -93,7 +92,6 @@ const jwtCsrf: () => RequestHandler = () =>
        * If the method is an ignored method and the jwt doesn't exist on it
        * a new secret will be generated and a jwt token will be set as cookie.
        */
-      log('Ignored method without jwt. Pre-login jwt will be set');
       secret = setSecret(tokens, req, res);
     } else {
       error('Missing jwt');
@@ -146,6 +144,7 @@ const jwtCsrf: () => RequestHandler = () =>
 
     next();
   };
+};
 
 /**
  * Returns whether or not the req has a jwt and the jwt contains
@@ -163,7 +162,6 @@ string | object | null => {
     error('Missing jwt on covered method');
     throw new UnauthorizedError();
   } else if (jwtToken === null) {
-    log('Missing jwt on ignored method');
     return null;
   }
 
@@ -174,7 +172,6 @@ string | object | null => {
     warn('Malformed jwt. Couldn\'t verify.');
     return null;
   }
-  log('Could verify jwt');
 
   return jwt;
 };
