@@ -9,6 +9,7 @@ import {NotLoggedInError, NotMemberOfGroupError} from '../../errors';
 import {TestUtils} from '../../util/test-utils.spec';
 import {User} from '../user';
 import Group from './group';
+import http from 'http';
 
 describe('GroupNotificationService', function() {
   const csrfName = config.jwt.securityOptions.tokenName.toLowerCase();
@@ -18,15 +19,18 @@ describe('GroupNotificationService', function() {
   let user: any;
   let agent: supertest.SuperTest<supertest.Test>;
   let jwtValue: string;
+  let server: http.Server;
 
   before(async function() {
     const socketIo = await TestUtils.startSocketIo();
     io = socketIo.io;
     port = socketIo.port;
+    server = socketIo.server;
   });
 
   after(function() {
     io.close();
+    server.close();
   });
 
   beforeEach(async function() {
@@ -69,7 +73,7 @@ describe('GroupNotificationService', function() {
               expect(e).to.be.a('string');
               expect(e).to.equal(new NotLoggedInError().message);
               socket.close();
-              resolve();
+              resolve(true);
             } catch (e) {
               socket.close();
               reject(e);
@@ -107,7 +111,7 @@ describe('GroupNotificationService', function() {
               expect(e).to.be.a('string');
               expect(e).to.equal(new NotMemberOfGroupError().message);
               socket.close();
-              resolve();
+              resolve(true);
             } catch (e) {
               socket.close();
               reject(e);
@@ -134,7 +138,7 @@ describe('GroupNotificationService', function() {
               expect(e).to.be.a('string');
               expect(e).to.equal(new NotMemberOfGroupError().message);
               socket.close();
-              resolve();
+              resolve(true);
             } catch (e) {
               socket.close();
               reject(e);
@@ -161,7 +165,7 @@ describe('GroupNotificationService', function() {
 
         socket.on('connect', () => {
           socket.close();
-          resolve();
+          resolve(true);
         });
 
         socket.on('connect_error', (e: any) => {
@@ -178,7 +182,11 @@ describe('GroupNotificationService', function() {
           socket.close();
           reject(e);
         });
+
+        socket.open();
       } catch (e) {
+        io.close();
+        server.close();
         reject(e);
       }
     });

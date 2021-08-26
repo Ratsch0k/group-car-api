@@ -79,14 +79,18 @@ export class TestUtils {
    * Creates an empty express app, a server instance
    * and then initialize socket.io.
    */
-  public static startSocketIo(): Promise<{port: number, io: Server}> {
+  public static startSocketIo(): Promise<{
+    port: number,
+    io: Server,
+    server: http.Server
+  }> {
     return new Promise((resolve, reject) => {
       const app = express();
       const server = http.createServer(app);
       const io = initSocketIoServer(server);
       const port = 9999;
       server.listen(port);
-      server.on('listening', () => resolve({port, io}));
+      server.on('listening', () => resolve({port, io, server}));
       server.on('error', (e) => {
         reject(e);
       });
