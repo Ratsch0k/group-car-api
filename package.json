@@ -131,12 +131,7 @@
     "typedoc": "^0.17.4"
   },
   "resolutions": {
-    "xmlhttprequest-ssl": ">=1.6.2",
-    "socket.io-parser": "^3.4.1",
-    "tar": ">=4.4.15",
-    "normalize-url": ">=4.5.1",
-    "ws": "^7.4.6",
-    "path-parse": ">=1.0.7",
-    "glob-parent": ">=5.1.2"
+    "nth-check": ">=2.0.1",
+    "validator": ">=13.7.0"
   }
 }
