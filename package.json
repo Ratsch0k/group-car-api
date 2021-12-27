@@ -1,6 +1,6 @@
 {
   "name": "group-car-api",
-  "version": "0.7.2-alpha.2",
+  "version": "0.7.2-alpha.3",
   "private": true,
   "config": {
     "port": "8080",
@@ -48,7 +48,7 @@
     "postcoverage": "yarn marge",
     "marge": "marge -f index.html -o static/test/ -p Report mochawesome-report/mochawesome.json",
     "generate-disclaimer": "yarn licenses generate-disclaimer >> static/license-disclaimer",
-    "postversion": "sed \"s/\\\"backend\\\": \\\".*\\\"/\\\"backend\\\": \\\"$npm_package_version\\\"/\" static/versions.json > static/versions.json"
+    "postversion": "echo \"$(sed \"s/\\\"backend\\\": \\\".*\\\"/\\\"backend\\\": \\\"$npm_package_version\\\"/\" static/versions.json)\" > static/versions.json"
   },
   "dependencies": {
     "@sentry/node": "^6.3.6",
