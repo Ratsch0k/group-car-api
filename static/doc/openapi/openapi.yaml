@@ -4,16 +4,16 @@ info:
   version: 0.4.0
 
 tags:
-- name: Authentication
-  description: Requests for authentication
-- name: User
-  description: Requests for everything user related
-- name: Group
-  description: Requests for everything groups related
-- name: Member
-  description: Requests for everything members related
-- name: Car
-  description: Requests for everything car related
+  - name: Authentication
+    description: Requests for authentication
+  - name: User
+    description: Requests for everything user related
+  - name: Group
+    description: Requests for everything groups related
+  - name: Member
+    description: Requests for everything members related
+  - name: Car
+    description: Requests for everything car related
 
 security:
   - csrfToken: []
@@ -32,12 +32,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/StatusObject'
 
+  /versions.json:
+    get:
+      summary: Get the backend version
+      description: Returns the semver version of the backend
+      responses:
+        200:
+          description: The semver version of the backend
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+
   # Authentication
   /auth:
     head:
       summary: Get the csrf token
       tags:
-      - Authentication
+        - Authentication
       responses:
         200:
           description: The csrf token is in the header XSRF-TOKEN
@@ -46,7 +61,7 @@ paths:
       summary: Log in
       description: Logs the user in with the given username and the given password
       tags:
-      - Authentication
+        - Authentication
       requestBody:
         description: Login data
         content:
@@ -73,7 +88,7 @@ paths:
       summary: Sign up
       description: Signs the user up with the given attributes
       tags:
-      - Authentication
+        - Authentication
       requestBody:
         description: The sign up properties
         content:
@@ -99,7 +114,7 @@ paths:
     put:
       summary: Log the client out
       tags:
-      - Authentication
+        - Authentication
       description: Log the client out by replacing the jwt cookie with a pre-login one
       responses:
         204:
@@ -110,7 +125,7 @@ paths:
     put:
       summary: Check if logged in
       tags:
-      - Authentication
+        - Authentication
       description: Check if the current state of the client indicates that it is logged in. Checks the jwt token and the payload within.
       responses:
         200:
@@ -127,21 +142,21 @@ paths:
     get:
       summary: Create new pseudo-random profile picture
       tags:
-      - User
+        - User
       description: Generates a new pseudo-random profile picture with the given username as seed. An offset can be
         send with the username to generate a different profile picture for the same username. The same username and offset will
         always produce the same profile picture.
       parameters:
-      - name: username
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: offset
-        in: query
-        required: false
-        schema:
-          type: number
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: number
       responses:
         200:
           description: The generation was successful and the picture is returned.
@@ -198,7 +213,7 @@ paths:
     get:
       summary: Get the profile picture
       tags:
-      - User
+        - User
       description: Get the profile picture of the user with the given id
       responses:
         200:
@@ -265,8 +280,8 @@ paths:
             application/json:
               schema:
                 oneOf:
-                - $ref: '#/components/schemas/GroupNotFoundErrorSchema'
-                - $ref: '#/components/schemas/InviteNotFoundSchema'
+                  - $ref: '#/components/schemas/GroupNotFoundErrorSchema'
+                  - $ref: '#/components/schemas/InviteNotFoundSchema'
 
   # Group
   /api/group:
@@ -294,7 +309,7 @@ paths:
     post:
       summary: Creates a new group
       tags:
-      - Group
+        - Group
       description: Create a new group with the currently logged in user as admin and owner.
       requestBody:
         description: The initial group data.
@@ -317,11 +332,11 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /api/group/{groupId}:
     parameters:
-    - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/GroupId'
     get:
       summary: Get group data
       tags:
-      - Group
+        - Group
       description: Get the data of a group if the user is a member of that group
       responses:
         200:
@@ -330,8 +345,8 @@ paths:
             application/json:
               schema:
                 oneOf:
-                - $ref: '#/components/schemas/GroupWithOwner'
-                - $ref: '#/components/schemas/GroupSimple'
+                  - $ref: '#/components/schemas/GroupWithOwner'
+                  - $ref: '#/components/schemas/GroupSimple'
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
         401:
@@ -345,7 +360,7 @@ paths:
     put:
       summary: Updates a group
       tags:
-      - Group
+        - Group
       description: Updated the group with the given data. The user can only update a group if the user is an admin of that group.
       requestBody:
         description: The data with which the group should be updated
@@ -369,7 +384,7 @@ paths:
     delete:
       summary: Deletes a group
       tags:
-      - Group
+        - Group
       description: Delete the group which has the given id if the user which requests the action is the owner of that group
       responses:
         204:
@@ -385,7 +400,7 @@ paths:
         - Group
       description: Gets a list of all users which are invited to the specified group.
       parameters:
-      - $ref: '#/components/parameters/GroupId'
+        - $ref: '#/components/parameters/GroupId'
       responses:
         200:
           description: The list of invited users
@@ -410,10 +425,10 @@ paths:
     post:
       summary: Invites a user to the group
       tags:
-      - Group
+        - Group
       description: Invites a user to the group
       parameters:
-      - $ref: '#/components/parameters/GroupId'
+        - $ref: '#/components/parameters/GroupId'
       requestBody:
         description: Either the id or the username of the user. If both are provided the username will be ignored.
         content:
@@ -785,11 +800,12 @@ components:
           $ref: '#/components/schemas/StatusType'
         database:
           $ref: '#/components/schemas/StatusType'
+
     StatusType:
       type: string
       enum:
-      - 'up'
-      - 'down'
+        - 'up'
+        - 'down'
 
     # User
     User:
@@ -830,20 +846,20 @@ components:
         description: Our new group for the family
     CreateGroupRequest:
       allOf:
-      - type: object # Override required of GroupData
-        required:
-        - name
-        properties:
-          name:
-            type: string
-      - $ref: '#/components/schemas/GroupRequest'
+        - type: object # Override required of GroupData
+          required:
+            - name
+          properties:
+            name:
+              type: string
+        - $ref: '#/components/schemas/GroupRequest'
     GroupData:
       type: object
       required:
-      - id
-      - name
-      - createdAt
-      - updatedAt
+        - id
+        - name
+        - createdAt
+        - updatedAt
       properties:
         id:
           type: integer
@@ -871,8 +887,8 @@ components:
     GroupMember:
       type: object
       required:
-      - userId
-      - isAdmin
+        - userId
+        - isAdmin
       properties:
         User:
           $ref: '#/components/schemas/UserSimple'
@@ -891,8 +907,8 @@ components:
     GroupSimple:
       type: object
       required:
-      - id
-      - name
+        - id
+        - name
       properties:
         id:
           type: integer
@@ -904,11 +920,11 @@ components:
           type: string
     GroupSimpleWithOwner:
       allOf:
-      - $ref: '#/components/schemas/GroupSimple'
-      - type: object
-        properties:
-          Owner:
-            $ref: '#/components/schemas/UserSimple'
+        - $ref: '#/components/schemas/GroupSimple'
+        - type: object
+          properties:
+            Owner:
+              $ref: '#/components/schemas/UserSimple'
 
     # Invite
     Invite:
@@ -1025,10 +1041,10 @@ components:
     RestError:
       type: object
       required:
-      - status
-      - statusCode
-      - timestamp
-      - message
+        - status
+        - statusCode
+        - timestamp
+        - message
       properties:
         status:
           type: string
@@ -1043,69 +1059,69 @@ components:
           type: object
     UnauthorizedErrorSchema:
       allOf:
-      - $ref: '#/components/schemas/RestError'
-      - example:
-          status: Unauthorized
-          statusCode: 401
-          message: You're not authorized to view the requested resourced.
-          detail: {}
-          timestamp: '2020-05-03T13:21:35.938Z'
+        - $ref: '#/components/schemas/RestError'
+        - example:
+            status: Unauthorized
+            statusCode: 401
+            message: You're not authorized to view the requested resourced.
+            detail: {}
+            timestamp: '2020-05-03T13:21:35.938Z'
     BadRequestErrorSchema:
       allOf:
-      - $ref: '#/components/schemas/RestError'
-      - example:
-          status: Bad Request
-          statusCode: 400
-          message: The sent request is missing required attributes.
-          detail: {}
-          timestamp: '2020-05-03T13:21:35.938Z'
+        - $ref: '#/components/schemas/RestError'
+        - example:
+            status: Bad Request
+            statusCode: 400
+            message: The sent request is missing required attributes.
+            detail: {}
+            timestamp: '2020-05-03T13:21:35.938Z'
     InternalServerErrorSchema:
       allOf:
-      - $ref: '#/components/schemas/RestError'
-      - example:
-          status: Internal Server Error
-          statusCode: 500
-          message: An unexpected error occurred.
-          detail: {}
-          timestamp: '2020-05-03T13:21:35.938Z'
+        - $ref: '#/components/schemas/RestError'
+        - example:
+            status: Internal Server Error
+            statusCode: 500
+            message: An unexpected error occurred.
+            detail: {}
+            timestamp: '2020-05-03T13:21:35.938Z'
     EntityNotFoundErrorSchema:
       allOf:
-      - $ref: '#/components/schemas/RestError'
-      - example:
-          message: Entity Not Found Error
-          statusCode: 404
-          status: Not found
-          detail: {}
-          timestamp: '2020-05-03T13:21:35.938Z'
+        - $ref: '#/components/schemas/RestError'
+        - example:
+            message: Entity Not Found Error
+            statusCode: 404
+            status: Not found
+            detail: {}
+            timestamp: '2020-05-03T13:21:35.938Z'
     UserNotFoundErrorSchema:
       allOf:
-      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
-      - example:
-          message: A user with id 4 doesn't exist
-          detail:
-            userId: 4
+        - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+        - example:
+            message: A user with id 4 doesn't exist
+            detail:
+              userId: 4
     UsernameNotFoundErrorSchema:
       allOf:
-      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
-      - example:
-          message: A user with then name "test-user" doesn't exist
-          detail:
-            username: 'test-user'
+        - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+        - example:
+            message: A user with then name "test-user" doesn't exist
+            detail:
+              username: 'test-user'
     GroupNotFoundErrorSchema:
       allOf:
-      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
-      - example:
-          message: A group with id 4 doesn't exist
-          detail:
-            groupId: 4
+        - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+        - example:
+            message: A group with id 4 doesn't exist
+            detail:
+              groupId: 4
     InviteNotFoundSchema:
       allOf:
-      - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
-      - example:
-          message: An invite for the group doesn't exist
-          detail:
-            groupId: 4
-            userId: 2
+        - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+        - example:
+            message: An invite for the group doesn't exist
+            detail:
+              groupId: 4
+              userId: 2
     MembershipNotFoundSchema:
       allOf:
         - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
@@ -1114,8 +1130,10 @@ components:
             detail:
               groupId: 4
               userId: 2
+
   # Responses
   responses:
+
     # Error
     BadRequestErrorResponse:
       description: The sent request is malformed or missing required attributes.
