@@ -48,7 +48,7 @@
     "postcoverage": "yarn marge",
     "marge": "marge -f index.html -o static/test/ -p Report mochawesome-report/mochawesome.json",
     "generate-disclaimer": "yarn licenses generate-disclaimer >> static/license-disclaimer",
-    "postversion": "echo \"$(sed \"s/\\\"backend\\\": \\\".*\\\"/\\\"backend\\\": \\\"$npm_package_version\\\"/\" static/versions.json)\" > static/versions.json"
+    "postversion": "./scripts/update_version.sh ./static/versions.json $npm_package_version"
   },
   "dependencies": {
     "@sentry/node": "^6.3.6",
