@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  group-car-dev:
+    container_name: group-car-dev
+    build: .
+    user: node
+    volumes:
+      - ../group-car/build:/home/node/group-car-api/frontend
+    environment:
+      - HTML_STATIC=/home/node/group-car-api/frontend
+      - SENTRY_DSN=$SENTRY_DSN
+      - DB_USERNAME=groupcartest
+      - DB_PASSWORD=groupcartest
+      - DB_NAME=groupcartest
+      - DB_HOSTNAME=group-car-db
+      - JWT_SECRET=groupcartest
+      - DEBUG=group-car*,group-car-db*
+      - DISABLE_SIGN_UP_THROUGH_REQUEST=true
+    working_dir: /home/node/group-car-api
+    restart: always
+    depends_on:
+      - postgres
+    command: /bin/bash -c "yarn sequelize-cli db:migrate && node -r tsconfig-paths/register ./build/group-car.js"
+    ports:
+      - "8080:8080"
+
+  postgres:
+    container_name: group-car-db
+    image: postgres:10-alpine
+    environment:
+      - POSTGRES_DB=groupcartest
+      - POSTGRES_PASSWORD=groupcartest
+      - POSTGRES_USER=groupcartest
+    restart: always
+    volumes:
+      - /tmp/postgres/data:/var/lib/postgresql/data
