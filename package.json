@@ -1,6 +1,6 @@
 {
   "name": "group-car-api",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "private": true,
   "config": {
     "port": "8080",
@@ -47,7 +47,8 @@
     "coverage": "cross-env NODE_ENV=test JWT_SECRET=secret nyc mocha \"app/**/*.spec.ts\" --exit --reporter mochawesome --reporter-options quiet=true,html=false",
     "postcoverage": "yarn marge",
     "marge": "marge -f index.html -o static/test/ -p Report mochawesome-report/mochawesome.json",
-    "generate-disclaimer": "yarn licenses generate-disclaimer >> static/license-disclaimer"
+    "generate-disclaimer": "yarn licenses generate-disclaimer >> static/license-disclaimer",
+    "postversion": "./scripts/update_version.sh ./static/versions.json $npm_package_version"
   },
   "dependencies": {
     "@sentry/node": "^6.3.6",
@@ -131,12 +132,7 @@
     "typedoc": "^0.17.4"
   },
   "resolutions": {
-    "xmlhttprequest-ssl": ">=1.6.2",
-    "socket.io-parser": "^3.4.1",
-    "tar": ">=4.4.15",
-    "normalize-url": ">=4.5.1",
-    "ws": "^7.4.6",
-    "path-parse": ">=1.0.7",
-    "glob-parent": ">=5.1.2"
+    "nth-check": ">=2.0.1",
+    "validator": ">=13.7.0"
   }
 }
