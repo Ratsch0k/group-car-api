@@ -14,6 +14,8 @@ tags:
     description: Requests for everything members related
   - name: Car
     description: Requests for everything car related
+  - name: Settings
+    description: Requests related to user settings
 
 security:
   - csrfToken: []
@@ -138,6 +140,59 @@ paths:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
 
   # User
+  /api/user/settings/change-password:
+    post:
+      summary: Change password of currently logged in user
+      tags:
+        - User
+        - Authentication
+        - Settings
+      description: 'Change the password of the currently logged in user. There are some conditions that have to be true,
+        before a call to this endpoint will succeed.
+        
+        1. The new password has to be different than the old password
+        
+        2. The new password has to fulfill the typical password constraints
+        
+        3. The old password has to be correct
+        '
+      requestBody:
+        description: The old and new password.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                  required: true
+                newPassword:
+                  type: string
+                  required: true
+      responses:
+        200:
+          description: Password successfully changed
+        400:
+          description: The request is either malformed, or the send data is incorrect.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BadRequestErrorSchema'
+                  - example:
+                      message: Your new password has to be different than your old password.
+        401:
+          description: The user is either not logged in or the sent old password is incorrect.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/UnauthorizedErrorSchema'
+                  - example:
+                      message: Incorrect old password
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
   /user/generate-profile-pic:
     get:
       summary: Create new pseudo-random profile picture
