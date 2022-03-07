@@ -3,7 +3,7 @@ import {validationResult} from 'express-validator';
 import {InvalidRequestError} from '@app/errors';
 import {RequestHandler, Request} from 'express';
 
-export interface Options {
+export interface ValidationResultHandlerOptions {
   /**
    * Key which should be used for logging.
    *
@@ -44,8 +44,9 @@ export interface Options {
  * @param options - The options with which the validationResultHandler
  *  should be created
  */
-export const createValidationResultHandler:
-(options: Options) => RequestHandler = (options: Options) => {
+export const createValidationResultHandler: (
+  options: ValidationResultHandlerOptions
+) => RequestHandler = (options: ValidationResultHandlerOptions) => {
   // Check if options are defined
   if (!options) {
     throw new Error('The options object has to be provided');
@@ -66,18 +67,28 @@ export const createValidationResultHandler:
 
   // Return the request handler
   return (req, _res, next) => {
+    let userIdentifierLog: string;
+    let userIdentifier: number | string;
+    if (req.user !== undefined) {
+      userIdentifierLog = 'User %d ';
+      userIdentifier = req.user.id;
+    } else {
+      userIdentifierLog = 'IP %s ';
+      userIdentifier = req.ip;
+    }
+
     const requestName = typeof options.requestName === 'string' ?
         options.requestName : options.requestName(req);
 
-    log('IP %s requested: %s', req.ip, requestName);
+    log(userIdentifierLog + 'requested: %s', userIdentifier, requestName);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      error('Request of IP %s failed validation for: %s',
-          req.ip, requestName);
+      error(`Request of ${userIdentifierLog} failed validation for: %s`,
+          userIdentifier, requestName);
       throw new InvalidRequestError(errors);
     } else {
-      log('Request of IP %s passed validation for: %s',
-          req.ip, requestName);
+      log(`Request of ${userIdentifierLog} passed validation for: %s`,
+          userIdentifier, requestName);
       next();
     }
   };
