@@ -3,7 +3,11 @@ version: "3.9"
 services:
   postgres:
     container_name: group-car-db
-    image: postgres:10-alpine
+    image: postgres:12
     restart: always
-    volumes:
-      - $DB_DATA_PATH:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=groupcartest
+      - POSTGRES_PASSWORD=groupcartest
+      - POSTGRES_USER=groupcartest
+    ports:
+      - '5432:5432'
