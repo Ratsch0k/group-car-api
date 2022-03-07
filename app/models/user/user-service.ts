@@ -7,7 +7,7 @@ import {
 import {
   OwnerCannotLeaveError,
   NotLoggedInError,
-  IncorrectPasswordError,
+  IncorrectPasswordError, NewPasswordMustBeDifferentError,
 } from '@errors';
 import config from '@app/config';
 import debug from 'debug';
@@ -101,7 +101,12 @@ export class UserService {
   ): Promise<void> {
     const userLog = bindToLog(log, {args: [currentUser.id]});
     const userError = bindToLog(error, {args: [currentUser.id]});
-    userLog('Change password for user %d', currentUser.id);
+    userLog('Change password');
+
+    userLog('Check if new and old passwords are different');
+    if (oldPassword === newPassword) {
+      throw new NewPasswordMustBeDifferentError();
+    }
 
     // Check if oldPassword matches the password of the user
     userLog('Verify if old password correct');
