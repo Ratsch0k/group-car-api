@@ -6,6 +6,7 @@ declare namespace Express {
     createdAt: Date;
     deletedAt: Date;
     updatedAt: Date;
+    email: string;
   }
 
   export type Auth = {
