@@ -117,7 +117,7 @@ export const signUpUserRequestHandler: RequestHandler = async (
   } catch (e) {
     // Only report error.
     // The actual request was done, just sending the email failed.
-    error('Could not send the email: %s', e);
+    error('Could not send the email: %o', e);
   }
 
   res.status(202)
