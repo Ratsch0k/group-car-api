@@ -85,7 +85,7 @@ export class User extends Model {
  * @param options - Options
  */
 export const hashPasswordOfUser = (user: User): Promise<void> => {
-  return bcrypt.hash(user.password + '', config.bcrypt.saltRounds)
+  return bcrypt.hash(user.password + '', config.auth.saltRounds)
       .then((hash: string) => {
         user.password = hash;
       }).catch(() => {

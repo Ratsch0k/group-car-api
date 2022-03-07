@@ -20,7 +20,7 @@ describe('User model', function() {
 
       // Overwrite saltRounds in config
       const saltRounds = 2;
-      config.default.bcrypt.saltRounds = saltRounds;
+      config.default.auth.saltRounds = saltRounds;
 
       const fakeHash = 'some hash';
       const hashStub = sandbox.stub(bcrypt)
@@ -43,7 +43,7 @@ describe('User model', function() {
 
       // Overwrite saltRounds in config
       const saltRounds = 2;
-      config.default.bcrypt.saltRounds = saltRounds;
+      config.default.auth.saltRounds = saltRounds;
 
       const fakeHash = 'some hash';
       const hashStub = sandbox.stub(bcrypt)
@@ -69,7 +69,7 @@ describe('User model', function() {
 
       // Overwrite saltRounds in config
       const saltRounds = 2;
-      config.default.bcrypt.saltRounds = saltRounds;
+      config.default.auth.saltRounds = saltRounds;
 
       const hashStub = sandbox.stub(bcrypt, 'hash')
           .withArgs(match.string, match.number)
