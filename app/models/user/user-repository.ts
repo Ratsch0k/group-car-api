@@ -1,9 +1,11 @@
 import config from '@app/config';
-import {User} from '../../models';
+import {User} from './.';
 import {RepositoryQueryOptions} from 'typings';
 import sequelize from 'sequelize';
 import debug from 'debug';
+import {UserNotFoundError} from '@errors';
 const log = debug('group-car:user:repository');
+const error = debug('group-car:user:repository:error');
 const Op = sequelize.Op;
 
 /**
@@ -51,5 +53,39 @@ export class UserRepository {
       limit,
       ...options,
     });
+  }
+
+  public static async findById(
+      id: number,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<User> {
+    const user = await User.findByPk(id, options);
+
+    if (user === null) {
+      throw new UserNotFoundError(id);
+    }
+
+    return user;
+  }
+
+  /**
+   * Search for user by their username.
+   *
+   * @param username -  The username to look for
+   * @param options -  Additional query options
+   *
+   * @throws UserNotFoundError if no username exists with that username
+   */
+  public static async findByUsername(
+      username: string,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<User> {
+    const user = await User.findOne({where: {username}, ...options});
+
+    if (user === null) {
+      throw new UserNotFoundError(username);
+    }
+
+    return user;
   }
 }
