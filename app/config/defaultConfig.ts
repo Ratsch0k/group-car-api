@@ -13,8 +13,9 @@ const defaultConfig: Config = {
     sequelize,
     withFlush: false,
   },
-  bcrypt: {
+  auth: {
     saltRounds: 8,
+    waitOnLogin: 500,
   },
   static: {
     path: path.resolve('./static'),
