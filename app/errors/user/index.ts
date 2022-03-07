@@ -5,3 +5,5 @@ export {default as UsernameAlreadyExistsError} from
 
 export * from './could-not-assign-to-group-error';
 export * from './username-not-found-error';
+export * from './new-password-must-be-different-error';
+export * from './incorrect-password-error';
