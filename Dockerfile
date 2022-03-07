@@ -6,6 +6,7 @@ RUN chown -R node:node /home/node/group-car-api
 
 WORKDIR /home/node/group-car-api
 
+RUN touch .env
 COPY package.json ./
 COPY yarn.lock ./
 
