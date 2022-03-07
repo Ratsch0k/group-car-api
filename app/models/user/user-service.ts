@@ -4,11 +4,18 @@ import {
   User,
   UserRepository,
 } from '@models';
-import {OwnerCannotLeaveError, NotLoggedInError} from '@errors';
+import {
+  OwnerCannotLeaveError,
+  NotLoggedInError,
+  IncorrectPasswordError,
+} from '@errors';
 import config from '@app/config';
 import debug from 'debug';
+import bcrypt from 'bcrypt';
+import bindToLog from '@util/user-bound-logging';
 
 const log = debug('group-car:user:service');
+const error = debug('group-car:user:service');
 
 /**
  * Service for complex user actions.
@@ -72,5 +79,48 @@ export class UserService {
     return UserRepository.findLimitedWithFilter(
         startsWith, limit,
     );
+  }
+
+  public static async checkPassword(
+      encryptedPassword: string,
+      password: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, encryptedPassword);
+  }
+
+  /**
+   *
+   * @param currentUser
+   * @param oldPassword
+   * @param newPassword
+   */
+  public static async changePassword(
+      currentUser: Express.User,
+      oldPassword: string,
+      newPassword: string,
+  ): Promise<void> {
+    const userLog = bindToLog(log, {args: [currentUser.id]});
+    const userError = bindToLog(error, {args: [currentUser.id]});
+    userLog('Change password for user %d', currentUser.id);
+
+    // Check if oldPassword matches the password of the user
+    userLog('Verify if old password correct');
+
+    const user = await UserRepository.findById(currentUser.id);
+
+    if (await this.checkPassword(user.password, oldPassword)) {
+      userLog('Old password verified, changing password');
+      try {
+        await user.update({
+          password: newPassword,
+        });
+      } catch (e) {
+        userError('An error occurred while changing the password: %s', e);
+      }
+      userLog('Password successfully changed');
+    } else {
+      userError('Old password was incorrect');
+      throw new IncorrectPasswordError();
+    }
   }
 }
