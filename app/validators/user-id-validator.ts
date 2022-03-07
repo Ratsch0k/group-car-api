@@ -1,8 +1,5 @@
 import {param} from 'express-validator';
-import {Router} from 'express';
-import {
-  createValidationResultHandler,
-} from '@app/util/validation-result-handler';
+import createValidationRouter from '@app/validators/create-validation-router';
 
 /**
  * Validation chain for validating user id.
@@ -19,13 +16,10 @@ export const userIdValidator = [
  * Validation router for validating and handling result of
  * validation of user id.
  */
-const userIdValidationRouter = Router({mergeParams: true}).use(
-    '/',
+const userIdValidationRouter = createValidationRouter(
+    'user-id',
     userIdValidator,
-    createValidationResultHandler({
-      debugScope: 'group-car:validation:user-id',
-      requestName: (req) => `check userId ${req.params.userId}`,
-    }),
+    (req) => `check userId ${req.params.userId}`,
 );
 
 export default userIdValidationRouter;
