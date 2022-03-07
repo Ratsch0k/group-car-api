@@ -22,7 +22,7 @@ const ChangePasswordController: RequestHandler = async (req, res, next) => {
 
   if (typeof user === 'object') {
     await UserService.changePassword(user, oldPassword, newPassword);
-    res.status(200).send();
+    res.status(204).send();
   } else {
     error('User not set on request');
     throw new BadRequestError();

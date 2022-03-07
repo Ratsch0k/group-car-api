@@ -170,7 +170,7 @@ paths:
                   type: string
                   required: true
       responses:
-        200:
+        204:
           description: Password successfully changed
         400:
           description: The request is either malformed, or the send data is incorrect.
