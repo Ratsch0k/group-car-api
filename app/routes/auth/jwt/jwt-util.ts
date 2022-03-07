@@ -1,6 +1,6 @@
 import config from '@config';
 import jwt from 'jsonwebtoken';
-import {User} from '@models';
+import {User, UserDto} from '@models';
 import {NotLoggedInError} from '@errors';
 import {RequestHandler} from 'express';
 
@@ -48,7 +48,7 @@ export interface UserJwtPayload {
  * @param user - The user for which the payload should be generated.
  * @returns   The user converted into a jwt payload
  */
-export function convertUserToJwtPayload(user: User): UserJwtPayload {
+export function convertUserToJwtPayload(user: User | UserDto): UserJwtPayload {
   if (user) {
     return {
       username: user.username,
@@ -75,7 +75,10 @@ export const postLoginJwtValidator: RequestHandler = (req, res, next) => {
     next(new NotLoggedInError());
   } else {
     // Check if a user with the user id exists
-    User.findByPk(req.auth.id).then((user) => {
+    User.findByPk(
+        req.auth.id,
+        {attributes: {exclude: ['password']}},
+    ).then((user) => {
       if (user !== null &&
           (user.deletedAt === null ||
             user.deletedAt >= new Date())) {
