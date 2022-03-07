@@ -11,6 +11,7 @@ import nodemailer from 'nodemailer';
 import hbs from 'nodemailer-express-handlebars-plaintext-inline-ccs';
 import exhbs from 'express-handlebars';
 import {Options} from 'nodemailer/lib/sendmail-transport';
+import db from '@db';
 
 /**
  * Log method for normal debug logging
@@ -30,7 +31,11 @@ const picDim = config.user.pb.dimensions;
  * @param res   - Response
  * @param next  - Next
  */
-export const signUpSwitchController: RequestHandler = (req, res, next) => {
+export const signUpSwitchController: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
   /*
    * Depending on the mode, either forward arguments
    * to signUpUserRequestHandler
@@ -38,9 +43,9 @@ export const signUpSwitchController: RequestHandler = (req, res, next) => {
    */
   if (config.user.signUpThroughRequest) {
     // Check if a user with that username already exists
-    signUpUserRequestHandler(req, res, next);
+    await signUpUserRequestHandler(req, res, next);
   } else {
-    signUpController(req, res, next);
+    await signUpController(req, res, next);
   }
 };
 
@@ -53,22 +58,34 @@ export const signUpSwitchController: RequestHandler = (req, res, next) => {
  * @param res   - Response
  * @param next  - Next
  */
-export const signUpUserRequestHandler: RequestHandler = (req, res, next) => {
-  User.findByUsername(req.body.username).then((user) => {
-    if (user === null) {
-      return generatePic(picDim, req.body.username, req.body.offset ?? 0);
-    } else {
-      throw new UsernameAlreadyExistsError(req.body.username);
-    }
-  }).then((data: Buffer) => {
-    // Store request
-    return UserRequest.create({
-      username: req.body.username,
-      password: req.body.password,
-      profilePic: data,
-      email: req.body.email,
-    });
-  }).then((userRequest) => {
+export const signUpUserRequestHandler: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  const user = await User.findByUsername(req.body.username);
+
+  let profilePictureBuffer: Buffer;
+  if (user === null) {
+    profilePictureBuffer = await generatePic(
+        picDim,
+        req.body.username,
+        req.body.offset ?? 0,
+    );
+  } else {
+    throw new UsernameAlreadyExistsError(req.body.username);
+  }
+
+  // Store request
+  const userRequest = await UserRequest.create({
+    username: req.body.username,
+    password: req.body.password,
+    profilePic: profilePictureBuffer,
+    email: req.body.email,
+  });
+
+  // Send email to admin
+  try {
     const transporter = nodemailer.createTransport(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       config.mail.accountRequest?.options as any);
@@ -85,7 +102,7 @@ export const signUpUserRequestHandler: RequestHandler = (req, res, next) => {
       viewPath: 'app/views',
     }));
 
-    return transporter.sendMail({
+    await transporter.sendMail({
       from: '"my-group-car.de" <mygroupcar@gmail.com',
       to: config.mail.accountRequest?.receiver,
       subject: `Account creation request for ${req.body.username}`,
@@ -97,11 +114,15 @@ export const signUpUserRequestHandler: RequestHandler = (req, res, next) => {
         serverType: process.env.SERVER_TYPE,
       },
     } as unknown as Options);
-  }).then(() => {
-    res.status(202)
-        .send({message: 'Request was sent successfully. ' +
-          'You will be notified if the request was accepted'});
-  }).catch(next);
+  } catch (e) {
+    // Only report error.
+    // The actual request was done, just sending the email failed.
+    error('Could not send the email: %s', e);
+  }
+
+  res.status(202)
+      .send({message: 'Request was sent successfully. ' +
+        'You will be notified if the request was accepted'});
 };
 
 /**
@@ -110,38 +131,47 @@ export const signUpUserRequestHandler: RequestHandler = (req, res, next) => {
  * Creates a new user with the given properties.
  * @param req  - Http request, information about user in `req.body`
  * @param res  - Http response
- * @param next - The next request handler
+ * @param _next - The next request handler
  */
-export const signUpController: RequestHandler = (req, res, next) => {
+export const signUpController: RequestHandler = async (req, res, _next) => {
+  const transaction = await db.transaction();
   log('Create new user for "%s"', req.body.username);
-  User.create({
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-  }).then((user) => {
-    generatePic(picDim, req.body.username, req.body.offset ?? 0)
-        .then((data: Buffer) => {
-          return ProfilePic.create({
-            data: data,
-            userId: user.id,
-          });
-        }).then(() => {
-          log('User "%s" successfully created', req.body.username);
-          res.setJwtToken(convertUserToJwtPayload(user), user.username);
-          res.status(201).send(ModelToDtoConverter
-              .convert<UserDto>(user.get({plain: true}), UserDto));
-        });
-  }).catch((err) => {
+  try {
+    const user = await User.create({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+    }, {transaction});
+
+    const profilePictureBuffer = await generatePic(
+        picDim,
+        req.body.username,
+        req.body.offset ?? 0,
+    );
+    await ProfilePic.create({
+      data: profilePictureBuffer,
+      userId: user.id,
+    }, {transaction});
+
+    // If everything executing successfully, commit transaction
+    transaction.commit();
+
+    log('User "%s" successfully created', req.body.username);
+    res.setJwtToken(convertUserToJwtPayload(user), user.username);
+    res.status(201).send(ModelToDtoConverter
+        .convert<UserDto>(user.get({plain: true}), UserDto));
+  } catch (err) {
     // Handle unique constraints error differently
     if (err instanceof UniqueConstraintError) {
       error('Couldn\'t create user "%s", because username already exists',
           req.body.username);
-      next(new UsernameAlreadyExistsError(req.body.username));
+      throw new UsernameAlreadyExistsError(req.body.username);
     } else {
+      // Rethrow
       error('Couldn\'t create user "%s"', req.body.username);
-      next(err);
+      throw err;
     }
-  });
+  }
 };
 
 const signUpRouter = Router().use(
