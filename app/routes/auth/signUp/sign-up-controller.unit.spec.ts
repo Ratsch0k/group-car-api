@@ -9,9 +9,24 @@ import UsernameAlreadyExistsError from
   '../../../errors/user/username-already-exists-error';
 import * as generatePic from '../../../util/generate-profile-pic';
 import config from '../../../config';
+import db from '../../../db';
 const sandbox = createSandbox();
 
 describe('SignUpController', function() {
+  let transactionStub: sinon.SinonStub;
+  let transaction: any;
+
+  beforeEach(function() {
+    transaction = {
+      commit: sandbox.stub().resolves(),
+      rollback: sandbox.stub().resolves(),
+    };
+    transactionStub = sandbox.stub(
+        db,
+        'transaction',
+    ).resolves(transaction as any);
+  });
+
   afterEach(function() {
     sandbox.restore();
   });
@@ -64,6 +79,8 @@ describe('SignUpController', function() {
       sandbox.assert.calledOnceWithExactly(generateStub, dim, user.username, 0);
 
       sandbox.assert.calledOnce(picCreateStub);
+      sandbox.assert.calledOnce(transactionStub);
+      sandbox.assert.calledOnce(transaction.commit);
 
       // Get user object
       const responseUser = responseStub.send.args[0][0];
@@ -101,6 +118,7 @@ describe('SignUpController', function() {
       expect(err).to.be.instanceOf(UsernameAlreadyExistsError);
       expect(err).to.haveOwnProperty('username');
       expect(err.username).to.equal(user.username);
+      sandbox.assert.calledOnce(transaction.rollback);
     }
   });
 
@@ -130,6 +148,7 @@ describe('SignUpController', function() {
       await signUpController(requestStub, responseStub, undefined as any);
     } catch (err) {
       expect(err).to.be.equal(error);
+      sandbox.assert.calledOnce(transaction.rollback);
     }
   });
 });
