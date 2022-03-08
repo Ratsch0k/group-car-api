@@ -7,6 +7,8 @@ const log = debug('group-car:user:settings:change-password');
 const error = debug('group-car:user:settings:change-password:error');
 
 const ChangePasswordController: RequestHandler = async (req, res, next) => {
+  log('IP %d requests password change', req.ip);
+
   // Check if request body has the two required fields
   if (
     typeof req.body.oldPassword !== 'string' ||
