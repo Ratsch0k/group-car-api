@@ -9,7 +9,6 @@ import UsernameAlreadyExistsError from
   '../../../errors/user/username-already-exists-error';
 import * as generatePic from '../../../util/generate-profile-pic';
 import config from '../../../config';
-
 const sandbox = createSandbox();
 
 describe('SignUpController', function() {
@@ -78,7 +77,7 @@ describe('SignUpController', function() {
     signUpController(requestStub, responseStub, fakeNext);
   });
 
-  it('fails to create user because username already exists', function(done) {
+  it('fails to create user because username already exists', async function() {
     const user = {
       username: 'demo',
       email: 'demo@mail.com',
@@ -95,17 +94,17 @@ describe('SignUpController', function() {
     const requestStub: any = sandbox.stub();
     const responseStub: any = sandbox.stub();
     requestStub.body = user;
-    const nextFake = fake((err: UsernameAlreadyExistsError) => {
+
+    try {
+      await signUpController(requestStub, responseStub, undefined as any);
+    } catch (err) {
       expect(err).to.be.instanceOf(UsernameAlreadyExistsError);
       expect(err).to.haveOwnProperty('username');
       expect(err.username).to.equal(user.username);
-      done();
-    });
-
-    signUpController(requestStub, responseStub, nextFake);
+    }
   });
 
-  it('fails to create user due to some error', function(done) {
+  it('fails to create user due to some error', async function() {
     // Fake user
     const user = {
       username: 'demo',
@@ -126,11 +125,11 @@ describe('SignUpController', function() {
     const requestStub: any = sandbox.stub();
     const responseStub: any = sandbox.stub();
     requestStub.body = user;
-    const nextFake = fake((err: Error) => {
-      expect(err).to.be.equal(error);
-      done();
-    });
 
-    signUpController(requestStub, responseStub, nextFake);
+    try {
+      await signUpController(requestStub, responseStub, undefined as any);
+    } catch (err) {
+      expect(err).to.be.equal(error);
+    }
   });
 });
