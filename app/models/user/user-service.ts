@@ -81,6 +81,11 @@ export class UserService {
     );
   }
 
+  /**
+   * Checks if the given passwords matches the encrypted password.
+   * @param encryptedPassword - The encrypted password (hash + salt)
+   * @param password - The password to check
+   */
   public static async checkPassword(
       encryptedPassword: string,
       password: string,
@@ -89,10 +94,14 @@ export class UserService {
   }
 
   /**
+   * Changes the password of the currently logged-in user.
    *
-   * @param currentUser
-   * @param oldPassword
-   * @param newPassword
+   * Only changes the password based on two conditions:
+   *  - oldPassword != newPassword
+   *  - oldPassword matches password of user
+   * @param currentUser - The currently logged-in user
+   * @param oldPassword - Current password of the user
+   * @param newPassword - New password
    */
   public static async changePassword(
       currentUser: Express.User,
