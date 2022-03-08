@@ -1,10 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from 'chai';
 import sinon, {assert} from 'sinon';
-import {UserService, MembershipRepository, GroupService} from '../index';
-import {OwnerCannotLeaveError, NotLoggedInError} from '../../errors';
+import bcrypt from 'bcrypt';
+import {
+  OwnerCannotLeaveError,
+  NotLoggedInError,
+  NewPasswordMustBeDifferentError,
+  IncorrectPasswordError,
+} from '../../errors';
 import {UserRepository} from './user-repository';
 import config from '../../config';
+import {MembershipRepository} from '../membership';
+import {UserService} from './user-service';
+import {GroupService} from '../group';
+
 
 describe('UserService', function() {
   afterEach(function() {
@@ -269,6 +278,145 @@ describe('UserService', function() {
             config.user.maxLimitQuery,
         );
       });
+    });
+  });
+
+  describe('checkPassword', function() {
+    let bcryptCompare: sinon.SinonStub;
+
+    beforeEach(function() {
+      bcryptCompare = sinon.stub(bcrypt, 'compare')
+          .callsFake((str1, str2) => Promise.resolve(str1 == str2));
+    });
+
+    it('returns true if both arguments match', async function() {
+      const encryptedPassword = 'PASSWORD';
+      const password = encryptedPassword;
+
+      const value = await UserService.checkPassword(
+          encryptedPassword, password);
+
+      expect(value).to.be.true;
+      assert.calledOnceWithExactly(bcryptCompare, password, encryptedPassword);
+    });
+
+    it('returns false if both arguments don\'t match', async function() {
+      const encryptedPassword = 'PASSWORD';
+      const password = 'FALSE_PASSWORD';
+
+      const value = await UserService.checkPassword(
+          encryptedPassword, password);
+
+      expect(value).to.be.false;
+      assert.calledOnceWithExactly(bcryptCompare, password, encryptedPassword);
+    });
+  });
+
+  describe('changePassword', function() {
+    let findUserById: sinon.SinonStub;
+    let bcryptCompare: sinon.SinonStub;
+
+    beforeEach(function() {
+      findUserById = sinon.stub(UserRepository, 'findById');
+      bcryptCompare = sinon.stub(bcrypt, 'compare')
+          .callsFake((str1, str2) => Promise.resolve(str1 == str2));
+    });
+
+    it('throws NewPasswordMustBeDifferent if new and old' +
+      ' passwords are equal', async function() {
+      await expect(
+          UserService.changePassword(
+            {id: 12} as Express.User,
+            'PASSWORD',
+            'PASSWORD',
+          ),
+      ).to.eventually.be.rejectedWith(NewPasswordMustBeDifferentError);
+
+      assert.notCalled(findUserById);
+      assert.notCalled(bcryptCompare);
+    });
+
+    it('throws IncorrectPasswordError if oldPassword doesn\'t match the ' +
+      'password of the user', async function() {
+      const password = 'CURRENT_PASSWORD';
+      const user = {
+        id: 12,
+        password,
+      };
+      findUserById.resolves(user);
+
+      const oldPassword = 'OLD_PASSWORD';
+      const newPassword = 'NEW_PASSWORD';
+
+      await expect(
+          UserService.changePassword(
+              {id: user.id} as Express.User,
+              oldPassword,
+              newPassword,
+          ),
+      ).to.eventually.be.rejectedWith(IncorrectPasswordError);
+
+      assert.calledOnceWithExactly(findUserById, user.id);
+      assert.calledOnceWithExactly(bcryptCompare, oldPassword, password);
+    });
+
+    it('updates password of user to new password if old password ' +
+      'matches the user\'s password', async function() {
+      const password = 'CURRENT_PASSWORD';
+      const user = {
+        id: 12,
+        password,
+        update: sinon.stub().resolves(),
+      };
+      findUserById.resolves(user);
+
+      const oldPassword = password;
+      const newPassword = 'NEW_PASSWORD';
+
+      await expect(
+          UserService.changePassword(
+              {id: user.id} as Express.User,
+              oldPassword,
+              newPassword,
+          ),
+      ).to.eventually.be.fulfilled;
+
+      assert.calledOnceWithExactly(findUserById, user.id);
+      assert.calledOnceWithExactly(bcryptCompare, oldPassword, password);
+      assert.calledOnceWithExactly(
+          user.update,
+          sinon.match({password: newPassword}),
+      );
+    });
+
+    it('rethrows error when an error occurs while changing ' +
+      'the password', async function() {
+      const password = 'CURRENT_PASSWORD';
+      const customError = new Error('CUSTOM ERROR');
+      const user = {
+        id: 12,
+        password,
+        update: sinon.stub().rejects(customError),
+      };
+      findUserById.resolves(user);
+
+      const oldPassword = password;
+      const newPassword = 'NEW_PASSWORD';
+
+      await expect(
+          UserService.changePassword(
+          {id: user.id} as Express.User,
+          oldPassword,
+          newPassword,
+          ),
+      ).to.eventually.be.rejectedWith(customError);
+
+      assert.calledOnceWithExactly(findUserById, user.id);
+      assert.calledOnceWithExactly(bcryptCompare, oldPassword, password);
+      assert.calledOnceWithExactly(
+          user.update,
+          sinon.match({password: newPassword}),
+      );
     });
   });
 });
