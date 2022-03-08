@@ -18,6 +18,7 @@ export class UserRepository {
    * @param startsWith  - The string with which the usernames should start
    * @param limit       - The limit of how many users should be returns. Has
    *          a default and a max value.
+   * @param options - Options
    */
   public static async findLimitedWithFilter(
       startsWith: string,
@@ -55,6 +56,11 @@ export class UserRepository {
     });
   }
 
+  /**
+   * Find a user by their id
+   * @param id - The user id
+   * @param options - Additional query options
+   */
   public static async findById(
       id: number,
       options?: Partial<RepositoryQueryOptions>,
@@ -62,6 +68,7 @@ export class UserRepository {
     const user = await User.findByPk(id, options);
 
     if (user === null) {
+      error('User with id "%d" doesn\'t exist', id);
       throw new UserNotFoundError(id);
     }
 
@@ -83,6 +90,7 @@ export class UserRepository {
     const user = await User.findOne({where: {username}, ...options});
 
     if (user === null) {
+      error('User with username "%s" doesn\'t exist', username);
       throw new UserNotFoundError(username);
     }
 
