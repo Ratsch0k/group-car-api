@@ -1,5 +1,5 @@
 import {User, UserDto, UserRepository, UserService} from '@models';
-import {InvalidLoginError, UserNotFoundError} from '@errors';
+import {UserNotFoundError} from '@errors';
 import {debug} from 'debug';
 import bindToLog from '@util/user-bound-logging';
 import {ServiceContext} from '@models/service';
@@ -20,9 +20,9 @@ export class AuthenticationService {
    * Lastly, return the dto version of the user model.
    *
    * If any step fails, immediately return null.
-   * @param username
-   * @param password
-   * @param ip
+   * @param username - Username
+   * @param password - Password
+   * @param ip - IP of the request (from context)
    */
   public static async login(
       username: string,
@@ -64,18 +64,6 @@ export class AuthenticationService {
     } else {
       return null;
     }
-  }
-
-  public async logout() {
-    throw new Error('Not implemented');
-  }
-
-  public async signUp() {
-    throw new Error('Not implemented');
-  }
-
-  public async getToken() {
-    throw new Error('Not implemented');
   }
 }
 
