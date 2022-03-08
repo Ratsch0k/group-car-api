@@ -5,7 +5,7 @@ import {expect} from 'chai';
 import {UserRepository} from './user-repository';
 import sequelize, {Transaction} from 'sequelize';
 import {UserNotFoundError} from '../../errors';
-import {RepositoryQueryOptions} from "../../../typings";
+import {RepositoryQueryOptions} from '../../../typings';
 const Op = sequelize.Op;
 
 describe('UserRepository', function() {
