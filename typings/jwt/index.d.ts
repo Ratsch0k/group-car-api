@@ -4,7 +4,7 @@ declare namespace Express {
     id: number;
     isBetaUser: boolean;
     createdAt: Date;
-    deletedAt: Date;
+    deletedAt?: Date;
     updatedAt: Date;
     email: string;
   }
