@@ -130,6 +130,7 @@ export class UserService {
         });
       } catch (e) {
         userError('An error occurred while changing the password: %s', e);
+        throw e;
       }
       userLog('Password successfully changed');
     } else {
