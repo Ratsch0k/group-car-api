@@ -154,13 +154,14 @@ export const signUpController: RequestHandler = async (req, res, _next) => {
     }, {transaction});
 
     // If everything executing successfully, commit transaction
-    transaction.commit();
+    await transaction.commit();
 
     log('User "%s" successfully created', req.body.username);
     res.setJwtToken(convertUserToJwtPayload(user), user.username);
     res.status(201).send(ModelToDtoConverter
         .convert<UserDto>(user.get({plain: true}), UserDto));
   } catch (err) {
+    await transaction.rollback();
     // Handle unique constraints error differently
     if (err instanceof UniqueConstraintError) {
       error('Couldn\'t create user "%s", because username already exists',
