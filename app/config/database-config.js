@@ -14,7 +14,7 @@ module.exports = {
   test: {
     username: 'groupcarapitest',
     password: 'groupcarapitest',
-    database: 'groupcartest',
+    database: 'groupcarapitest',
     host: '127.0.0.1',
     dialect: 'postgres',
     keepDefaultTimezone: true,

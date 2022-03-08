@@ -6,8 +6,8 @@ services:
     image: postgres:12
     restart: always
     environment:
-      - POSTGRES_DB=groupcartest
-      - POSTGRES_PASSWORD=groupcartest
-      - POSTGRES_USER=groupcartest
+      - POSTGRES_DB=groupcarapitest
+      - POSTGRES_PASSWORD=groupcarapitest
+      - POSTGRES_USER=groupcarapitest
     ports:
       - '5432:5432'
