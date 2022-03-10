@@ -4,11 +4,18 @@ import {
   User,
   UserRepository,
 } from '@models';
-import {OwnerCannotLeaveError, NotLoggedInError} from '@errors';
+import {
+  OwnerCannotLeaveError,
+  NotLoggedInError,
+  IncorrectPasswordError, NewPasswordMustBeDifferentError,
+} from '@errors';
 import config from '@app/config';
 import debug from 'debug';
+import bcrypt from 'bcrypt';
+import bindToLog from '@util/user-bound-logging';
 
 const log = debug('group-car:user:service');
+const error = debug('group-car:user:service');
 
 /**
  * Service for complex user actions.
@@ -72,5 +79,63 @@ export class UserService {
     return UserRepository.findLimitedWithFilter(
         startsWith, limit,
     );
+  }
+
+  /**
+   * Checks if the given passwords matches the encrypted password.
+   * @param encryptedPassword - The encrypted password (hash + salt)
+   * @param password - The password to check
+   */
+  public static async checkPassword(
+      encryptedPassword: string,
+      password: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, encryptedPassword);
+  }
+
+  /**
+   * Changes the password of the currently logged-in user.
+   *
+   * Only changes the password based on two conditions:
+   *  - oldPassword != newPassword
+   *  - oldPassword matches password of user
+   * @param currentUser - The currently logged-in user
+   * @param oldPassword - Current password of the user
+   * @param newPassword - New password
+   */
+  public static async changePassword(
+      currentUser: Express.User,
+      oldPassword: string,
+      newPassword: string,
+  ): Promise<void> {
+    const userLog = bindToLog(log, {args: [currentUser.id]});
+    const userError = bindToLog(error, {args: [currentUser.id]});
+    userLog('Change password');
+
+    userLog('Check if new and old passwords are different');
+    if (oldPassword === newPassword) {
+      throw new NewPasswordMustBeDifferentError();
+    }
+
+    // Check if oldPassword matches the password of the user
+    userLog('Verify if old password correct');
+
+    const user = await UserRepository.findById(currentUser.id);
+
+    if (await this.checkPassword(user.password, oldPassword)) {
+      userLog('Old password verified, changing password');
+      try {
+        await user.update({
+          password: newPassword,
+        });
+      } catch (e) {
+        userError('An error occurred while changing the password: %s', e);
+        throw e;
+      }
+      userLog('Password successfully changed');
+    } else {
+      userError('Old password was incorrect');
+      throw new IncorrectPasswordError();
+    }
   }
 }

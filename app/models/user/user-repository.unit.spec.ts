@@ -3,7 +3,9 @@ import sinon, {assert} from 'sinon';
 import {User} from '../../models';
 import {expect} from 'chai';
 import {UserRepository} from './user-repository';
-import sequelize from 'sequelize';
+import sequelize, {Transaction} from 'sequelize';
+import {UserNotFoundError} from '../../errors';
+import {RepositoryQueryOptions} from '../../../typings';
 const Op = sequelize.Op;
 
 describe('UserRepository', function() {
@@ -103,6 +105,58 @@ describe('UserRepository', function() {
       };
 
       expect(parameter).to.be.eql(expectedParameter);
+    });
+  });
+
+  describe('findById', function() {
+    let userStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      userStub = sinon.stub(User, 'findByPk');
+    });
+
+    it('throws UserNotFoundError if not user is found', async function() {
+      userStub.resolves(null);
+      const id = 2;
+
+      await expect(
+          UserRepository.findById(id),
+      ).to.eventually.be.rejectedWith(UserNotFoundError);
+
+      assert.calledOnceWithExactly(userStub, id, undefined);
+    });
+
+    it('returns the user', async function() {
+      const id = 2;
+      const user = {
+        id,
+        username: 'TEST',
+      };
+      userStub.resolves(user);
+
+      await expect(
+          UserRepository.findById(id),
+      ).to.eventually.eql(user);
+
+      assert.calledOnceWithExactly(userStub, id, undefined);
+    });
+
+    it('forwards the given options to the database query', async function() {
+      const id = 2;
+      const user = {
+        id,
+        username: 'TEST',
+      };
+      userStub.resolves(user);
+      const options: Partial<RepositoryQueryOptions> = {
+        transaction: 5 as unknown as Transaction,
+      };
+
+      await expect(
+          UserRepository.findById(id, options),
+      ).to.eventually.eql(user);
+
+      assert.calledOnceWithExactly(userStub, id, options);
     });
   });
 });

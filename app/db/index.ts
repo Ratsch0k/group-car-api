@@ -11,6 +11,10 @@ const httpLog = debug('group-car:http');
  * if the database is reachable or not.
  */
 export class Database extends Sequelize {
+  private username: string;
+  private password : string;
+  private options: Options | undefined;
+
   /**
    * Creates an instance of this object
    * @param database  Name of the database
@@ -23,6 +27,9 @@ export class Database extends Sequelize {
       password: string,
       options: Options | undefined) {
     super(database, username, password, options);
+    this.username = username;
+    this.password = password;
+    this.options = options;
   }
 
   /**
@@ -31,12 +38,21 @@ export class Database extends Sequelize {
    * @returns A promise which resolves to true or false depending
    *          on the availability of the database
    */
-  isAvailable() {
-    return this.authenticate().then(() => {
+  async isAvailable() {
+    httpLog('Check connection to %s:%s', this.options!.host, this.options!.port);
+
+    try {
+      await this.authenticate();
+      httpLog('Connection test successful');
       return true;
-    }).catch(() => {
+    } catch (e) {
+      if (e !== undefined) {
+        httpLog('Connection test failed because $s', e);
+      } else {
+        httpLog('Connection test failed');
+      }
       return false;
-    });
+    }
   }
 }
 

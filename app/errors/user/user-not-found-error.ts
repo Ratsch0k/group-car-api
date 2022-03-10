@@ -6,10 +6,20 @@ import {NotFoundError} from '@errors';
 class UserNotFoundError extends NotFoundError {
   /**
    * Creates an instance of this class.
-   * @param userId - User id of the user which can not be found
+   * @param idOrName - User id or name of the user which can not be found
    */
-  constructor(userId: number) {
-    super(`The user with id "${userId}" doesn\'t exist`, {userId});
+  constructor(idOrName: number | string) {
+    if (typeof idOrName === 'string') {
+      super(
+          `The user with username "${idOrName} doesn't exist`,
+          {username: idOrName},
+      );
+    } else {
+      super(
+          `The user with id "${idOrName}" doesn't exist`,
+          {userId: idOrName},
+      );
+    }
   }
 }
 

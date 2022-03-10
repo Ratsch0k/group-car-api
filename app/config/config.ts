@@ -2,7 +2,7 @@ import path from 'path';
 import debug from 'debug';
 import {argv} from 'yargs';
 import {
-  BcryptConfig,
+  AuthConfig,
   DBConfig,
   ErrorConfig,
   MorganConfig,
@@ -37,8 +37,9 @@ log('Server: %s', serverType);
 /**
  * Initialize BcryptConfig with default value.
  */
-const bcrypt: BcryptConfig = {
+const auth: AuthConfig = {
   saltRounds: 8,
+  waitOnLogin: 500,
 };
 /**
  * Initialize ErrorConfig with default value
@@ -53,11 +54,11 @@ const morgan: MorganConfig = {
 
 // Depending on node environment changes configs
 if (environment === 'production') {
-  bcrypt.saltRounds = 10;
+  auth.saltRounds = 10;
   error.withStack = false;
   morgan.formatString = 'common';
 } else if (environment === 'test') {
-  bcrypt.saltRounds = 4;
+  auth.saltRounds = 4;
   morgan.formatString = null;
 }
 
@@ -111,7 +112,7 @@ const config: DeepPartial<Config> = {
   user,
   database,
   static: staticConfig,
-  bcrypt,
+  auth,
   morgan,
   error,
   metrics,

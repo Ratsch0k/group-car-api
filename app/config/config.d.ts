@@ -1,9 +1,9 @@
 import {JWTConfig} from './jwt-config';
 import {Config as SequelizeConfig} from 'sequelize/types';
 
-
-export interface BcryptConfig {
+export interface AuthConfig {
   saltRounds: number;
+  waitOnLogin: number;
 }
 
 export interface StaticConfig {
@@ -64,7 +64,7 @@ export interface MetricsConfig {
 
 export interface Config {
   database: DBConfig;
-  bcrypt: BcryptConfig;
+  auth: AuthConfig;
   static: StaticConfig;
   error: ErrorConfig;
   jwt: JWTConfig;

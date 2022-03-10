@@ -81,7 +81,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: groupcartest
+          POSTGRES_DB: groupcarapitest
           POSTGRES_PASSWORD: groupcarapitest
           POSTGRES_USER: groupcarapitest
         options: >-
