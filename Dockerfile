@@ -15,8 +15,9 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-RUN npm_config_build_from_source=true yarn add canvas
-RUN yarn install
+RUN npm_config_build_from_source=true yarn add canvas \
+  && yarn install \
+  && yarn cache clean
 
 COPY --chown=node:node . .
 
