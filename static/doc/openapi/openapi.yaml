@@ -149,11 +149,11 @@ paths:
         - Settings
       description: 'Change the password of the currently logged in user. There are some conditions that have to be true,
         before a call to this endpoint will succeed.
-        
+
         1. The new password has to be different than the old password
-        
+
         2. The new password has to fulfill the typical password constraints
-        
+
         3. The old password has to be correct
         '
       requestBody:
