@@ -1,8 +1,8 @@
 FROM node:16
 
-RUN mkdir /home/node/group-car-api
-RUN mkdir /home/node/group-car-api/node_modules
-RUN chown -R node:node /home/node/group-car-api
+RUN mkdir /home/node/group-car-api \
+  && mkdir /home/node/group-car-api/node_modules \
+  && chown -R node:node /home/node/group-car-api
 
 WORKDIR /home/node/group-car-api
 
