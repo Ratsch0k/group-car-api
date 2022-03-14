@@ -1,11 +1,12 @@
 FROM node:16
 
-RUN mkdir /home/node/group-car-api
-RUN mkdir /home/node/group-car-api/node_modules
-RUN chown -R node:node /home/node/group-car-api
+RUN mkdir /home/node/group-car-api \
+  && mkdir /home/node/group-car-api/node_modules \
+  && chown -R node:node /home/node/group-car-api
 
 WORKDIR /home/node/group-car-api
 
+RUN touch .env
 COPY package.json ./
 COPY yarn.lock ./
 
@@ -14,8 +15,9 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-RUN npm_config_build_from_source=true yarn add canvas
-RUN yarn install
+RUN npm_config_build_from_source=true yarn add canvas \
+  && yarn install \
+  && yarn cache clean
 
 COPY --chown=node:node . .
 

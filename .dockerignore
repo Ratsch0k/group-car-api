@@ -5,3 +5,4 @@ build
 mochawesome-report
 *.md
 data
+.env

@@ -1,36 +1,25 @@
 import * as express from 'express';
 import signUpController from '@app/routes/auth/signUp/sign-up-controller';
-import {createValidationResultHandler} from '@util/validation-result-handler';
-import {body} from 'express-validator';
+import {asyncWrapper} from '@util/async-wrapper';
+import {
+  emailValidator,
+  passwordValidator,
+  usernameValidator,
+} from '@app/validators/user-validators';
+import createValidationRouter from '@app/validators/create-validation-router';
 const router: express.Router = express.Router();
 
 
 export const signUpValidator = [
-  body('username')
-      .isString()
-      .trim()
-      .notEmpty()
-      .isLength({min: 4, max: 25})
-      .withMessage('Username has to be between 4 and 25 characters long')
-      .custom((value: string) => {
-        if (/\s/.test(value)) {
-          throw new Error('Username should not contain whitespace');
-        }
-        return true;
-      })
-      .escape(),
-  body('email').escape().trim().isEmail()
-      .withMessage('Email has to be a valid email address'),
-  body('password')
-      .isString()
-      .withMessage('password has to be a string')
-      .isLength({min: 6, max: 255})
-      .withMessage('Password has to be at least 6 characters long'),
+  usernameValidator(),
+  emailValidator(),
+  passwordValidator(),
 ];
 
 /**
  * Add the {@link signUpValidationHandler} to the router.
  */
+/*
 router.post(
     '/',
     signUpValidator,
@@ -38,7 +27,18 @@ router.post(
       debugScope: 'group-car:sign-up',
       requestName: (req) => `Sign up for "${req.body.username}"`,
     }),
-    signUpController,
+    asyncWrapper(signUpController),
 );
+*/
+router.post(
+    '/',
+    createValidationRouter(
+        'sign-up',
+        signUpValidator,
+        (req) => `Sign up as \"${req.body.username}\"`,
+    ),
+    asyncWrapper(signUpController),
+);
+
 
 export default router;

@@ -35,7 +35,6 @@ jobs:
   audit:
     name: Audit libraries
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node.js
@@ -45,6 +44,7 @@ jobs:
       - run: yarn install
       - name: Auditing
         run: yarn audit
+        continue-on-error: true
   
   build:
     name: Test building
@@ -81,7 +81,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: groupcartest
+          POSTGRES_DB: groupcarapitest
           POSTGRES_PASSWORD: groupcarapitest
           POSTGRES_USER: groupcarapitest
         options: >-
@@ -123,7 +123,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: groupcartest
+          POSTGRES_DB: groupcarapitest
           POSTGRES_PASSWORD: groupcarapitest
           POSTGRES_USER: groupcarapitest
         options: >-
@@ -181,7 +181,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: groupcartest
+          POSTGRES_DB: groupcarapitest
           POSTGRES_PASSWORD: groupcarapitest
           POSTGRES_USER: groupcarapitest
         options: >-
@@ -239,7 +239,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: groupcartest
+          POSTGRES_DB: groupcarapitest
           POSTGRES_PASSWORD: groupcarapitest
           POSTGRES_USER: groupcarapitest
         options: >-

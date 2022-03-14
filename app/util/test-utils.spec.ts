@@ -7,11 +7,13 @@ import express from 'express';
 import http from 'http';
 import {Server} from 'socket.io';
 import ioClient from 'socket.io-client';
+import db, {syncPromise} from '../db';
+import {UserDto} from '../models';
 
 export interface SignUpReturn {
   user: any;
   csrf: string;
-  agent: request.SuperTest<request.Test>;
+  agent: request.SuperAgentTest;
   signUpBody: {
     username: string;
     password: string;
@@ -20,7 +22,15 @@ export interface SignUpReturn {
   jwtValue: string;
 }
 
+export interface TestContext {
+  agent: request.SuperAgentTest;
+  user: UserDto & SignUpReturn['signUpBody'];
+  csrf: string;
+  jwtValue: string;
+}
+
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+
 
 /**
  * Util class for tests.
@@ -132,5 +142,41 @@ export class TestUtils {
         },
       },
     });
+  }
+
+
+  /**
+   * Sets up for an integration test.
+   *
+   * **Should be used once for each test**
+   *
+   * The setup process is done in 3 steps:
+   *  1. Sync the database, meaning: reset it
+   *  2. Sign up a default user
+   *  3. Prepare a SuperTest agent for use in tests
+   * @returns An instance of SuperAgent which is logged in.
+   */
+  public static async setupIntegrationTest():
+      Promise<TestContext> {
+    await syncPromise;
+    await db.sync({force: true});
+
+    const response = await this.signUp();
+
+    // Extract needed fields
+    const {agent, csrf, user, jwtValue} = response;
+
+    // Set csrf header
+    agent.set(csrfHeaderName, csrf);
+
+    return {
+      agent,
+      csrf,
+      user: {
+        ...user,
+        password: response.signUpBody.password,
+      },
+      jwtValue,
+    };
   }
 }

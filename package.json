@@ -1,9 +1,9 @@
 {
   "name": "group-car-api",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "private": true,
   "config": {
-    "port": "8080",
+    "port": "8000",
     "public": "../group-car/build/"
   },
   "nyc": {
@@ -42,7 +42,7 @@
     "test": "cross-env NODE_ENV=test JWT_SECRET=secret mocha \"app/**/*.spec.ts\"",
     "test:unit": "cross-env NODE_ENV=test JWT_SECRET=secret mocha \"app/**/*.unit.spec.ts\"",
     "test:integration": "cross-env NODE_ENV=test JWT_SECRET=secret mocha \"app/**/*.integration.spec.ts\"",
-    "migrate:dev": "cross-env NODE_ENV=development sequelize-cli db:migrate",
+    "migrate:dev": "env-cmd cross-env NODE_ENV=development sequelize-cli db:migrate",
     "migrate:prod": "cross-env NODE_ENV=production sequelize-cli db:migrate",
     "coverage": "cross-env NODE_ENV=test JWT_SECRET=secret nyc mocha \"app/**/*.spec.ts\" --exit --reporter mochawesome --reporter-options quiet=true,html=false",
     "postcoverage": "yarn marge",
