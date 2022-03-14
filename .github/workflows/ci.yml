@@ -35,7 +35,6 @@ jobs:
   audit:
     name: Audit libraries
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node.js
@@ -45,6 +44,7 @@ jobs:
       - run: yarn install
       - name: Auditing
         run: yarn audit
+        continue-on-error: true
   
   build:
     name: Test building
