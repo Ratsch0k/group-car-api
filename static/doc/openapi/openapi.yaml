@@ -260,11 +260,7 @@ paths:
           $ref: '#/components/responses/BadRequestErrorResponse'
   /api/user/{userId}/profile-pic:
     parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
+      - $ref: '#/components/parameters/userId'
     get:
       summary: Get the profile picture
       tags:
@@ -312,11 +308,7 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /api/user/invite/{groupId}/join:
     parameters:
-      - name: groupId
-        in: path
-        required: true
-        schema:
-          type: integer
+      - $ref: '#/components/parameters/groupId'
     post:
       summary: Joins the group
       tags:
@@ -387,7 +379,7 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /api/group/{groupId}:
     parameters:
-      - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/groupId'
     get:
       summary: Get group data
       tags:
@@ -449,13 +441,13 @@ paths:
         404:
           $ref: '#/components/responses/GroupNotFoundErrorResponse'
   /api/group/{groupId}/invites:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
     get:
       summary: Get all invited users of this group
       tags:
         - Group
       description: Gets a list of all users which are invited to the specified group.
-      parameters:
-        - $ref: '#/components/parameters/GroupId'
       responses:
         200:
           description: The list of invited users
@@ -477,13 +469,13 @@ paths:
         404:
           $ref: '#/components/responses/GroupNotFoundErrorResponse'
   /api/group/{groupId}/invite:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
     post:
       summary: Invites a user to the group
       tags:
         - Group
       description: Invites a user to the group
-      parameters:
-        - $ref: '#/components/parameters/GroupId'
       requestBody:
         description: Either the id or the username of the user. If both are provided the username will be ignored.
         content:
@@ -520,16 +512,12 @@ paths:
                   - $ref: '#/components/schemas/UserNotFoundErrorSchema'
                   - $ref: '#/components/schemas/UsernameNotFoundErrorSchema'
   /api/group/{groupId}/leave:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
     post:
       summary: Leaves the specified group
       tags:
         - Group
-      parameters:
-        - name: groupId
-          in: path
-          required: true
-          schema:
-            type: integer
       description: Removes the currently logged in user from the specified group.
       responses:
         204:
@@ -540,7 +528,7 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /api/group/{groupId}/member:
     parameters:
-      - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/groupId'
     get:
       summary: Get members
       description: Get the list of members of the specified group
@@ -565,16 +553,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
   /api/group/{groupId}/member/{userId}/kick:
     parameters:
-      - name: groupId
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
     post:
       summary: Kicks a user
       description: Kicks the specified user from the specified group. The owner can kick any user, an admin can kick any non-admin user and normal members cannot kick any user.
@@ -609,23 +589,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/MembershipNotFoundSchema'
   /api/group/{groupId}/member/{userId}/admin/grant:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
     put:
       summary: Grants a user admin permissions
       description: Grants the specified user admin permissions.
       tags:
         - Group
         - Member
-      parameters:
-        - name: groupId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: integer
       responses:
         204:
           description: The user was granted admin permissions
@@ -643,16 +615,8 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /api/group/{groupId}/member/{userId}/admin/revoke:
     parameters:
-      - name: groupId
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
     put:
       summary: Grants a user admin permissions
       description: Grants the specified user admin permissions.
@@ -676,17 +640,8 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /api/group/{groupId}/member/{userId}/admin/transfer-ownership:
     parameters:
-      - name: groupId
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: integer
-
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/userId'
     post:
       summary: Transfers ownership to specified user
       description: Transfers the ownership of the currently logged in user of the specified group to the specified user
@@ -711,11 +666,7 @@ paths:
                 $ref: '#/components/schemas/UnauthorizedErrorSchema'
   /api/group/{groupId}/car:
     parameters:
-      - name: groupId
-        in: path
-        required: true
-        schema:
-          type: integer
+      - $ref: '#/components/parameters/groupId'
     get:
       summary: Get all cars
       tags:
@@ -767,20 +718,11 @@ paths:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
+
   /api/group/{groupId}/car/{carId}/drive:
     parameters:
-      - name: groupId
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: The id of the group
-      - name: carId
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: The id of the car
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/carId'
     put:
       summary: Drive a car
       description: Request to drive the specified car. A user can only drive a
@@ -799,18 +741,8 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
   /api/group/{groupId}/car/{carId}/park:
     parameters:
-      - name: groupId
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: The id of the group
-      - name: carId
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: The id of the car
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/carId'
     put:
       summary: Park the car
       description: Park the specified car at the specified location. Only the driver
@@ -1229,12 +1161,27 @@ components:
 
   # Parameter
   parameters:
-    GroupId:
+    groupId:
       name: groupId
       in: path
       schema:
         type: integer
       required: true
+      description: The id of the group
+    carId:
+      name: carId
+      in: path
+      schema:
+        type: integer
+      required: true
+      description: The id of the car
+    userId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: The id of the user
 
   # Security Definitions
   securitySchemes:
