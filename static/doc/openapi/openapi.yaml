@@ -718,6 +718,37 @@ paths:
           $ref: '#/components/responses/UnauthorizedErrorResponse'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /api/group/{groupId}/car/{carId}:
+    parameters:
+      - $ref: '#/components/parameters/groupId'
+      - $ref: '#/components/parameters/carId'
+    delete:
+      summary: Delete a car
+      description: If the logged-in user is an admin of the group with the given id, they can delete the given car.
+      tags:
+        - Group
+        - Car
+      responses:
+        204:
+          description: The car was successfully deleted
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          allOf:
+            - description: 'This response could be sent if one of the following conditions is met:
+            
+                - The user is not logged in
+              
+                - The user is not a member of the given group (this is also the case if the group does not exist)
+              
+                - The user is a member of a group but not an admin'
+            - $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          allOf:
+            - description: 'Sent if the user is an admin of the group but the car does not exist'
+            - $ref: '#/components/responses/CarNotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
 
   /api/group/{groupId}/car/{carId}/drive:
     parameters:
@@ -1117,6 +1148,14 @@ components:
             detail:
               groupId: 4
               userId: 2
+    CarNotFoundSchema:
+      allOf:
+        - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
+        - example:
+            message: Car 2 doesn't exist in group 4
+            detail:
+              groupId: 4
+              carId: 2
 
   # Responses
   responses:
@@ -1158,6 +1197,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/GroupNotFoundErrorSchema'
+    CarNotFoundErrorResponse:
+      description: The group has no car with the given id
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CarNotFoundSchema'
 
   # Parameter
   parameters:
