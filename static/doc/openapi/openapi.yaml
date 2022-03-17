@@ -734,19 +734,28 @@ paths:
         400:
           $ref: '#/components/responses/BadRequestErrorResponse'
         401:
-          allOf:
-            - description: 'This response could be sent if one of the following conditions is met:
+          description: 'This response could be sent if one of the following conditions is met:
+          
+              - The user is not logged in
             
-                - The user is not logged in
-              
-                - The user is not a member of the given group (this is also the case if the group does not exist)
-              
-                - The user is a member of a group but not an admin'
-            - $ref: '#/components/responses/UnauthorizedErrorResponse'
+              - The user is not a member of the given group
+            
+              - The user is a member of a group but not an admin'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/UnauthorizedErrorSchema'
+                  - $ref: '#/components/schemas/NotAdminOfGroupErrorSchema'
+                  - $ref: '#/components/schemas/NotMemberOfGroupErrorSchema'
         404:
-          allOf:
-            - description: 'Sent if the user is an admin of the group but the car does not exist'
-            - $ref: '#/components/responses/CarNotFoundErrorResponse'
+          description: 'Sent if the user is an admin of the group but the car does not exist or if the group does not exist'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/CarNotFoundErrorSchema'
+                  - $ref: '#/components/schemas/GroupNotFoundErrorSchema'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
@@ -1075,6 +1084,10 @@ components:
           type: string
         detail:
           type: object
+          properties:
+            errorName:
+              type: string
+              required: true
     UnauthorizedErrorSchema:
       allOf:
         - $ref: '#/components/schemas/RestError'
@@ -1082,7 +1095,8 @@ components:
             status: Unauthorized
             statusCode: 401
             message: You're not authorized to view the requested resourced.
-            detail: {}
+            detail:
+              errorName: UnauthorizedError
             timestamp: '2020-05-03T13:21:35.938Z'
     BadRequestErrorSchema:
       allOf:
@@ -1091,7 +1105,8 @@ components:
             status: Bad Request
             statusCode: 400
             message: The sent request is missing required attributes.
-            detail: {}
+            detail:
+              errorName: BadRequestError
             timestamp: '2020-05-03T13:21:35.938Z'
     InternalServerErrorSchema:
       allOf:
@@ -1100,7 +1115,8 @@ components:
             status: Internal Server Error
             statusCode: 500
             message: An unexpected error occurred.
-            detail: {}
+            detail:
+              errorName: InternalServerError
             timestamp: '2020-05-03T13:21:35.938Z'
     EntityNotFoundErrorSchema:
       allOf:
@@ -1109,7 +1125,8 @@ components:
             message: Entity Not Found Error
             statusCode: 404
             status: Not found
-            detail: {}
+            detail:
+              errorName: NotFoundError
             timestamp: '2020-05-03T13:21:35.938Z'
     UserNotFoundErrorSchema:
       allOf:
@@ -1118,6 +1135,7 @@ components:
             message: A user with id 4 doesn't exist
             detail:
               userId: 4
+              errorName: UserNotFoundError
     UsernameNotFoundErrorSchema:
       allOf:
         - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
@@ -1125,6 +1143,7 @@ components:
             message: A user with then name "test-user" doesn't exist
             detail:
               username: 'test-user'
+              errorName: UsernameNotFoundError
     GroupNotFoundErrorSchema:
       allOf:
         - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
@@ -1132,6 +1151,7 @@ components:
             message: A group with id 4 doesn't exist
             detail:
               groupId: 4
+              errorName: GroupNotFoundError
     InviteNotFoundSchema:
       allOf:
         - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
@@ -1140,6 +1160,7 @@ components:
             detail:
               groupId: 4
               userId: 2
+              errorName: InviteNotFoundError
     MembershipNotFoundSchema:
       allOf:
         - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
@@ -1148,7 +1169,8 @@ components:
             detail:
               groupId: 4
               userId: 2
-    CarNotFoundSchema:
+              errorName: MembershipNotFoundError
+    CarNotFoundErrorSchema:
       allOf:
         - $ref: '#/components/schemas/EntityNotFoundErrorSchema'
         - example:
@@ -1156,7 +1178,21 @@ components:
             detail:
               groupId: 4
               carId: 2
-
+              errorName: CarNotFoundError
+    NotAdminOfGroupErrorSchema:
+      allOf:
+        - $ref: '#/components/schemas/UnauthorizedErrorSchema'
+        - example:
+            message: You have to be an admin of the group you have referred to
+            detail:
+              errorName: NotMemberOfGroupError
+    NotMemberOfGroupErrorSchema:
+      allOf:
+        - $ref: '#/components/schemas/UnauthorizedErrorSchema'
+        - example:
+            message: You have to be a member of the group you referred to
+            detail:
+              errorName: NotMemberOfGroupError
   # Responses
   responses:
 
