@@ -44,7 +44,7 @@ export const defaultOptions = {
  * @param message - The message to log when checking the results
  * @param options - Additional options to modify default behaviour
  */
-export const createValidationRouter = (
+export const createValidator = (
     name: string,
     validationChain: ValidationChain | ValidationChain[],
     message: ((req: Request) => string) | string,
@@ -76,4 +76,4 @@ export const createValidationRouter = (
   );
 };
 
-export default createValidationRouter;
+export default createValidator;
