@@ -4,14 +4,16 @@ import deleteGroupRouter from './delete';
 import getGroupRouter from './get';
 import inviteUserToGroupRouter from './invite';
 import leaveGroupRouter from './leave';
-import {groupIdValidation} from '@app/validators';
 import groupGroupIdInvitesRouter from './invites';
 import groupMemberRouter from './member';
 import groupCarRouter from './car';
+import createValidationRouter from '@app/validators/create-validation-router';
+import {groupIdValidator} from '@app/validators';
 
 const groupGroupIdRouter = Router({mergeParams: true});
 
-groupGroupIdRouter.use(groupIdValidation);
+groupGroupIdRouter.use(
+    createValidationRouter('groupId', groupIdValidator, 'check-groupId'));
 groupGroupIdRouter.put('/', updateGroupRouter);
 groupGroupIdRouter.delete('/', deleteGroupRouter);
 groupGroupIdRouter.get('/', getGroupRouter);
