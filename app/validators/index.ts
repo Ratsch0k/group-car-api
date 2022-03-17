@@ -1,5 +1,4 @@
-export {default as userIdValidation} from './user-id-validator';
-export {default as carIdValidation} from './car-id-validator';
-export * from './user-id-validator';
-export * from './car-id-validator';
+export * from './user-validators';
 export * from './group-validators';
+export * from './create-validation-router';
+export {default} from './create-validation-router';

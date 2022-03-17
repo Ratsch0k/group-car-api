@@ -1,7 +1,14 @@
-import {param} from 'express-validator';
+import {param, ValidationChain} from 'express-validator';
 
 export const groupIdValidator =
-  param('groupId')
+  (location = param('groupId')): ValidationChain =>
+    location
+        .exists()
+        .withMessage('groupId is missing')
+        .isNumeric().withMessage('groupId has to be a number');
+
+export const carIdValidator =
+  (location = param('carId')): ValidationChain => location
       .exists()
-      .withMessage('groupId is missing')
-      .isNumeric().withMessage('groupId has to be a number');
+      .withMessage('carId is missing')
+      .isNumeric().withMessage('carId has to be a number');

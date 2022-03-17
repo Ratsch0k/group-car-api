@@ -13,7 +13,7 @@ import {groupIdValidator} from '@app/validators';
 const groupGroupIdRouter = Router({mergeParams: true});
 
 groupGroupIdRouter.use(
-    createValidationRouter('groupId', groupIdValidator, 'check-groupId'));
+    createValidationRouter('groupId', groupIdValidator(), 'check-groupId'));
 groupGroupIdRouter.put('/', updateGroupRouter);
 groupGroupIdRouter.delete('/', deleteGroupRouter);
 groupGroupIdRouter.get('/', getGroupRouter);
