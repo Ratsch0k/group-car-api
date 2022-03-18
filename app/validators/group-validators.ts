@@ -1,10 +1,15 @@
 import {ValidationChain} from 'express-validator';
-import {ValidatorsImpl} from 'express-validator/src/chain';
+import {ValidatorsImpl, Validators} from 'express-validator/src/chain';
+
+export interface GroupValidators extends Validators<ValidationChain> {
+  isGroupName(): ValidationChain;
+  isGroupDescription(): ValidationChain;
+}
 
 /**
  * Class for additional validators related to groups.
  */
-export class GroupValidators extends ValidatorsImpl<ValidationChain> {
+export class GroupValidatorsImpl extends ValidatorsImpl<ValidationChain> {
   /**
    * Check if group name.
    */

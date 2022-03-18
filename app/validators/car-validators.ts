@@ -1,11 +1,18 @@
 import {ValidationChain} from 'express-validator';
 import {CarColor} from '@models';
-import {ValidatorsImpl} from 'express-validator/src/chain';
+import {ValidatorsImpl, Validators} from 'express-validator/src/chain';
+
+export interface CarValidators extends Validators<ValidationChain> {
+  isCarColor(): ValidationChain;
+  isCarName(): ValidationChain;
+  isLatitude(): ValidationChain;
+  isLongitude(): ValidationChain;
+}
 
 /**
  * Class for additional car related validation checks.
  */
-export class CarValidators extends ValidatorsImpl<ValidationChain> {
+export class CarValidatorsImpl extends ValidatorsImpl<ValidationChain> {
   /**
    * Checks if car color.
    */

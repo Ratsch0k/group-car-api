@@ -1,10 +1,15 @@
 import {ValidationChain} from 'express-validator';
-import {ValidatorsImpl} from 'express-validator/src/chain';
+import {Validators, ValidatorsImpl} from 'express-validator/src/chain';
+
+export interface UserValidators extends Validators<ValidationChain> {
+  isPassword(name?: string): ValidationChain;
+  isUsername(name?: string): ValidationChain;
+}
 
 /**
  * Additional checks for user related checks.
  */
-export class UserValidators extends ValidatorsImpl<ValidationChain> {
+export class UserValidatorsImpl extends ValidatorsImpl<ValidationChain> {
   /**
    * Checks if field conforms to password rules.
    */

@@ -1,12 +1,22 @@
-import {GroupValidators} from '@app/validators/group-validators';
+import {
+  GroupValidators,
+  GroupValidatorsImpl,
+} from '@app/validators/group-validators';
 import {ValidatorsImpl} from 'express-validator/src/chain';
-import {UserValidators} from '@app/validators/user-validators';
-import {CarValidators} from '@app/validators/car-validators';
+import {
+  UserValidators,
+  UserValidatorsImpl,
+} from '@app/validators/user-validators';
+import {CarValidators, CarValidatorsImpl} from '@app/validators/car-validators';
 
 export type ExtendedValidationChain = GroupValidators &
   UserValidators &
   CarValidators;
-const customValidators = [GroupValidators, UserValidators, CarValidators];
+const customValidators = [
+  GroupValidatorsImpl,
+  UserValidatorsImpl,
+  CarValidatorsImpl,
+];
 
 /**
  * Injects custom validation checks into the validation chain
