@@ -1,13 +1,23 @@
 import {asyncWrapper} from '@app/util/async-wrapper';
 import {Router} from 'express';
 import {createCarController} from './create-car-controller';
-import createCarValidationRouter from './create-car-validator';
+import {
+  createValidationRouter,
+} from '@app/validators';
+import {body} from 'express-validator';
 
 const createCarRouter = Router({mergeParams: true});
 
 createCarRouter.use(
     '/',
-    createCarValidationRouter,
+    createValidationRouter(
+        'group:car:create',
+        [
+          body('color').exists().withMessage('color is missing').isCarColor(),
+          body('name').exists().withMessage('name is missing').isCarName(),
+        ],
+        'create car',
+    ),
     asyncWrapper(createCarController),
 );
 

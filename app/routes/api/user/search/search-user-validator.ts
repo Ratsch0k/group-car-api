@@ -1,8 +1,6 @@
 import {query} from 'express-validator';
 import {Router} from 'express';
-import {
-  createValidationResultHandler,
-} from '@app/util/validation-result-handler';
+import {createValidationRouter} from '@app/validators';
 
 export const searchUserValidation = [
   query('filter')
@@ -17,10 +15,11 @@ export const searchUserValidation = [
 const searchUserValidationRouter = Router()
     .use(
         searchUserValidation,
-        createValidationResultHandler({
-          debugScope: 'group-car:user:search',
-          requestName: 'search for filtered users',
-        }),
+        createValidationRouter(
+            'user:search',
+            searchUserValidation,
+            'search for filtered users',
+        ),
     );
 
 export default searchUserValidationRouter;

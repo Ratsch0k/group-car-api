@@ -1,21 +1,27 @@
 import {Router} from 'express';
 import changePasswordController from './change-password-controller';
-import {passwordValidator} from '@app/validators/user-validators';
+import {
+  createValidationRouter,
+} from '@app/validators';
 import {body} from 'express-validator';
 import {asyncWrapper} from '@util/async-wrapper';
-import createValidationRouter from '@app/validators/create-validation-router';
 
 const changePasswordRouter = Router();
 
 const oldPasswordValidator = body('oldPassword')
-    .isString().withMessage('has to be a string')
-    .notEmpty().withMessage('has to be a non-empty string');
+    .exists().withMessage('oldPassword is missing')
+    .isString().withMessage('oldPassword has to be a string')
+    .notEmpty().withMessage('oldPassword has to be a non-empty string');
 
 changePasswordRouter.post(
     '/',
     createValidationRouter(
         'user:settings:change-password',
-        [passwordValidator(body('newPassword')), oldPasswordValidator],
+        [
+          body('newPassword').exists().withMessage('newPassword is missing')
+              .isPassword('newPassword'),
+          oldPasswordValidator,
+        ],
         'Change password',
     ),
     asyncWrapper(changePasswordController),

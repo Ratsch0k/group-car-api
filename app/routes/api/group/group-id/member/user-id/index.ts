@@ -1,15 +1,18 @@
 import {Router} from 'express';
-import {userIdValidator} from '@app/validators';
+import {createValidationRouter} from '@app/validators';
 import groupGroupIdUserIdAdminRouter from './admin';
 import kickUserRouter from './kick';
-import createValidationRouter from '@app/validators/create-validation-router';
+import {param} from 'express-validator';
 
 const groupGroupIdUserIdRouter = Router({mergeParams: true});
 
 groupGroupIdUserIdRouter.use(
     createValidationRouter(
         'groupId:member:userId',
-        userIdValidator(),
+        param('userId').exists()
+            .withMessage('userId is missing')
+            .isNumeric()
+            .withMessage('userId has to be a number'),
         'check userId',
     ),
 );

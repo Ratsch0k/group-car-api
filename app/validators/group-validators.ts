@@ -1,14 +1,34 @@
-import {param, ValidationChain} from 'express-validator';
+import {ValidationChain} from 'express-validator';
+import {ValidatorsImpl} from 'express-validator/src/chain';
 
-export const groupIdValidator =
-  (location = param('groupId')): ValidationChain =>
-    location
-        .exists()
-        .withMessage('groupId is missing')
-        .isNumeric().withMessage('groupId has to be a number');
+/**
+ * Class for additional validators related to groups.
+ */
+export class GroupValidators extends ValidatorsImpl<ValidationChain> {
+  /**
+   * Check if group name.
+   */
+  isGroupName(): ValidationChain {
+    return this
+        .isString()
+        .withMessage('Name has to be a string')
+        .notEmpty()
+        .withMessage('Name has to be a non empty string')
+        // Sanitize name
+        .trim()
+        .escape();
+  }
 
-export const carIdValidator =
-  (location = param('carId')): ValidationChain => location
-      .exists()
-      .withMessage('carId is missing')
-      .isNumeric().withMessage('carId has to be a number');
+  /**
+   * Check if group description
+   */
+  isGroupDescription(): ValidationChain {
+    return this
+        // But if it exists it has to be a non-empty string
+        .isString()
+        .withMessage('Description has to be a string')
+        // Sanitize description
+        .trim()
+        .escape();
+  }
+}

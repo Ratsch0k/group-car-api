@@ -1,14 +1,32 @@
 import {Router} from 'express';
 import updateGroupController from './update-group-controller';
-import updateGroupValidationRouter from './update-group-validator';
+import {
+  createValidationRouter,
+} from '@app/validators';
+import {body} from 'express-validator';
 
 export {default as updateGroupController} from './update-group-controller';
-export * from './update-group-validator';
 
 // Create update group router
 const updateGroupRouter = Router({mergeParams: true}).use(
     '/',
-    updateGroupValidationRouter,
+    createValidationRouter(
+        'group:update',
+        [
+          body('name')
+              .optional()
+              .isGroupName(),
+          body('description')
+              .optional()
+              .isGroupDescription(),
+          body('ownerId')
+              .not()
+              .exists()
+              .withMessage('OwnerId can\'t be changed by this request. ' +
+              'Use the transfer ownership request'),
+        ],
+        'update group',
+    ),
     updateGroupController,
 );
 

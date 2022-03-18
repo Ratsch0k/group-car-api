@@ -32,7 +32,10 @@ if (!argsCorrect) {
 }
 
 import http = require('http');
+const importStart = performance.now();
 import app from './app';
+const importEnd = performance.now();
+console.log(`Import took: ${importEnd - importStart}ms`);
 import db from '@db';
 
 const log = debug('group-car:http');
@@ -51,7 +54,10 @@ app.set('port', port);
  * Create HTTP server.
  */
 
+const createStart = performance.now();
 const server = http.createServer(app);
+const createEnd = performance.now();
+console.log(`Create server took: ${createEnd - createStart}ms`);
 
 /**
  * Set up socket.io
