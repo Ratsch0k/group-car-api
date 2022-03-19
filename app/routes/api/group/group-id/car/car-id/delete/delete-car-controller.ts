@@ -1,5 +1,6 @@
 import {RequestHandler} from 'express';
-import {BadRequestError, NotImplementedError} from '@errors';
+import {BadRequestError} from '@errors';
+import {CarService} from '@models';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const deleteCarController: RequestHandler = async (req, res, _next) => {
@@ -12,5 +13,5 @@ export const deleteCarController: RequestHandler = async (req, res, _next) => {
     throw new BadRequestError('Parameters are missing');
   }
 
-  throw new NotImplementedError('Deletion of car');
+  await CarService.delete(user, groupId, carId);
 };
