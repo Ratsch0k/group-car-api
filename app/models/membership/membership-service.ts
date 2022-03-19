@@ -32,14 +32,12 @@ export class MembershipService {
   /**
    * Returns a membership with the specific id if it exists.
    *
-   * Throws {@link MembershipNotFoundError} if the membership
-   * doesn't exist. Throws {@link UnauthorizedError} if
-   * the current user is not the user which is
-   * referenced in the membership and not a member
-   * of the group.
    * @param currentUser - Currently logged in user
    * @param id          - Id to search for
    * @param options     - Options for the repository queries
+   *
+   * @throws {@link NotMemberOfGroupError}
+   * if the user is not a member of the specified group
    */
   public static async findById(
       currentUser: Express.User,
