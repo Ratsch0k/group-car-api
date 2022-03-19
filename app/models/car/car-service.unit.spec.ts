@@ -4,7 +4,7 @@ import sinon, {assert, match} from 'sinon';
 import {
   CarColorAlreadyInUseError,
   CarInUseError,
-  CarNameAlreadyInUserError,
+  CarNameAlreadyInUseError,
   InternalError,
   MaxCarAmountReachedError,
   MembershipNotFoundError,
@@ -147,7 +147,7 @@ describe('CarService', function() {
           fakeCar.groupId,
           fakeCar.name,
         fakeCar.color as any,
-      )).to.be.rejectedWith(CarNameAlreadyInUserError);
+      )).to.be.rejectedWith(CarNameAlreadyInUseError);
 
       assert.calledOnceWithExactly(
           membershipRepFindStub,

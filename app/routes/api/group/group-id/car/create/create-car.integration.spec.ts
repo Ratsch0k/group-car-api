@@ -7,7 +7,7 @@ import app from '../../../../../../app';
 import {expect} from 'chai';
 import {
   CarColorAlreadyInUseError,
-  CarNameAlreadyInUserError,
+  CarNameAlreadyInUseError,
   MaxCarAmountReachedError,
   NotAdminOfGroupError,
   UnauthorizedError,
@@ -216,7 +216,7 @@ describe('post /api/group/:groupId/car', function() {
           .expect(400)
           .then((res) => {
             expect(res.body.message)
-                .to.equal(new CarNameAlreadyInUserError('CAR').message);
+                .to.equal(new CarNameAlreadyInUseError('CAR').message);
           });
     });
 
