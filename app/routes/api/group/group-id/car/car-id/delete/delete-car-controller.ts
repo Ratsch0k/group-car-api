@@ -14,4 +14,6 @@ export const deleteCarController: RequestHandler = async (req, res, _next) => {
   }
 
   await CarService.delete(user, groupId, carId);
+
+  res.status(204).send();
 };

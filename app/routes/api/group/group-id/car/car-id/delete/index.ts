@@ -4,7 +4,7 @@ import {deleteCarController} from './delete-car-controller';
 
 const deleteCarRouter = Router({mergeParams: true});
 
-deleteCarRouter.use(
+deleteCarRouter.delete(
     '/',
     asyncWrapper(deleteCarController),
 );
