@@ -344,6 +344,8 @@ export class CarService {
    * If `currentUser` is not a member of the group
    * @throws {@link NotAdminOfGroupError}
    * If `currentUser` is not an admin of the group
+   * @throws {@link CarNotFoundError}
+   * if there is no car with the specified id
    */
   public static async delete(
       currentUser: Express.User,
