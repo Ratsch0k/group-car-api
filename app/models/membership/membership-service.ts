@@ -53,6 +53,20 @@ export class MembershipService {
 
     this.log(`User %d: Find membership with %o`, currentUser.id, id);
 
+    /*
+     * TODO: This behaviour can be very confusing. It always
+     *  find a membership of the current user and the given
+     *  group and completely ignores id.userId. Change this
+     *  to be consistent and immediately search for the
+     *  membership if `currentUser.id === id.userId`
+     *  (a user should be allowed to look for their
+     *  own membership) or check if currentUser is
+     *  a member of the mentioned group if
+     *  `currentUser.id !== id.userId`. Only allow
+     *  a member of a group to access memberships
+     *  in that group.
+     */
+
     if (userId !== id.userId) {
       this.log('User %d: not user of membership. ' +
       'Check if member of group', currentUser.id);
