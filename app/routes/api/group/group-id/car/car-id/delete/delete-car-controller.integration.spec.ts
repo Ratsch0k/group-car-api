@@ -7,8 +7,8 @@ import app from '../../../../../../../app';
 import {expect} from 'chai';
 import {
   CarNotFoundError,
-  MembershipNotFoundError,
   NotAdminOfGroupError,
+  NotMemberOfGroupError,
 } from '../../../../../../../errors';
 import {
   CarColor,
@@ -96,13 +96,12 @@ describe('delete /api/group/:groupId/car/:carId', function() {
     return agent
         .delete(createUrl(1, 1))
         .send()
-        .expect(404)
+        .expect(401)
         .then((res) => {
           expect(res.body.message).to
-              .eql(new MembershipNotFoundError(
-                  {userId: user.id, groupId: 1}).message);
+              .eql(new NotMemberOfGroupError().message);
           expect(res.body.detail.errorName).to
-              .eql(MembershipNotFoundError.name);
+              .eql(NotMemberOfGroupError.name);
         });
   });
 
@@ -113,13 +112,12 @@ describe('delete /api/group/:groupId/car/:carId', function() {
     return agent
         .delete(createUrl(group.id, 1))
         .send()
-        .expect(404)
+        .expect(401)
         .then((res) => {
           expect(res.body.message).to
-              .eql(new MembershipNotFoundError(
-                  {userId: user.id, groupId: 1}).message);
+              .eql(new NotMemberOfGroupError().message);
           expect(res.body.detail.errorName).to.
-              eql(MembershipNotFoundError.name);
+              eql(NotMemberOfGroupError.name);
         });
   });
 
