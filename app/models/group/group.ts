@@ -40,7 +40,7 @@ export class Group extends Model {
   /**
    * The description
    */
-  public descriptions!: string;
+  public description!: string;
 
   /**
    * The userId of the owner.
