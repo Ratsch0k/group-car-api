@@ -64,7 +64,6 @@ describe('MembershipService', function() {
             groupId: id.groupId,
             userId: currentUser.id,
           }),
-          match.any,
       );
     });
 
@@ -91,7 +90,6 @@ describe('MembershipService', function() {
             groupId: id.groupId,
             userId: currentUser.id,
           }),
-          match.any,
       );
 
       assert.calledWithExactly(
