@@ -2,7 +2,6 @@ import {RequestHandler} from 'express';
 import {BadRequestError} from '@errors';
 import {CarService} from '@models';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const deleteCarController: RequestHandler = async (req, res, _next) => {
   // Check parameter
   const groupId = Number.parseInt(req.params.groupId, 10);
