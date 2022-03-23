@@ -735,9 +735,9 @@ paths:
           $ref: '#/components/responses/BadRequestErrorResponse'
         401:
           description: 'This response could be sent if one of the following conditions is met:
-          
+
               - The user is not logged in
-                        
+
               - The user is a member of a group but not an admin'
           content:
             application/json:
