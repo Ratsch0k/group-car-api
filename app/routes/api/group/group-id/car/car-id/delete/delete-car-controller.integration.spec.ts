@@ -7,8 +7,8 @@ import app from '../../../../../../../app';
 import {expect} from 'chai';
 import {
   CarNotFoundError,
+  MembershipNotFoundError,
   NotAdminOfGroupError,
-  NotMemberOfGroupError,
 } from '../../../../../../../errors';
 import {
   CarColor,
@@ -92,32 +92,36 @@ describe('delete /api/group/:groupId/car/:carId', function() {
   });
 
   it('if the group doesn\'t exist, ' +
-    'reject with NotMemberOfGroupError', function() {
+    'reject with MembershipNotFoundError', function() {
     return agent
         .delete(createUrl(1, 1))
         .send()
-        .expect(401)
+        .expect(404)
         .then((res) => {
           expect(res.body.message).to
-              .eql(new NotMemberOfGroupError().message);
+              .eql(new MembershipNotFoundError(
+                  {groupId: 1, userId: user.id},
+              ).message);
           expect(res.body.detail.errorName).to
-              .eql(NotMemberOfGroupError.name);
+              .eql(MembershipNotFoundError.name);
         });
   });
 
   it('if the user is not a member of the group, ' +
-    'reject with NotMemberOfGroupError', async function() {
+    'reject with MembershipNotFoundError', async function() {
     const {group} = await setupTestGroup();
 
     return agent
         .delete(createUrl(group.id, 1))
         .send()
-        .expect(401)
+        .expect(404)
         .then((res) => {
           expect(res.body.message).to
-              .eql(new NotMemberOfGroupError().message);
-          expect(res.body.detail.errorName).to.
-              eql(NotMemberOfGroupError.name);
+              .eql(new MembershipNotFoundError(
+                  {groupId: group.id, userId: user.id},
+              ).message);
+          expect(res.body.detail.errorName).to
+              .eql(MembershipNotFoundError.name);
         });
   });
 

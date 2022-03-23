@@ -737,9 +737,7 @@ paths:
           description: 'This response could be sent if one of the following conditions is met:
           
               - The user is not logged in
-            
-              - The user is not a member of the given group
-            
+                        
               - The user is a member of a group but not an admin'
           content:
             application/json:
@@ -749,13 +747,15 @@ paths:
                   - $ref: '#/components/schemas/NotAdminOfGroupErrorSchema'
                   - $ref: '#/components/schemas/NotMemberOfGroupErrorSchema'
         404:
-          description: 'Sent if the user is an admin of the group but the car does not exist or if the group does not exist'
+          description: Sent if the user is an admin of the group but the car does not exist or
+            if the user is not a member of the group
           content:
             application/json:
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/CarNotFoundErrorSchema'
                   - $ref: '#/components/schemas/GroupNotFoundErrorSchema'
+                  - $ref: '#/components/schemas/MembershipNotFoundSchema'
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
