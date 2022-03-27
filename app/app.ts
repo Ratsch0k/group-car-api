@@ -31,7 +31,10 @@ const app: express.Application = express();
 // Add middleware
 app.set('trust proxy', true);
 
-const nonTracablePaths = [
+// Disable powered by
+app.disable('x-powered-by');
+
+const nonTraceablePaths = [
   '/swagger-stats/metrics',
 ];
 /**
@@ -53,7 +56,7 @@ if (process.env.NODE_ENV !== 'test') {
   app.use((req, res, next) => {
     // Filter out paths which should not be traced
 
-    if (!nonTracablePaths.includes(req.path)) {
+    if (!nonTraceablePaths.includes(req.path)) {
       tracingHandler(req, res, next);
     } else {
       next();
@@ -69,7 +72,7 @@ if (config.morgan.formatString !== null) {
       config.morgan.formatString,
       {
         skip: (req: express.Request) =>
-          nonTracablePaths.includes(req.path),
+          nonTraceablePaths.includes(req.path),
       },
   ));
 }
