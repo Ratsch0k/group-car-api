@@ -1,5 +1,5 @@
 import * as express from 'express';
-import loginValidator from './login/login-validator';
+import loginRouter from './login';
 import signUpValidator from './signUp/sign-up-validator';
 import csrfRouter from './csrf/csrf-router';
 import tokenRouter from './token/token-router';
@@ -8,7 +8,7 @@ const router = express.Router();
 
 
 router.use('/', csrfRouter);
-router.use('/login', loginValidator);
+router.use('/login', loginRouter);
 router.use('/sign-up', signUpValidator);
 router.use('/token', tokenRouter);
 router.use('/logout', logoutRouter);

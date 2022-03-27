@@ -8,7 +8,7 @@ import expressJwt from 'express-jwt';
 import config from '@app/config';
 import {postLoginJwtValidator} from '@app/routes/auth/jwt/jwt-util';
 import {NextFunction, Request, Response} from 'express';
-import {MembershipService} from '../membership';
+import {MembershipService} from '@app/models';
 import {
   InternalError,
   NotMemberOfGroupError,
@@ -31,6 +31,11 @@ export enum GroupCarAction {
    * A new car is added to the group.
    */
   Add = 'add',
+
+  /**
+   * An existing car is deleted.
+   */
+  Delete = 'delete'
 }
 
 /**

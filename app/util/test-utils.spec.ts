@@ -11,7 +11,7 @@ import db, {syncPromise} from '../db';
 import {UserDto} from '../models';
 
 export interface SignUpReturn {
-  user: any;
+  user: UserDto & SignUpReturn['signUpBody'];
   csrf: string;
   agent: request.SuperAgentTest;
   signUpBody: {

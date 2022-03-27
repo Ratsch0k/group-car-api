@@ -4,10 +4,15 @@ import cookieParser from 'cookie-parser';
 import errorHandler from '@errors';
 import expressJwt from 'express-jwt';
 import morganDebug from 'morgan-debug';
-import {obfuscateMetrics} from './util/obfuscateMetrics';
+import {obfuscateMetrics} from '@util/obfuscateMetrics';
 import debug from 'debug';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
+
+// Inject custom checks for **express-validator**.
+// See `validators/inject-custom-checks.ts` for more details.
+import {injectCustomChecks} from '@app/validators';
+injectCustomChecks();
 
 /**
  * Import router
@@ -15,9 +20,9 @@ import * as Tracing from '@sentry/tracing';
 import config from '@config';
 import authRouter from '@app/routes/auth';
 import jwtCsrf from './routes/auth/jwt/jwt-csrf';
-import {postLoginJwtValidator} from './routes/auth/jwt/jwt-util';
+import {postLoginJwtValidator} from '@routes/auth/jwt/jwt-util';
 import apiRouter from './routes/api';
-import {userRouter} from './routes/user';
+import {userRouter} from '@routes/user';
 
 const log = debug('group-car:app');
 
@@ -26,8 +31,10 @@ const app: express.Application = express();
 // Add middleware
 app.set('trust proxy', true);
 
+// Disable powered by
+app.disable('x-powered-by');
 
-const nonTracablePaths = [
+const nonTraceablePaths = [
   '/swagger-stats/metrics',
 ];
 /**
@@ -49,7 +56,7 @@ if (process.env.NODE_ENV !== 'test') {
   app.use((req, res, next) => {
     // Filter out paths which should not be traced
 
-    if (!nonTracablePaths.includes(req.path)) {
+    if (!nonTraceablePaths.includes(req.path)) {
       tracingHandler(req, res, next);
     } else {
       next();
@@ -65,7 +72,7 @@ if (config.morgan.formatString !== null) {
       config.morgan.formatString,
       {
         skip: (req: express.Request) =>
-          nonTracablePaths.includes(req.path),
+          nonTraceablePaths.includes(req.path),
       },
   ));
 }

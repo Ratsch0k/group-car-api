@@ -4,7 +4,8 @@ import sinon, {assert, match} from 'sinon';
 import {
   CarColorAlreadyInUseError,
   CarInUseError,
-  CarNameAlreadyInUserError,
+  CarNameAlreadyInUseError,
+  CarNotFoundError,
   InternalError,
   MaxCarAmountReachedError,
   MembershipNotFoundError,
@@ -12,7 +13,11 @@ import {
   NotDriverOfCarError,
   NotMemberOfGroupError,
 } from '../../errors';
-import {MembershipRepository, MembershipService} from '../membership';
+import {
+  Membership,
+  MembershipRepository,
+  MembershipService,
+} from '../membership';
 import CarRepository from './car-repository';
 import CarService from './car-service';
 import config from '../../config';
@@ -147,7 +152,7 @@ describe('CarService', function() {
           fakeCar.groupId,
           fakeCar.name,
         fakeCar.color as any,
-      )).to.be.rejectedWith(CarNameAlreadyInUserError);
+      )).to.be.rejectedWith(CarNameAlreadyInUseError);
 
       assert.calledOnceWithExactly(
           membershipRepFindStub,
@@ -602,6 +607,135 @@ describe('CarService', function() {
       assert.calledOnce(t.rollback);
       assert.notCalled(t.commit);
       assert.notCalled(groupNotifStub);
+    });
+  });
+
+  describe('delete', function() {
+    let findMembershipStub: sinon.SinonStub;
+    let repositoryDeleteStub: sinon.SinonStub;
+    let notifyStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      findMembershipStub = sinon.stub(MembershipService, 'findById');
+      repositoryDeleteStub = sinon.stub(CarRepository, 'delete');
+      notifyStub = sinon.stub(GroupNotificationService, 'notifyCarUpdate');
+    });
+
+    it('throws NotMemberOfGroupError if currentUser is ' +
+      'not a member of the group', async function() {
+      findMembershipStub.callsFake(() =>
+        Promise.reject(new NotMemberOfGroupError()));
+
+      const groupId = 1;
+      const carId = 1;
+
+      await expect(CarService.delete(user, groupId, carId))
+          .to.be.rejectedWith(NotMemberOfGroupError);
+
+      assert.calledOnceWithExactly(
+          findMembershipStub,
+          user,
+          match({groupId, userId: user.id}),
+      );
+      assert.notCalled(repositoryDeleteStub);
+      assert.notCalled(notifyStub);
+    });
+
+    it('throws NotAdminOfGroupError if currentUser is a member of the ' +
+      'group but not an admin', async function() {
+      const groupId = 1;
+      const carId = 1;
+
+      const membership = {
+        groupId,
+        isAdmin: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: user.id,
+      } as Membership;
+
+      findMembershipStub.resolves(membership);
+
+      await expect(CarService.delete(user, groupId, carId))
+          .to.be.rejectedWith(NotAdminOfGroupError);
+
+      assert.calledOnceWithExactly(
+          findMembershipStub,
+          user,
+          match({groupId, userId: user.id}),
+      );
+      assert.notCalled(repositoryDeleteStub);
+      assert.notCalled(notifyStub);
+    });
+
+    it('throws CarNotFoundError if car doesn\'t exist', async function() {
+      const groupId = 1;
+      const carId = 1;
+
+      const membership = {
+        groupId,
+        isAdmin: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: user.id,
+      } as Membership;
+
+      findMembershipStub.resolves(membership);
+
+      repositoryDeleteStub.callsFake(() =>
+        Promise.reject(new CarNotFoundError(groupId, carId)));
+
+      await expect(CarService.delete(user, groupId, carId))
+          .to.be.rejectedWith(CarNotFoundError);
+
+      assert.calledOnceWithExactly(
+          findMembershipStub,
+          user,
+          match({groupId, userId: user.id}),
+      );
+      assert.calledOnceWithExactly(
+          repositoryDeleteStub,
+          match({groupId, carId}),
+      );
+      assert.notCalled(notifyStub);
+    });
+
+    it('if currentUser is admin of group and car exists, delete the car and ' +
+      'emit a DELETE action', async function() {
+      const groupId = 1;
+      const carId = 1;
+
+      const membership = {
+        groupId,
+        isAdmin: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: user.id,
+      } as Membership;
+
+      findMembershipStub.resolves(membership);
+
+      repositoryDeleteStub.resolves();
+
+      await expect(CarService.delete(user, groupId, carId))
+          .to.be.eventually.fulfilled;
+
+      assert.calledOnceWithExactly(
+          findMembershipStub,
+          user,
+          match({groupId, userId: user.id}),
+      );
+      assert.calledOnceWithExactly(
+          repositoryDeleteStub,
+          match({groupId, carId}),
+      );
+      assert.calledOnceWithExactly(
+          notifyStub,
+          groupId,
+          carId,
+          GroupCarAction.Delete,
+          match({groupId, carId}),
+      );
     });
   });
 });

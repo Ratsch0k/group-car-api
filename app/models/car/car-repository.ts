@@ -1,4 +1,6 @@
-import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
+import {
+  buildFindQueryOptionsMethod,
+} from '@app/util/build-find-query-options';
 import {RepositoryQueryOptions} from 'typings';
 import {Group, User, Car, CarColor} from '@models';
 import debug from 'debug';
@@ -187,6 +189,35 @@ export class CarRepository {
 
     this.log('Found car with pk %o', pk);
     return car;
+  }
+
+  /**
+   * Deletes a car of a group.
+   *
+   * @param pk - Primary key of car. Consists of group and car id.
+   * @param options - Options. Only transaction is used.
+   *
+   * @throws {@link CarNotFoundError}
+   * If there is no car with the given primary key
+   */
+  public static async delete(
+      pk: CarPk,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<void> {
+    // Delete car
+    const deletedAmount = await Car.destroy({
+      where: {
+        carId: pk.carId,
+        groupId: pk.groupId,
+      },
+      limit: 1, // Ensure that never more than one car can be deleted.
+      transaction: options?.transaction,
+    });
+
+    // If no row is deleted, throw CarNotFoundError
+    if (deletedAmount === 0) {
+      throw new CarNotFoundError(pk.groupId, pk.carId);
+    }
   }
 
   /**

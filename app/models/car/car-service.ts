@@ -2,7 +2,7 @@ import config from '@app/config';
 import {
   CarColorAlreadyInUseError,
   CarInUseError,
-  CarNameAlreadyInUserError,
+  CarNameAlreadyInUseError,
   CarNotFoundError,
   InternalError,
   MaxCarAmountReachedError,
@@ -13,14 +13,14 @@ import {
 } from '@app/errors';
 import {
   Car,
-  CarQueryOptions,
-  MembershipRepository,
-  CarRepository,
   CarColor,
-  Membership,
-  MembershipService,
-  GroupNotificationService,
+  CarQueryOptions,
+  CarRepository,
   GroupCarAction,
+  GroupNotificationService,
+  Membership,
+  MembershipRepository,
+  MembershipService,
 } from '@models';
 import debug from 'debug';
 import sequelize from '@db';
@@ -42,13 +42,17 @@ export class CarService {
   /**
    * Create a new car.
    *
-   * Throws {@link NotAdminOfGroup} if the current user is not an
+   * @throws {@link NotAdminOfGroupError}
+   * if the current user is not an
    * admin of the specified group.
-   * Throws {@link CarNameAlreadyInUseError} if a car with the specified
+   * @throws {@link CarNameAlreadyInUseError}
+   * if a car with the specified
    * name already exists for the specified group.
-   * Throws {@link CarColorAlreadyInUseError} if the color is already used
+   * @throws {@link CarColorAlreadyInUseError}
+   * if the color is already used
    * for a car in the group.
-   * @param groupId - Id of the group this car belongs to
+   * @param currentUser - Currently logged-in user
+   * @param groupId - ID of the group this car belongs to
    * @param name    - Name of the car
    * @param color   - Color of the car
    * @param options - Options for the return value
@@ -100,7 +104,7 @@ export class CarService {
     // Check if name already used.
     const nameUsed = cars.some((car) => car.name === name);
     if (nameUsed) {
-      throw new CarNameAlreadyInUserError(name);
+      throw new CarNameAlreadyInUseError(name);
     }
 
     /**
@@ -170,7 +174,7 @@ export class CarService {
    *
    * Throws {@link NotMemberOfGroupError} if the current user
    * is not a member of the group with the specified `groupId`.
-   * Throws {@link CarInUserError} if the specified car is
+   * Throws {@link CarInUseError} if the specified car is
    * used by a user. (`driverId` is not `null`)
    * @param currentUser - The currently logged in user
    * @param groupId     - The id of the group
@@ -318,6 +322,66 @@ export class CarService {
         throw new InternalError('Couldn\'t park car');
       }
     }
+  }
+
+  /**
+   * Delete a car of a group if user has permission.
+   *
+   * Before deleting a car this method checks if
+   * the `currentUser` is a member and an admin
+   * of the specified group. If so, the car
+   * is deleted. After the successful deletion, a delete
+   * event is emitted with {@link GroupNotificationService}.
+   *
+   * ***Note:*** *The deletion event only includes `groupId`
+   * and `carId` and no other field.*
+   *
+   * @param currentUser - Currently logged-in user
+   * @param groupId - ID of the group
+   * @param carId - ID of the car
+   *
+   * @throws {@link NotMemberOfGroupError}
+   * If `currentUser` is not a member of the group
+   * @throws {@link NotAdminOfGroupError}
+   * If `currentUser` is not an admin of the group
+   * @throws {@link CarNotFoundError}
+   * if there is no car with the specified id
+   */
+  public static async delete(
+      currentUser: Express.User,
+      groupId: number,
+      carId: number,
+  ): Promise<void> {
+    // Get membership of user in group
+    const membership = await MembershipService.findById(
+        currentUser,
+        {groupId, userId: currentUser.id},
+    );
+
+    // Check if user is an admin
+    if (!membership.isAdmin) {
+      throw new NotAdminOfGroupError();
+    }
+
+    // User is allowed to delete the car
+    await CarRepository.delete({groupId, carId});
+
+    // Notify of the deletion
+    GroupNotificationService.notifyCarUpdate(
+        groupId,
+        carId,
+        GroupCarAction.Delete,
+        /*
+         * This should be enough data for a client to know which car is deleted.
+         * But other fields of the car are missing, which has to be taken into
+         * account on the client. Therefore, it should be noted in the
+         * documentation.
+         */
+        {
+          carId,
+          groupId,
+        } as Car,
+    );
   }
 }
 
