@@ -1,5 +1,6 @@
 import {Router, RouterOptions, Request} from 'express';
 import {ValidationChain} from 'express-validator';
+import {Middleware} from 'express-validator/src/base';
 import {
   createValidationResultHandler,
   ValidationResultHandlerOptions,
@@ -46,7 +47,7 @@ export const defaultOptions = {
  */
 export const createValidationRouter = (
     name: string,
-    validationChain: ValidationChain | ValidationChain[],
+    validationChain: ValidationChain | ValidationChain[] | Middleware,
     message: ((req: Request) => string) | string,
     options?: CreateValidationRouterOptions,
 ): Router => {
@@ -66,7 +67,7 @@ export const createValidationRouter = (
 
   // Convert the validation chain into an array if it only a single one.
   if (!Array.isArray(validationChain)) {
-    validationChain = [validationChain];
+    validationChain = [validationChain as ValidationChain];
   }
 
   return Router(routerOptions).use(

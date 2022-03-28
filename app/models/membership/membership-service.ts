@@ -30,16 +30,32 @@ export class MembershipService {
 
 
   /**
-   * Returns a membership with the specific id if it exists.
+   * Retrieves a membership by its ID.
    *
-   * Throws {@link MembershipNotFoundError} if the membership
-   * doesn't exist. Throws {@link UnauthorizedError} if
-   * the current user is not the user which is
-   * referenced in the membership and not a member
-   * of the group.
-   * @param currentUser - Currently logged in user
-   * @param id          - Id to search for
+   * Before retrieving the membership, the method makes sure that `currentUser`
+   * is authorized to access the membership. A user is authorized if one of
+   * two conditions are true.
+   *
+   *  - `currentUser.id === id.userId`: The user accesses their own memberships
+   *  - `currentUser` is member of the group specified in `id`
+   *
+   * The reasoning behind this is that a user should only be able to get
+   * memberships which concern them and not be able to check memberships
+   * between every user and group. This would infringe on the privacy of
+   * other users.
+   *
+   * @param currentUser - Currently logged-in user
+   * @param id          - ID to search for
    * @param options     - Options for the repository queries
+   *
+   * @throws {@link NotMemberOfGroupError}
+   * If `currentUser.id !== id.userId` and the logged-in user is not
+   * a member of the given group
+   *
+   * @throws {@link MembershipNotFoundError}
+   * *Rethrown from `MembershipRepository.findById()`*. Is thrown if the
+   * logged-in user is authorized to access the membership,
+   * but it doesn't exist
    */
   public static async findById(
       currentUser: Express.User,
@@ -55,27 +71,33 @@ export class MembershipService {
 
     this.log(`User %d: Find membership with %o`, currentUser.id, id);
 
+    /*
+     * Check if logged-in user is the specified user.
+     * If yes, skip the membership check for the logged-in user.
+     * If no, check if the logged-in user is a member of the group.
+     */
     if (userId !== id.userId) {
       this.log('User %d: not user of membership. ' +
       'Check if member of group', currentUser.id);
 
-      // Check if user is member of that group
+      // Check if the logged-in user is member of that group
       try {
         await MembershipRepository.findById(
             {
               userId: userId,
               groupId: id.groupId,
             },
-            options,
         );
         this.log('User %d: is member of group referenced in membership',
             currentUser.id);
       } catch (err) {
         if (err instanceof MembershipNotFoundError) {
+          // Logged-in user is not a member, throw an UnauthorizedError
           this.error('User %d: not member of group referenced ' +
           'in membership $o', currentUser.id, id);
           throw new NotMemberOfGroupError();
         } else {
+          // Something else went wrong, rethrow the error
           this.error('Unexpected error', err);
           throw err;
         }

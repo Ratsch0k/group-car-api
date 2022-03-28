@@ -203,4 +203,47 @@ describe('CarRepository', function() {
       );
     });
   });
+
+  describe('delete', function() {
+    let destroyStub: sinon.SinonStub;
+    beforeEach(function() {
+      destroyStub = sinon.stub(Car, 'destroy');
+    });
+
+    it('calls Car.destroy with correct parameters', async function() {
+      destroyStub.resolves(1);
+
+      const carPk = {
+        groupId: 1,
+        carId: 1,
+      };
+
+      await expect(CarRepository.delete(carPk)).to.eventually.be.fulfilled;
+
+      assert.calledOnceWithExactly(
+          destroyStub,
+          match({
+            where: {
+              carId: carPk.carId,
+              groupId: carPk.groupId,
+            },
+            limit: 1,
+          }),
+      );
+    });
+
+    it('throws CarNotFoundError if no car was deleted', async function() {
+      destroyStub.resolves(0);
+
+      const carPk = {
+        groupId: 1,
+        carId: 1,
+      };
+
+      await expect(CarRepository.delete(carPk))
+          .to.eventually.be.rejectedWith(CarNotFoundError);
+
+      assert.calledOnce(destroyStub);
+    });
+  });
 });

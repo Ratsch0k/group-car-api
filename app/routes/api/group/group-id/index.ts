@@ -4,14 +4,22 @@ import deleteGroupRouter from './delete';
 import getGroupRouter from './get';
 import inviteUserToGroupRouter from './invite';
 import leaveGroupRouter from './leave';
-import {groupIdValidation} from '@app/validators';
 import groupGroupIdInvitesRouter from './invites';
 import groupMemberRouter from './member';
 import groupCarRouter from './car';
+import {createValidationRouter} from '@app/validators';
+import {param} from 'express-validator';
 
 const groupGroupIdRouter = Router({mergeParams: true});
 
-groupGroupIdRouter.use(groupIdValidation);
+groupGroupIdRouter.use(
+    createValidationRouter(
+        'groupId',
+        param('groupId')
+            .exists().withMessage('groupId is missing')
+            .isNumeric().withMessage('groupId has to be a number'),
+        'check-groupId'),
+);
 groupGroupIdRouter.put('/', updateGroupRouter);
 groupGroupIdRouter.delete('/', deleteGroupRouter);
 groupGroupIdRouter.get('/', getGroupRouter);

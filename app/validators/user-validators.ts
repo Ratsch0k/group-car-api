@@ -1,37 +1,42 @@
-import {body, param, ValidationChain} from 'express-validator';
+import {ValidationChain} from 'express-validator';
+import {Validators, ValidatorsImpl} from 'express-validator/src/chain';
 
-export const passwordValidator =
-  (location = body('password')): ValidationChain => location
-      .isString()
-      .withMessage('password has to be a string')
-      .isLength({min: 6, max: 255})
-      .withMessage('Password has to be at least 6 characters long');
+export interface UserValidators extends Validators<ValidationChain> {
+  isPassword(name?: string): ValidationChain;
+  isUsername(name?: string): ValidationChain;
+}
 
-export const usernameValidator =
-  (location = body('username')): ValidationChain => location
-      .isString()
-      .trim()
-      .notEmpty()
-      .isLength({min: 4, max: 25})
-      .withMessage('Username has to be between 4 and 25 characters long')
-      .custom((value: string) => {
-        if (/\s/.test(value)) {
-          throw new Error('Username should not contain whitespace');
-        }
-        return true;
-      })
-      .escape();
+/**
+ * Additional checks for user related checks.
+ */
+export class UserValidatorsImpl extends ValidatorsImpl<ValidationChain> {
+  /**
+   * Checks if field conforms to password rules.
+   */
+  isPassword(name = 'password'): ValidationChain {
+    return this
+        .isString()
+        .withMessage(name + ' has to be a string')
+        .isLength({min: 6, max: 255})
+        .withMessage(name + ' has to be at least 6 characters long');
+  }
 
-export const emailValidator =
-  (location = body('email')): ValidationChain => location
-      .escape()
-      .trim()
-      .isEmail()
-      .withMessage('Email has to be a valid email address');
-
-export const userIdValidator =
-  (location = param('userId')): ValidationChain => location
-      .exists()
-      .withMessage('userId is missing')
-      .isNumeric()
-      .withMessage('userId has to be a number');
+  /**
+   * Checks if conforms to username rules.
+   */
+  isUsername(name = 'username'): ValidationChain {
+    return this
+        .isString()
+        .trim()
+        .notEmpty()
+        .isLength({min: 4, max: 25})
+        .withMessage(name + ' has to be between 4 and 25 characters long')
+        .custom((value: string) => {
+          if (/\s/.test(value)) {
+            throw new Error(name + ' should not contain whitespace');
+          }
+          return true;
+        })
+        .escape();
+  }
+}
