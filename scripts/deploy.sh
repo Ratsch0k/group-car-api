@@ -45,7 +45,7 @@ envsubst < $COMPOSE_CONFIG > config.yml
 cat config.yml
 
 echo "Upload compose configs"
-rsync --compress --quiet docker-compose.yml $SERVER_USER@$SERVER_IP:/home/$SERVER_USER/docker-compose.yml
+rsync --compress --quiet docker/docker-compose.yml $SERVER_USER@$SERVER_IP:/home/$SERVER_USER/docker-compose.yml
 rsync --compress --quiet config.yml $SERVER_USER@$SERVER_IP:/home/$SERVER_USER/config.yml
 rsync --compress --quiet ./scripts/update_server.sh $SERVER_USER@$SERVER_IP:/home/$SERVER_USER/update_server.sh
 
