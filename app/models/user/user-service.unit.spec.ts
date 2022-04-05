@@ -2,6 +2,7 @@
 import {expect} from 'chai';
 import sinon, {assert} from 'sinon';
 import bcrypt from 'bcrypt';
+import * as generateProfilePic from '../../util/generate-profile-pic';
 import {
   OwnerCannotLeaveError,
   NotLoggedInError,
@@ -416,6 +417,30 @@ describe('UserService', function() {
       assert.calledOnceWithExactly(
           user.update,
           sinon.match({password: newPassword}),
+      );
+    });
+  });
+
+  describe('generateProfilePicture', function() {
+    let generateProfilePicStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      generateProfilePicStub = sinon.stub(generateProfilePic, 'default');
+    });
+
+    it('uses generateProfilePic utility function to generate ' +
+      'profile picture', async function() {
+      const ip = 'TEST_IP';
+      const username = 'TEST_USERNAME';
+      const offset = 1;
+
+      await UserService.generateProfilePicture(ip, username, offset);
+
+      assert.calledOnceWithExactly(
+          generateProfilePicStub,
+          config.user.pb.dimensions,
+          username,
+          offset,
       );
     });
   });

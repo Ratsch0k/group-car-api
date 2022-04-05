@@ -13,6 +13,7 @@ import config from '@app/config';
 import debug from 'debug';
 import bcrypt from 'bcrypt';
 import bindToLog from '@util/user-bound-logging';
+import generateProfilePic from '@util/generate-profile-pic';
 
 const log = debug('group-car:user:service');
 const error = debug('group-car:user:service');
@@ -137,5 +138,38 @@ export class UserService {
       userError('Old password was incorrect');
       throw new IncorrectPasswordError();
     }
+  }
+
+  /**
+   * Randomly generates the profile picture for a given username and offset.
+   * @param ip - The ip which wants to generate it.
+   *
+   * As a seed for the randomness the username and the offset is used.
+   * @param username - The username
+   * @param offset - Offset for the randomness
+   */
+  public static async generateProfilePicture(
+      ip: string,
+      username: string,
+      offset: number,
+  ): Promise<Buffer> {
+    const userLog = bindToLog(log, {args: [ip]});
+    const userError = bindToLog(error, {args: [ip]});
+
+    userLog('Generate profile picture for %s with offset %d', username, offset);
+
+    let pb: Buffer;
+    try {
+      pb = await generateProfilePic(
+          config.user.pb.dimensions,
+          username,
+          offset,
+      );
+    } catch (e) {
+      userError('Error while generating profile picture');
+      throw e;
+    }
+
+    return pb;
   }
 }
