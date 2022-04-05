@@ -4,6 +4,7 @@ import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 import {Group, User} from '@models';
 import debug from 'debug';
 import Sequelize from 'sequelize';
+import {containsTransaction} from '@util/is-transaction';
 
 const Op = Sequelize.Op;
 
@@ -68,7 +69,7 @@ export class GroupRepository {
         {
           include,
           attributes,
-          ...options,
+          ...containsTransaction(options),
         },
     );
 
@@ -83,6 +84,7 @@ export class GroupRepository {
    * Changes the owner of the specified group to the specified user.
    * @param groupId     - The group which should be updated
    * @param newOwnerId  - The new id of the owner
+   * @param options     - Options
    */
   public static async changeOwnership(
       groupId: number,
@@ -92,7 +94,7 @@ export class GroupRepository {
     const group = await this.findById(groupId, options);
     return group.update({
       ownerId: newOwnerId,
-    }, options);
+    }, containsTransaction(options));
   }
 
   /**
@@ -127,7 +129,7 @@ export class GroupRepository {
         [Op.or]: orArray,
       },
       include,
-      ...options,
+      ...containsTransaction(options),
     });
   }
 

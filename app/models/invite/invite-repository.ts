@@ -3,6 +3,7 @@ import {InviteNotFoundError} from '@errors';
 import {RepositoryQueryOptions} from 'typings';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 import debug from 'debug';
+import {isTransaction} from '@util/is-transaction';
 
 export type InviteId = {userId: number, groupId: number};
 
@@ -71,7 +72,7 @@ export class InviteRepository {
         groupId: id.groupId,
       },
       include,
-      transaction: options?.transaction,
+      transaction: isTransaction(options?.transaction),
     });
 
     if (invite === null) {
@@ -83,7 +84,7 @@ export class InviteRepository {
 
   /**
    * Returns a list of all invites the user has.
-   * @param user          - The currently logged in user
+   * @param userId          - The currently logged-in user
    * @param options       - FindOptions define what should be eagerly loaded
    */
   public static async findAllForUser(
@@ -98,14 +99,14 @@ export class InviteRepository {
         userId,
       },
       include,
-      transaction: options?.transaction,
+      transaction: isTransaction(options?.transaction),
     });
   }
 
   /**
    * Deletes an invite which is for the given user and group.
-   * @param user    - The currently logged in user. Is owner of invite
-   * @param groupId - The id of the group for which the invite is
+   * @param id - ID of the invite
+   * @param options - Options
    * @returns Promise of number of deleted rows
    */
   public static async deleteById(
@@ -117,14 +118,13 @@ export class InviteRepository {
         userId: id.userId,
         groupId: id.groupId,
       },
-      transaction: options?.transaction,
+      transaction: isTransaction(options?.transaction),
     });
   }
 
   /**
    * Returns whether or not an invite with the given user and group id exists.
-   * @param user    - User of the invite
-   * @param groupId - Group id of the invite
+   * @param id      - Invite ID
    * @param options - Query options
    */
   public static async existsById(

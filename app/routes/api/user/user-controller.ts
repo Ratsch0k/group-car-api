@@ -1,54 +1,33 @@
 import express from 'express';
-import ModelToDtoConverter from '@util/model-to-dto-converter';
-import {User, ProfilePic, UserDto} from '@models';
-import debug from 'debug';
-import {UserNotFoundError} from '@errors';
-
-const log = debug('group-car:user-router');
-const error = debug('group-car:user-router:error');
+import {UserService} from '@models';
+import {BadRequestError} from '@errors';
+import {asyncWrapper} from '@util/async-wrapper';
 
 const router: express.Router = express.Router();
 
 /**
- * User router
- * @param req - Http request
- * @param res - Http response
+ * Controller to handle getting the profile picture of a specific user
+ * @param req - Request
+ * @param res - Response
+ * @param _next - Unused next
  */
-export const userController: express.RequestHandler = (req, res) => {
-  User.findAll().then((users: User[]) => {
-    res.send(ModelToDtoConverter
-        .convertAllSequelizeModels<UserDto>(users, UserDto));
-  });
-};
-
 export const userProfilePicController: express.RequestHandler =
-(req, res, next) => {
+async (req, res, _next) => {
   const userId = Number.parseInt(req.params.userId, 10);
-  log('User id: %s', userId);
 
-  ProfilePic.findOne({
-    where: {
-      userId,
-    },
-  }).then((pic) => {
-    if (pic !== null) {
-      log('Profile picture found');
-      res.type('image/jpeg');
-      res.send(pic.data);
-    } else {
-      error('Profile picture doesn\'t exist');
-      next(new UserNotFoundError(userId));
-    }
-  }).catch((err: Error) => {
-    error('ProfilePic search threw error: %s', err.message);
-    next(err);
-  });
+  if (isNaN(userId) || typeof req.user !== 'object') {
+    throw new BadRequestError('Missing fields');
+  }
+
+  const pb = await UserService.getProfilePicture(req.user, userId);
+
+  res.type('image/jpeg');
+  res.send(pb.data);
 };
 
 /**
  * Add the routers to the route
  */
-router.get('/', userController);
-router.get('/:userId/profile-pic', userProfilePicController);
+router.get('/:userId/profile-pic', asyncWrapper(userProfilePicController));
 
 export default router;

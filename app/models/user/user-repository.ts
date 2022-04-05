@@ -3,7 +3,9 @@ import {User} from './.';
 import {RepositoryQueryOptions} from 'typings';
 import sequelize from 'sequelize';
 import debug from 'debug';
-import {UserNotFoundError} from '@errors';
+import {ProfilePictureNotFoundError, UserNotFoundError} from '@errors';
+import {ProfilePic} from '@app/models';
+import {containsTransaction, isTransaction} from '@util/is-transaction';
 const log = debug('group-car:user:repository');
 const error = debug('group-car:user:repository:error');
 const Op = sequelize.Op;
@@ -52,7 +54,7 @@ export class UserRepository {
       order: [['username', 'ASC']],
       attributes: User.simpleAttributes,
       limit,
-      ...options,
+      ...containsTransaction(options),
     });
   }
 
@@ -65,7 +67,7 @@ export class UserRepository {
       id: number,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<User> {
-    const user = await User.findByPk(id, options);
+    const user = await User.findByPk(id, containsTransaction(options));
 
     if (user === null) {
       error('User with id "%d" doesn\'t exist', id);
@@ -87,7 +89,10 @@ export class UserRepository {
       username: string,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<User> {
-    const user = await User.findOne({where: {username}, ...options});
+    const user = await User.findOne(
+        {where: {username},
+          ...containsTransaction(options)},
+    );
 
     if (user === null) {
       error('User with username "%s" doesn\'t exist', username);
@@ -95,5 +100,26 @@ export class UserRepository {
     }
 
     return user;
+  }
+
+  /**
+   * Gets the profile picture of the user with the given id.
+   * @param userId - The ID of the user
+   * @param options - Additional options (only transaction is used)
+   */
+  public static async findProfilePictureById(
+      userId: number,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<ProfilePic> {
+    const pb = await ProfilePic.findByPk(
+        userId,
+        {transaction: isTransaction(options?.transaction)},
+    );
+
+    if (pb === null) {
+      throw new ProfilePictureNotFoundError(userId);
+    }
+
+    return pb;
   }
 }

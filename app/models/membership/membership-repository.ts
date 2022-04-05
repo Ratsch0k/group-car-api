@@ -4,6 +4,7 @@ import {MembershipNotFoundError} from '@errors';
 import {User, Membership} from '@models';
 import debug from 'debug';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
+import {containsTransaction, isTransaction} from '@util/is-transaction';
 
 const log = debug('group-car:membership:repository');
 const error = debug('group-car:membership:repository:error');
@@ -54,7 +55,7 @@ export class MembershipRepository {
       groupId,
       isAdmin,
     }, {
-      transaction: options?.transaction,
+      transaction: isTransaction(options?.transaction),
     });
   }
 
@@ -77,7 +78,7 @@ export class MembershipRepository {
         groupId: id.groupId,
       },
       include,
-      transaction: options?.transaction,
+      transaction: isTransaction(options?.transaction),
     });
 
     if (membership === null) {
@@ -105,7 +106,7 @@ export class MembershipRepository {
         groupId,
       },
       include,
-      ...options,
+      ...containsTransaction(options),
     });
 
     return memberships;
@@ -132,7 +133,7 @@ export class MembershipRepository {
         userId,
       },
       include,
-      ...options,
+      ...containsTransaction(options),
     });
   }
 
@@ -153,7 +154,7 @@ export class MembershipRepository {
         userId,
         groupId,
       },
-      ...options,
+      ...containsTransaction(options),
     });
   }
 
@@ -162,6 +163,7 @@ export class MembershipRepository {
    * specified id to the specified value.
    * @param id      - Id of the membership
    * @param isAdmin - New value of the isAdmin field
+   * @param options - Options
    */
   public static async changeAdminPermission(
       id: MembershipId,
@@ -169,10 +171,10 @@ export class MembershipRepository {
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<Membership> {
     // Get membership of user
-    const membership = await this.findById(id, options);
+    const membership = await this.findById(id, containsTransaction(options));
 
     // Update membership to admin
-    return membership.update({isAdmin}, options);
+    return membership.update({isAdmin}, containsTransaction(options));
   }
 
   /**

@@ -1,4 +1,3 @@
-import { Transaction } from 'sequelize/types';
 import {ExtendedValidationChain} from '@app/validators';
 
 declare module 'morgan-debug';
@@ -6,6 +5,11 @@ declare module 'morgan-debug';
 declare module 'nodemailer-express-handlebars';
 
 declare module 'nodemailer-express-handlebars-plaintext-inline-ccs';
+
+export interface Transaction {
+  commit(): Promise<void>;
+  rollback(): Promise<void>;
+}
 
 /**
  * Options for all repository methods.

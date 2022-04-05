@@ -7,6 +7,7 @@ import debug from 'debug';
 import {CarNotFoundError, InternalError} from '@app/errors';
 import sequelize from '@db';
 import Sequelize from 'sequelize';
+import {containsTransaction, isTransaction} from '@util/is-transaction';
 
 /**
  * Primary key for a car.
@@ -88,7 +89,7 @@ export class CarRepository {
             groupId,
           },
           transaction: t,
-          ...options,
+          ...containsTransaction(options),
         }).then((res) => {
           if (res && res.get('max_id')) {
             return res.get('max_id') as number + 1;
@@ -107,7 +108,7 @@ export class CarRepository {
             {
               include: buildOptions.include,
               transaction: t,
-              ...options,
+              ...containsTransaction(options),
             },
         );
       });
@@ -144,7 +145,7 @@ export class CarRepository {
               groupId,
             },
             include: queryOptions.include,
-            ...options,
+            ...containsTransaction(options),
           },
       );
       return cars;
@@ -175,7 +176,7 @@ export class CarRepository {
           groupId: pk.groupId,
         },
         include: queryOptions.include,
-        ...options,
+        ...containsTransaction(options),
       });
     } catch (e) {
       this.error('Error while finding car with pk %o: ', pk, e);
@@ -211,7 +212,7 @@ export class CarRepository {
         groupId: pk.groupId,
       },
       limit: 1, // Ensure that never more than one car can be deleted.
-      transaction: options?.transaction,
+      transaction: isTransaction(options?.transaction),
     });
 
     // If no row is deleted, throw CarNotFoundError

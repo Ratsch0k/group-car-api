@@ -1,13 +1,16 @@
 import {
   GroupService,
-  MembershipRepository,
+  MembershipRepository, ProfilePic,
   User,
   UserRepository,
 } from '@models';
 import {
   OwnerCannotLeaveError,
   NotLoggedInError,
-  IncorrectPasswordError, NewPasswordMustBeDifferentError,
+  IncorrectPasswordError,
+  NewPasswordMustBeDifferentError,
+  ProfilePictureNotFoundError,
+  UserNotFoundError,
 } from '@errors';
 import config from '@app/config';
 import debug from 'debug';
@@ -171,5 +174,28 @@ export class UserService {
     }
 
     return pb;
+  }
+
+  /**
+   * Get the profile picture of a user.
+   * @param currentUser - Logged-in user
+   * @param userId - ID of the user of which to get the profile picture
+   */
+  public static async getProfilePicture(
+      currentUser: Express.User,
+      userId: number,
+  ): Promise<ProfilePic> {
+    const userLog = bindToLog(log, {args: [currentUser.id]});
+
+    userLog('Get profile picture of user %d', userId);
+
+    try {
+      return UserRepository.findProfilePictureById(userId);
+    } catch (e) {
+      if (e instanceof ProfilePictureNotFoundError) {
+        throw new UserNotFoundError(userId);
+      }
+      throw e;
+    }
   }
 }
