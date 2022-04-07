@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sinon, {assert} from 'sinon';
-import {User} from '../../models';
+import {ProfilePic, User} from '../../models';
 import {expect} from 'chai';
 import {UserRepository} from './user-repository';
 import sequelize, {Transaction} from 'sequelize';
-import {UserNotFoundError} from '../../errors';
+import {ProfilePictureNotFoundError, UserNotFoundError} from '../../errors';
 import {RepositoryQueryOptions} from '../../../typings';
 const Op = sequelize.Op;
 
@@ -157,6 +157,54 @@ describe('UserRepository', function() {
       ).to.eventually.eql(user);
 
       assert.calledOnceWithExactly(userStub, id, options);
+    });
+  });
+
+  describe('findProfilePictureById', function() {
+    let pbFindByPkStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      pbFindByPkStub = sinon.stub(ProfilePic, 'findByPk');
+    });
+
+    it('calls ProfilePic.findByPk with correct arguments', async function() {
+      const fakePB = 'TEST';
+      const userId = 10;
+      const options = {
+        transaction: 'T',
+      };
+
+      pbFindByPkStub.resolves(fakePB);
+
+      const actual = await UserRepository.findProfilePictureById(
+          userId,
+          options as any,
+      );
+
+      expect(actual).to.eq(fakePB);
+
+      assert.calledOnceWithExactly(
+          pbFindByPkStub,
+          userId,
+          sinon.match({transaction: options.transaction}),
+      );
+    });
+
+    it('throws ProfilePictureNotFoundError if no profile ' +
+      'picture found', async function() {
+      const fakePB = null;
+      const userId = 10;
+
+      pbFindByPkStub.resolves(fakePB);
+
+      await expect(UserRepository.findProfilePictureById(userId))
+          .to.be.eventually.be.rejectedWith(ProfilePictureNotFoundError);
+
+      assert.calledOnceWithExactly(
+          pbFindByPkStub,
+          userId,
+          sinon.match.any,
+      );
     });
   });
 });

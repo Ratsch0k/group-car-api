@@ -189,13 +189,16 @@ export class UserService {
 
     userLog('Get profile picture of user %d', userId);
 
+    let pb: ProfilePic;
     try {
-      return UserRepository.findProfilePictureById(userId);
+      pb = await UserRepository.findProfilePictureById(userId);
     } catch (e) {
       if (e instanceof ProfilePictureNotFoundError) {
         throw new UserNotFoundError(userId);
       }
       throw e;
     }
+
+    return pb;
   }
 }

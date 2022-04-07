@@ -7,7 +7,7 @@ import {
   OwnerCannotLeaveError,
   NotLoggedInError,
   NewPasswordMustBeDifferentError,
-  IncorrectPasswordError,
+  IncorrectPasswordError, ProfilePictureNotFoundError, UserNotFoundError,
 } from '../../errors';
 import {UserRepository} from './user-repository';
 import config from '../../config';
@@ -442,6 +442,59 @@ describe('UserService', function() {
           username,
           offset,
       );
+    });
+  });
+
+  describe('getProfilePicture', function() {
+    let findProfilePictureStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      findProfilePictureStub = sinon.stub(
+          UserRepository,
+          'findProfilePictureById',
+      );
+    });
+
+    it('calls UserRepository.findProfilePictureById with ' +
+      'correct arguments', async function() {
+      const fakePb = 'TEST_PROFILE_PICTURE';
+      const userId = 51;
+      const user = {id: 10};
+
+      findProfilePictureStub.resolves(fakePb);
+
+      const actual = await UserService.getProfilePicture(user as any, userId);
+
+      expect(actual).to.eq(fakePb);
+
+      assert.calledOnceWithExactly(findProfilePictureStub, userId);
+    });
+
+    it('throws UserNotFoundError if the ProfilePicture ' +
+      'exists', async function() {
+      const userId = 61;
+      findProfilePictureStub.callsFake(() =>
+        Promise.reject(new ProfilePictureNotFoundError(userId)));
+
+      const user = {id: 11};
+
+      await expect(UserService.getProfilePicture(user as any, userId))
+          .to.eventually.be.rejectedWith(UserNotFoundError);
+
+      assert.calledOnceWithExactly(findProfilePictureStub, userId);
+    });
+
+    it('rethrows any other error', async function() {
+      const error = new Error('TEST_ERROR');
+      const userId = 66;
+      findProfilePictureStub.callsFake(() => Promise.reject(error));
+
+      const user = {id: 12};
+
+      await expect(UserService.getProfilePicture(user as any, userId))
+          .to.eventually.be.rejectedWith(error);
+
+      assert.calledOnceWithExactly(findProfilePictureStub, userId);
     });
   });
 });
