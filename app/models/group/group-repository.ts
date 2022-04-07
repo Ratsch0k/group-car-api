@@ -26,6 +26,12 @@ interface GroupQueryOptions extends RepositoryQueryOptions {
   simple: boolean;
 }
 
+export interface CreateGroupValues {
+  name: string;
+  description?: string;
+  ownerId: number;
+}
+
 /**
  * Default options
  */
@@ -131,6 +137,27 @@ export class GroupRepository {
       include,
       ...containsTransaction(options),
     });
+  }
+
+  /**
+   * Creates a group with the given values.
+   * @param values  - Values ({@link CreateGroupValues})
+   * @param options - Additional options
+   */
+  public static async create(
+      values: CreateGroupValues,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<Group> {
+    return Group.create(
+        {
+          name: values.name,
+          description: values.description,
+          ownerId: values.ownerId,
+        },
+        {
+          ...containsTransaction(options),
+        },
+    );
   }
 
   /**

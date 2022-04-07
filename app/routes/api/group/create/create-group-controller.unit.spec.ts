@@ -1,22 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {Group} from '../../../../models';
+import {GroupService} from '../../../../models';
 import sinon, {match} from 'sinon';
 import createGroupController from './create-group-controller';
-import Bluebird from 'bluebird';
 import {expect} from 'chai';
-
-const sandbox = sinon.createSandbox();
+import {BadRequestError} from '../../../../errors';
 
 describe('CreateGroupController', function() {
   let req: any;
   let res: any;
   let next: any;
+  let createGroupStub: sinon.SinonStub;
+
+  beforeEach(function() {
+    createGroupStub = sinon.stub(GroupService, 'create');
+  });
 
   afterEach(function() {
-    sandbox.restore();
+    sinon.restore();
   });
 
-  it('creates group and responses with group data and 201', function(done) {
+  it('creates group and responses with group data and 201', async function() {
     // Create fake user object
     const user = {
       id: 77,
@@ -35,8 +38,7 @@ describe('CreateGroupController', function() {
     };
 
     // Stub create group method
-    const createGroupStub = sandbox.stub(Group, 'create');
-    createGroupStub.usingPromise(Bluebird).resolves(group as any);
+    createGroupStub.resolves(group as any);
 
     // Create fake request
     req = {
@@ -44,124 +46,87 @@ describe('CreateGroupController', function() {
       user,
     };
 
-    next = sandbox.stub();
+    next = sinon.stub();
 
     res = {};
-    res.status = sandbox.stub().returns(res);
-    res.send = sandbox.stub().callsFake((data) => {
-      sandbox.assert.calledOnceWithExactly(
-        createGroupStub as any,
-        match(group),
-      );
-      sandbox.assert.calledOnceWithExactly(res.status, 201);
-      sandbox.assert.calledOnce(res.send);
-      sandbox.assert.notCalled(next);
+    res.status = sinon.stub().returns(res);
+    res.send = sinon.stub();
 
-      expect(data).to.eql(group);
-      done();
-    });
+    await createGroupController(req, res, next);
 
-    createGroupController(req, res, next);
+    sinon.assert.calledOnceWithExactly(
+        createGroupStub,
+        user,
+        match({
+          name: group.name,
+          description: group.description,
+        }),
+    );
+    sinon.assert.calledOnceWithExactly(res.status, 201);
+    sinon.assert.calledOnce(res.send);
+    sinon.assert.notCalled(next);
+    sinon.assert.calledOnceWithExactly(res.send, group);
   });
 
-  it('calls next on error', function(done) {
-    // Create fake user object
+  it('throws BadRequestError if request data is wrong', async function() {
+    // Create mocks
+    res = {};
+    res.status = sinon.stub();
+    res.send = sinon.stub();
+    next = sinon.stub();
+
     const user = {
       id: 77,
     };
 
-    // Create body object
-    const body = {
-      name: 'TEST GROUP',
+    /*
+     * Test if error when name is missing
+     */
+    const nameMissing = {
       description: 'TEST DESC',
     };
 
-    const group = {
-      name: body.name,
-      description: body.description,
-      ownerId: user.id,
-    };
-
-    // Stub create group method
-    const createGroupStub = sandbox.stub(Group, 'create');
-    const fakeError = new Error('TEST');
-    createGroupStub.usingPromise(Bluebird).rejects(fakeError);
-
-    // Create fake request
     req = {
-      body,
+      body: nameMissing,
       user,
     };
 
-    res = {};
-    res.status = sandbox.stub();
-    res.send = sandbox.stub();
+    await expect(createGroupController(req, res, next))
+        .to.eventually.be.rejectedWith(BadRequestError);
 
-    next = sandbox.stub().callsFake((error) => {
-      sandbox.assert.calledOnceWithExactly(
-            createGroupStub as any,
-            match(group),
-      );
-      sandbox.assert.notCalled(res.status);
-      sandbox.assert.notCalled(res.send);
-
-      sandbox.assert.calledOnce(next);
-
-      expect(error).to.equal(fakeError);
-      done();
-    });
-
-    createGroupController(req, res, next);
-  });
-
-  it('only uses certain sent attribute', function(done) {
-    // Create fake user object
-    const user = {
-      id: 77,
-      otherUser: 'should not be used',
+    /*
+     * Test if error when description is defined but not a string
+     */
+    const descriptionWrong = {
+      name: 'GROUP_NAME',
+      description: 1,
     };
 
-    // Create body object
-    const body = {
-      name: 'TEST GROUP',
-      description: 'TEST DESC',
-      otherGroup: 'should not be used',
-    };
-
-    const group = {
-      name: body.name,
-      description: body.description,
-      ownerId: user.id,
-    };
-
-    // Stub create group method
-    const createGroupStub = sandbox.stub(Group, 'create');
-    createGroupStub.usingPromise(Bluebird).resolves(group as any);
-
-    // Create fake request
     req = {
-      body,
+      body: descriptionWrong,
       user,
     };
 
-    next = sandbox.stub();
+    await expect(createGroupController(req, res, next))
+        .to.eventually.be.rejectedWith(BadRequestError);
 
-    res = {};
-    res.status = sandbox.stub().returns(res);
-    res.send = sandbox.stub().callsFake((data) => {
-      sandbox.assert.calledOnceWithExactly(
-        createGroupStub as any,
-        match(group),
-      );
-      sandbox.assert.calledOnceWithExactly(res.status, 201);
-      sandbox.assert.calledOnce(res.send);
-      sandbox.assert.notCalled(next);
+    /*
+     * Test if error when user is missing
+     */
+    const correctBody = {
+      name: 'GROUP_NAME',
+      description: 'GORUP_DESC',
+    };
+    req = {
+      body: correctBody,
+    };
 
-      expect(data).to.eql(group);
-      expect(data).to.not.have.any.keys('someOther', 'otherGroup');
-      done();
-    });
+    await expect(createGroupController(req, res, next))
+        .to.eventually.be.rejectedWith(BadRequestError);
 
-    createGroupController(req, res, next);
+    sinon.assert.notCalled(createGroupStub);
+    sinon.assert.notCalled(res.status);
+    sinon.assert.notCalled(res.send);
+    sinon.assert.notCalled(next);
   });
 });

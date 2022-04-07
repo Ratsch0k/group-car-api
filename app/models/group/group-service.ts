@@ -4,7 +4,7 @@ import {
   InviteService,
   MembershipService,
   Membership,
-  MembershipRepository,
+  MembershipRepository, CreateGroupValues,
 } from '@models';
 import {
   UnauthorizedError,
@@ -17,6 +17,7 @@ import {
   NotMemberOfGroupError,
 } from '@errors';
 import debug from 'debug';
+import bindToLog from '@util/user-bound-logging';
 
 const log = debug('group-car:group:service');
 const error = debug('group-car:group:service:error');
@@ -274,5 +275,33 @@ export class GroupService {
         currentUser.id,
         groupIdArray.length);
     return GroupRepository.findAllWithIds(groupIdArray);
+  }
+
+  /**
+   * Create a new group with the given values.
+   *
+   * The owner of the group will be set to the currently
+   * logged-in user.
+   * @param currentUser - Currently logged-in
+   * @param values      - Values of the group
+   */
+  public static async create(
+      currentUser: Express.User,
+      values: Omit<CreateGroupValues, 'ownerId'>,
+  ): Promise<Group> {
+    const userLog = bindToLog(log, {args: [currentUser.id]});
+    const {name, description} = values;
+
+    userLog('Create the group %s', name);
+
+    // Create the group
+    const group = await GroupRepository.create({
+      name,
+      description,
+      ownerId: currentUser.id,
+    });
+
+    // Only return plain version
+    return group.get({plain: true}) as Group;
   }
 }

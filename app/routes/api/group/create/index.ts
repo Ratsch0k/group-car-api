@@ -4,6 +4,7 @@ import {
   createValidationRouter,
 } from '@app/validators';
 import {body} from 'express-validator';
+import {asyncWrapper} from '@util/async-wrapper';
 
 const validationChain = [
   body('name').exists().withMessage('name is missing').isGroupName(),
@@ -19,7 +20,7 @@ const createGroupRouter = Router().use(
         validationChain,
         'check group fields',
     ),
-    createGroupController,
+    asyncWrapper(createGroupController),
 );
 
 export default createGroupRouter;

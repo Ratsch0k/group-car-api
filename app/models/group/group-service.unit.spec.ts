@@ -15,7 +15,7 @@ import {
   NotMemberOfGroupError,
 } from '../../errors';
 import {GroupRepository} from './group-repository';
-import {MembershipService} from '../membership/membership-service';
+import {MembershipService} from '../membership';
 import {MembershipRepository} from '../membership';
 
 describe('GroupService', function() {
@@ -814,6 +814,45 @@ describe('GroupService', function() {
 
       assert.calledOnceWithExactly(membershipFindAllForUser, currentUser);
       assert.calledOnceWithExactly(groupFindAllWithIds, match(expected));
+    });
+  });
+
+  describe('create', function() {
+    let repCreateStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      repCreateStub = sinon.stub(GroupRepository, 'create');
+    });
+
+    it('calls GroupRepository.create with the correct args and ' +
+      'returns the plain group', async function() {
+      // Create fake data
+      const currentUser = {
+        id: 88,
+      };
+
+      const args = {
+        name: 'GROUP_NAME',
+        description: 'GROUP_DESCRIPTION',
+      };
+
+      const expected = {
+        ...args,
+        ownerId: currentUser.id,
+      };
+
+      const fakeGroup = {
+        ...expected,
+        get: sinon.stub().returns(expected),
+      };
+
+      repCreateStub.resolves(fakeGroup);
+
+      const actual = await GroupService.create(currentUser as any, args);
+
+      expect(actual).to.eql(expected);
+      assert.calledOnceWithExactly(repCreateStub, match(expected));
+      assert.calledOnceWithExactly(fakeGroup.get, match({plain: true}));
     });
   });
 });

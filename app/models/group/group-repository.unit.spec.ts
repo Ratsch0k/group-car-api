@@ -161,4 +161,41 @@ describe('GroupRepository', function() {
       );
     });
   });
+
+  describe('create', function() {
+    let groupCreateStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      groupCreateStub = sinon.stub(Group, 'create');
+    });
+
+    it('calls Group.create with correct arguments', async function() {
+      const userId = 55;
+
+      const args = {
+        name: 'TEST_GROUP',
+        description: 'TEST_DESCRIPTION',
+        ownerId: userId,
+      };
+
+      const fakeGroup = {
+        name: args.name,
+        description: args.description,
+        ownerId: userId,
+      };
+
+      groupCreateStub.resolves(fakeGroup);
+
+      const options = {transaction: 'T'};
+
+      const actual = await GroupRepository.create(args, options as any);
+
+      expect(actual).to.eql(fakeGroup);
+      assert.calledOnceWithExactly(
+          groupCreateStub,
+          match(args),
+          match(options),
+      );
+    });
+  });
 });
