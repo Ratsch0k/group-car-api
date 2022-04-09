@@ -48,6 +48,9 @@ export class GroupRepository {
    * Searches for a group with the specified id.
    * @param id      - The id of the group to search for
    * @param options - Query options
+   *
+   * @throws {@link GroupNotFoundError}
+   * If the group doesn't exist
    */
   public static async findById(
       id: number,

@@ -224,7 +224,7 @@ export class MembershipService {
   /**
    * Checks if the current user is a member
    * of the specified group.
-   * @param currentUser - The currently logged in user
+   * @param currentUser - The currently logged-in user
    * @param groupId     - The if of the group.
    */
   public static async isMember(

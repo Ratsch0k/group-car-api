@@ -85,10 +85,11 @@ export class GroupService {
    * Returns the updated group.
    * Throws UnauthorizedError if the current user is not a member or
    * the owner of the specified group.
-   * Throws {@link CannotTransferOwnershipToNotAdminError} if the
-   * specified user is not an admin of the specified group.
-   * @param currentUser - The currently logged in user
-   * @param groupId     - The group of which the owner should used
+   * @throws {@link UserNotAdminOfGroupError}
+   * If the user who should become the owner is not an admin
+   * of the group.
+   * @param currentUser - The currently logged-in user
+   * @param groupId     - The group of which the ownership should be transferred
    * @param toId        - The user to which the ownership should be transferred
    */
   public static async transferOwnership(
@@ -303,5 +304,45 @@ export class GroupService {
 
     // Only return plain version
     return group.get({plain: true}) as Group;
+  }
+
+  /**
+   * Deletes the group with the given id if the user is the owner.
+   *
+   * First, it checks if `currentUser` is the owner of the specified group.
+   * If not, the method throws. If yes, it deletes the group.
+   *
+   * @param currentUser - Currently logged-in user
+   * @param groupId     - ID of the group to delete
+   *
+   * @throws {@link NotMemberOfGroupError}
+   * Thrown if `currentUser` is not a member of the group
+   *
+   * @throws {@link GroupNotFoundError}
+   * Thrown if `currentUser` is somehow a member of the group but the
+   * group itself doesn't exist. *Could be thrown in some edge-cases
+   * where the group is deleted before the membership and the method
+   * is called in between*
+   * @throws {@link NotOwnerOfGroupError}
+   * If the user is a member of the group but not the owner.
+   */
+  public static async delete(
+      currentUser: Express.User,
+      groupId: number,
+  ): Promise<void> {
+    // Check if user is a member of the group
+    if (!await MembershipService.isMember(currentUser, groupId)) {
+      throw new NotMemberOfGroupError();
+    }
+
+    // Get the group and check if the user is the owner
+    const group = await GroupRepository.findById(groupId);
+
+    if (group.ownerId !== currentUser.id) {
+      throw new NotOwnerOfGroupError();
+    }
+
+    // Delete the group
+    await group.destroy();
   }
 }

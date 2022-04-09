@@ -855,4 +855,77 @@ describe('GroupService', function() {
       assert.calledOnceWithExactly(fakeGroup.get, match({plain: true}));
     });
   });
+
+  describe('delete', function() {
+    let isMemberStub: sinon.SinonStub;
+    let findGroupStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      isMemberStub = sinon.stub(MembershipService, 'isMember');
+      findGroupStub = sinon.stub(GroupRepository, 'findById');
+    });
+
+    it('throws NotMemberOfGroup if user is not a member of ' +
+      'the group', async function() {
+      const user = {
+        id: 88,
+      } as Express.User;
+      const groupId = 11;
+
+      // Set stubs
+      isMemberStub.resolves(false);
+
+      await expect(GroupService.delete(user, groupId))
+          .to.eventually.be.rejectedWith(NotMemberOfGroupError);
+
+      assert.calledOnceWithExactly(isMemberStub, user, groupId);
+      assert.notCalled(findGroupStub);
+    });
+
+    it('throws NotOwnerOfGroup if user is not an ' +
+      'owner of the group', async function() {
+      const user = {
+        id: 88,
+      } as Express.User;
+      const group = {
+        id: 11,
+        ownerId: user.id + 1, // Ensure user is not the owner
+        destroy: sinon.stub(),
+      };
+
+      // Set stubs
+      isMemberStub.resolves(true);
+      findGroupStub.resolves(group);
+
+      await expect(GroupService.delete(user, group.id))
+          .to.eventually.be.rejectedWith(NotOwnerOfGroupError);
+
+      assert.calledOnceWithExactly(isMemberStub, user, group.id);
+      assert.calledOnceWithExactly(findGroupStub, group.id);
+      assert.notCalled(group.destroy);
+    });
+
+    it('delete the group if the group exists and the ' +
+      'user is the owner', async function() {
+      const user = {
+        id: 88,
+      } as Express.User;
+      const group = {
+        id: 11,
+        ownerId: user.id, // Make user the owner
+        destroy: sinon.stub(),
+      };
+
+      // Set stubs
+      isMemberStub.resolves(true);
+      findGroupStub.resolves(group);
+
+      await expect(GroupService.delete(user, group.id))
+          .to.be.eventually.be.fulfilled;
+
+      assert.calledOnceWithExactly(isMemberStub, user, group.id);
+      assert.calledOnceWithExactly(findGroupStub, group.id);
+      assert.calledOnceWithExactly(group.destroy);
+    });
+  });
 });

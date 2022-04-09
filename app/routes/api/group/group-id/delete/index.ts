@@ -1,3 +1,5 @@
+import {asyncWrapper} from '@util/async-wrapper';
+
 export * from './delete-group-controller';
 
 import {Router} from 'express';
@@ -8,7 +10,7 @@ import deleteGroupController from './delete-group-controller';
  */
 const deleteGroupRouter = Router({mergeParams: true}).delete(
     '/',
-    deleteGroupController,
+    asyncWrapper(deleteGroupController),
 );
 
 export default deleteGroupRouter;
