@@ -178,6 +178,43 @@ export class MembershipRepository {
   }
 
   /**
+   * Get the amount of members of a group.
+   * @param groupId - ID of the group
+   * @param options - Additional options
+   * @returns The amount of members as a Promise
+   */
+  public static async countForGroup(
+      groupId: number,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<number> {
+    return Membership.count({
+      where: {groupId},
+      transaction: isTransaction(options?.transaction)},
+    );
+  }
+
+  /**
+   * Checks if a membership of a user for a group exists.
+   * @param groupId - ID of the group
+   * @param userId - ID of the user
+   * @param options - Additional options
+   */
+  public static async exists(
+      {groupId, userId}: MembershipId,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<boolean> {
+    const membership = await Membership.findOne({
+      where: {
+        groupId,
+        userId,
+      },
+      transaction: isTransaction(options?.transaction),
+    });
+
+    return membership !== null;
+  }
+
+  /**
    * Build options for the query builder.
    */
   private static readonly queryBuildOptions = buildFindQueryOptionsMethod(

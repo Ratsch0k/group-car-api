@@ -211,4 +211,61 @@ describe('InviteRepository', function() {
       );
     });
   });
+
+  describe('exists', function() {
+    let findInviteStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      findInviteStub = sinon.stub(Invite, 'findOne');
+    });
+
+    it('returns true if the invite exists', async function() {
+      const groupId = 42;
+      const userId = 55;
+      const invite = {
+        userId,
+        groupId,
+        invitedBy: 88,
+      };
+
+      findInviteStub.resolves(invite);
+
+      const options = {
+        transaction: {},
+      };
+
+      await expect(InviteRepository.exists({groupId, userId}, options as any))
+          .to.eventually.be.true;
+
+      assert.calledOnceWithExactly(
+          findInviteStub,
+          match({
+            where: {groupId, userId},
+            transaction: options.transaction,
+          }),
+      );
+    });
+
+    it('returns false if no invite exists', async function() {
+      const groupId = 42;
+      const userId = 55;
+
+      findInviteStub.resolves(null);
+
+      const options = {
+        transaction: {},
+      };
+
+      await expect(InviteRepository.exists({groupId, userId}, options as any))
+          .to.eventually.be.false;
+
+      assert.calledOnceWithExactly(
+          findInviteStub,
+          match({
+            where: {groupId, userId},
+            transaction: options.transaction,
+          }),
+      );
+    });
+  });
 });

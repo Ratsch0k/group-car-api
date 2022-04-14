@@ -4,7 +4,11 @@ import {
   InviteService,
   MembershipService,
   Membership,
-  MembershipRepository, CreateGroupValues,
+  MembershipRepository,
+  CreateGroupValues,
+  UserRepository,
+  InviteRepository,
+  Invite,
 } from '@models';
 import {
   UnauthorizedError,
@@ -15,9 +19,15 @@ import {
   CannotKickSelfError,
   NotAdminOfGroupError,
   NotMemberOfGroupError,
+  NoSelfInviteError,
+  InternalError,
+  AlreadyInvitedError,
+  AlreadyMemberError,
+  GroupIsFullError,
 } from '@errors';
 import debug from 'debug';
 import bindToLog from '@util/user-bound-logging';
+import config from '@config';
 
 const log = debug('group-car:group:service');
 const error = debug('group-car:group:service:error');
@@ -344,5 +354,143 @@ export class GroupService {
 
     // Delete the group
     await group.destroy();
+  }
+
+  /**
+   * Invites a user to the given group.
+   *
+   * The user to invite can either be specified by their user-id or by their
+   * username. If the username is provided, this method will automatically
+   * retrieve their id.
+   *
+   * **The following has to be fulfilled before a user is invited:**
+   *
+   * A user can only be invited if the currently logged-in user
+   * is an admin of the group and the group has not reached the maximum
+   * amount of members. Additionally, the user to be invited has to
+   * exist, is not allowed to be the logged-in user, must not have
+   * an invite or be a member of the group
+   * @param currentUser - Currently logged-in user
+   * @param groupId     - ID of the group to which the user should be invited
+   * @param user        - Username or id of the user to invite
+   *
+   * @throws {@link NoSelfInviteError}
+   * If `currentUser` is the same user as specified with `user`
+   * @throws {@link NotMemberOfGroupError}
+   * If `currentUser` is not a member of the group
+   * @throws {@link NotAdminOfGroupError}
+   * If `currentUser` is not an admin of the group
+   * @throws {@link UserNotFoundError}
+   * If a user id is provided but not user with that id exists
+   * @throws {@link UsernameNotFoundError}
+   * If the username is provided but no user with that username exists
+   * @throws {@link AlreadyInvitedError}
+   * If the user to invite is already invited to the group
+   * @throws {@link AlreadyMemberError}
+   * If the user to invite is already a member of the group
+   * @throws {@link GroupIsFullError}
+   * If the group has already reached to maximum amount of allowed members
+   */
+  public static async inviteUser(
+      currentUser: Express.User,
+      groupId: number,
+      user: string | number,
+  ): Promise<Invite> {
+    // Check that logged-in user doesn't invite themselves
+    if (
+      (typeof user === 'string' && currentUser.username === user) ||
+      (typeof user === 'number' && currentUser.id === user)
+    ) {
+      throw new NoSelfInviteError();
+    }
+
+    // Validate that the user is an admin of the group
+    let loggedInUserMembership: Membership;
+    try {
+      loggedInUserMembership = await MembershipRepository.findById(
+          {groupId, userId: currentUser.id});
+    } catch (e) {
+      if (e instanceof MembershipNotFoundError) {
+        throw new NotMemberOfGroupError();
+      }
+      throw e;
+    }
+
+    if (!loggedInUserMembership.isAdmin) {
+      throw new NotAdminOfGroupError();
+    }
+    /*
+     * From here on out, we know the logged-in user
+     * is authorized to make this request
+     */
+
+    /*
+     * Retrieve the id of the user.
+     *
+     * If `user` is a number it will be the id.
+     * Then we just check if a user with that id exists.
+     *
+     * If `user` is a string, we expect it to be the username.
+     * Try to retrieve the user by their username and set
+     * the userId accordingly.
+     */
+    let userId: number;
+
+    if (typeof user === 'number') {
+      // Check if a user with that id exists
+      await UserRepository.findById(user);
+
+      userId = user;
+    } else if (typeof user === 'string') {
+      const toInviteUser = await UserRepository.findByUsername(user);
+
+      userId = toInviteUser.id;
+    } else {
+      throw new InternalError('Unexpected behaviour');
+    }
+
+    /*
+     * The following 3 checks are done sequentially to minimize impact
+     * on system resources. This will lead to a longer response time but only
+     * as many database queries as really necessary.
+     *
+     * If the increased response time becomes a big issue, this code could be
+     * optimized by either using `Promise.all` for all checks or by combining
+     * the separate checks into one database query (if possible).
+     */
+
+    // Check if user is already invited to group
+    if (await InviteRepository.exists({groupId, userId})) {
+      throw new AlreadyInvitedError(userId, groupId);
+    }
+
+    // Check that the user is not a member of the group
+    if (await MembershipRepository.exists({groupId, userId})) {
+      throw new AlreadyMemberError(userId, groupId);
+    }
+
+    // Get member count of group. The relevant count includes all members
+    // but also all invited users because it should not be possible ot invite
+    // more users than the group is allowed to contain.
+    const [memberCount, inviteCount] = await Promise.all([
+      MembershipRepository.countForGroup(groupId),
+      InviteRepository.countForGroup(groupId),
+    ]);
+
+    const totalAmount = memberCount + inviteCount;
+
+    if (totalAmount >= config.group.maxMembers) {
+      throw new GroupIsFullError();
+    }
+
+    // At this point, all checks have passed and the invite
+    // for the user is created
+    const invite = await InviteRepository.create(
+        userId,
+        groupId,
+        currentUser.id,
+    );
+
+    return invite.get({plain: true}) as Invite;
   }
 }

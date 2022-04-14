@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sinon, {assert, match} from 'sinon';
-import {InviteService} from '../invite';
+import {Invite, InviteRepository, InviteService} from '../invite';
 import {expect} from 'chai';
 import {GroupService} from './group-service';
 import {
@@ -13,10 +13,16 @@ import {
   CannotKickSelfError,
   NotAdminOfGroupError,
   NotMemberOfGroupError,
+  UserNotFoundError,
+  AlreadyInvitedError,
+  AlreadyMemberError,
+  GroupIsFullError,
 } from '../../errors';
 import {GroupRepository} from './group-repository';
-import {MembershipService} from '../membership';
+import {Membership, MembershipService} from '../membership';
 import {MembershipRepository} from '../membership';
+import {User, UserRepository} from '../user';
+import config from '../../config';
 
 describe('GroupService', function() {
   afterEach(function() {
@@ -926,6 +932,367 @@ describe('GroupService', function() {
       assert.calledOnceWithExactly(isMemberStub, user, group.id);
       assert.calledOnceWithExactly(findGroupStub, group.id);
       assert.calledOnceWithExactly(group.destroy);
+    });
+  });
+
+  describe('inviteUser', function() {
+    let isMemberStub: sinon.SinonStub;
+    let isInvitedStub: sinon.SinonStub;
+    let getMembershipStub: sinon.SinonStub;
+    let createInviteStub: sinon.SinonStub;
+    let getMemberAmountStub: sinon.SinonStub;
+    let getInvitesAmountStub: sinon.SinonStub;
+    let findUserByIdStub: sinon.SinonStub;
+    let findUserUsernameStub: sinon.SinonStub;
+    let currentUser: Express.User;
+
+    beforeEach(function() {
+      isMemberStub = sinon.stub(MembershipRepository, 'exists');
+      isInvitedStub = sinon.stub(InviteRepository, 'exists');
+      getMembershipStub = sinon.stub(MembershipRepository, 'findById');
+      createInviteStub = sinon.stub(InviteRepository, 'create');
+      getMemberAmountStub = sinon.stub(MembershipRepository, 'countForGroup');
+      getInvitesAmountStub = sinon.stub(InviteRepository, 'countForGroup');
+      findUserByIdStub = sinon.stub(UserRepository, 'findById');
+      findUserUsernameStub = sinon.stub(UserRepository, 'findByUsername');
+
+      /**
+       * Only assign necessary fields
+       */
+      currentUser = {
+        id: 5,
+      } as Express.User;
+    });
+
+    describe('throws ', function() {
+      // eslint-disable-next-line require-jsdoc
+      function checkCreateInviteCall() {
+        assert.notCalled(createInviteStub);
+      }
+
+      it('NotMemberOfGroupError if requesting user is not a ' +
+        'member of the group', async function() {
+        const userId = 66;
+        const groupId = 88;
+
+        getMembershipStub.callsFake(() =>
+          Promise.reject(new NotMemberOfGroupError()));
+
+        await expect(GroupService.inviteUser(currentUser, groupId, userId))
+            .to.eventually.be.rejectedWith(NotMemberOfGroupError);
+
+        checkCreateInviteCall();
+        assert.calledOnceWithExactly(
+            getMembershipStub,
+            {groupId, userId: currentUser.id},
+        );
+        assert.notCalled(getInvitesAmountStub);
+        assert.notCalled(getMemberAmountStub);
+        assert.notCalled(findUserUsernameStub);
+        assert.notCalled(findUserByIdStub);
+        assert.notCalled(isMemberStub);
+        assert.notCalled(isInvitedStub);
+      });
+
+      it('NotAdminOfGroupError if requesting user not an ' +
+        'admin of the group', async function() {
+        const userId = 66;
+        const groupId = 88;
+
+        const membership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: false,
+        } as Membership;
+
+        getMembershipStub.resolves(membership);
+
+        await expect(GroupService.inviteUser(currentUser, groupId, userId))
+            .to.eventually.be.rejectedWith(NotAdminOfGroupError);
+
+        checkCreateInviteCall();
+        assert.calledOnceWithExactly(
+            getMembershipStub,
+            {groupId, userId: currentUser.id},
+        );
+        assert.notCalled(getInvitesAmountStub);
+        assert.notCalled(getMemberAmountStub);
+        assert.notCalled(findUserUsernameStub);
+        assert.notCalled(findUserByIdStub);
+        assert.notCalled(isMemberStub);
+        assert.notCalled(isInvitedStub);
+      });
+
+      it('UserNotFoundError if no user with the ' +
+        'specified id exists', async function() {
+        const userId = 66;
+        const groupId = 88;
+
+        const membership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: true,
+        } as Membership;
+
+        findUserByIdStub.callsFake(() =>
+          Promise.reject(new UserNotFoundError(userId)));
+
+        getMembershipStub.resolves(membership);
+
+        await expect(GroupService.inviteUser(currentUser, groupId, userId))
+            .to.eventually.be.rejectedWith(UserNotFoundError);
+
+        checkCreateInviteCall();
+        assert.calledOnceWithExactly(
+            getMembershipStub,
+            {groupId, userId: currentUser.id},
+        );
+        assert.calledOnceWithExactly(findUserByIdStub, userId);
+        assert.notCalled(getInvitesAmountStub);
+        assert.notCalled(getMemberAmountStub);
+        assert.notCalled(findUserUsernameStub);
+        assert.notCalled(isMemberStub);
+        assert.notCalled(isInvitedStub);
+      });
+
+      it('UserNotFoundError if no user with the specified ' +
+        'username exists', async function() {
+        const username = 'INVITEE';
+        const groupId = 88;
+
+        const membership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: true,
+        } as Membership;
+
+        findUserUsernameStub.callsFake(() =>
+          Promise.reject(new UserNotFoundError(username)));
+
+        getMembershipStub.resolves(membership);
+
+        await expect(GroupService.inviteUser(currentUser, groupId, username))
+            .to.eventually.be.rejectedWith(UserNotFoundError);
+
+        checkCreateInviteCall();
+        assert.calledOnceWithExactly(
+            getMembershipStub,
+            {groupId, userId: currentUser.id},
+        );
+        assert.calledOnceWithExactly(findUserUsernameStub, username);
+        assert.notCalled(getInvitesAmountStub);
+        assert.notCalled(getMemberAmountStub);
+        assert.notCalled(findUserByIdStub);
+        assert.notCalled(isMemberStub);
+        assert.notCalled(isInvitedStub);
+      });
+
+      it('AlreadyInvitedError if the user to invite is already ' +
+        'invited to the group', async function() {
+        const userId = 54;
+        const groupId = 88;
+
+        const membership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: true,
+        } as Membership;
+
+        findUserByIdStub.resolves();
+        getMembershipStub.resolves(membership);
+        isInvitedStub.resolves(true);
+
+        await expect(GroupService.inviteUser(currentUser, groupId, userId))
+            .to.eventually.be.rejectedWith(AlreadyInvitedError);
+
+        checkCreateInviteCall();
+        assert.calledOnceWithExactly(
+            getMembershipStub,
+            {groupId, userId: currentUser.id},
+        );
+        assert.calledOnceWithExactly(findUserByIdStub, userId);
+        assert.calledOnceWithExactly(isInvitedStub, {groupId, userId});
+        assert.notCalled(findUserUsernameStub);
+        assert.notCalled(getInvitesAmountStub);
+        assert.notCalled(getMemberAmountStub);
+        assert.notCalled(isMemberStub);
+      });
+
+      it('AlreadyMemberError if the user to invite is already ' +
+        'a member of the group', async function() {
+        const userId = 54;
+        const groupId = 88;
+
+        const membership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: true,
+        } as Membership;
+
+        findUserByIdStub.resolves();
+        getMembershipStub.resolves(membership);
+        isInvitedStub.resolves(false);
+        isMemberStub.resolves(true);
+
+        await expect(GroupService.inviteUser(currentUser, groupId, userId))
+            .to.eventually.be.rejectedWith(AlreadyMemberError);
+
+        checkCreateInviteCall();
+        assert.calledOnceWithExactly(
+            getMembershipStub,
+            {groupId, userId: currentUser.id},
+        );
+        assert.calledOnceWithExactly(findUserByIdStub, userId);
+        assert.calledOnceWithExactly(isInvitedStub, {groupId, userId});
+        assert.calledOnceWithExactly(isMemberStub, {groupId, userId});
+        assert.notCalled(findUserUsernameStub);
+        assert.notCalled(getInvitesAmountStub);
+        assert.notCalled(getMemberAmountStub);
+      });
+
+      it('GroupIsFullError if the group is already at ' +
+        'max capacity', async function() {
+        const userId = 54;
+        const groupId = 88;
+
+        const membership = {
+          userId: currentUser.id,
+          groupId,
+          isAdmin: true,
+        } as Membership;
+
+        findUserByIdStub.resolves();
+        getMembershipStub.resolves(membership);
+        isInvitedStub.resolves(false);
+        isMemberStub.resolves(false);
+        getMemberAmountStub.resolves(config.group.maxMembers - 2);
+        getInvitesAmountStub.resolves(3);
+
+        await expect(GroupService.inviteUser(currentUser, groupId, userId))
+            .to.eventually.be.rejectedWith(GroupIsFullError);
+
+        checkCreateInviteCall();
+        assert.calledOnceWithExactly(
+            getMembershipStub,
+            {groupId, userId: currentUser.id},
+        );
+        assert.calledOnceWithExactly(findUserByIdStub, userId);
+        assert.calledOnceWithExactly(isInvitedStub, {groupId, userId});
+        assert.calledOnceWithExactly(isMemberStub, {groupId, userId});
+        assert.calledOnceWithExactly(getInvitesAmountStub, groupId);
+        assert.calledOnceWithExactly(getMemberAmountStub, groupId);
+        assert.notCalled(findUserUsernameStub);
+      });
+    });
+
+    it('if the logged-in user is an admin of the group, the specified user ' +
+      'exists and ist neither already invited or a member of the group and' +
+      'the group is not full, create the invite and return the invite as a ' +
+      'plain object', async function() {
+      const userId = 54;
+      const groupId = 88;
+
+      const membership = {
+        userId: currentUser.id,
+        groupId,
+        isAdmin: true,
+      } as Membership;
+
+      findUserByIdStub.resolves();
+      getMembershipStub.resolves(membership);
+      isInvitedStub.resolves(false);
+      isMemberStub.resolves(false);
+      getMemberAmountStub.resolves(1);
+      getInvitesAmountStub.resolves(0);
+
+      const invite = {
+        userId,
+        groupId,
+        invitedBy: currentUser.id,
+      } as Invite;
+      const response = {
+        ...invite,
+        get: sinon.stub().returns(invite),
+      };
+      createInviteStub.resolves(response);
+
+      const actual = await GroupService
+          .inviteUser(currentUser, groupId, userId);
+
+      expect(actual).to.eq(invite);
+      assert.calledOnceWithExactly(
+          getMembershipStub,
+          {groupId, userId: currentUser.id},
+      );
+      assert.calledOnceWithExactly(findUserByIdStub, userId);
+      assert.calledOnceWithExactly(isInvitedStub, {groupId, userId});
+      assert.calledOnceWithExactly(isMemberStub, {groupId, userId});
+      assert.calledOnceWithExactly(getInvitesAmountStub, groupId);
+      assert.calledOnceWithExactly(getMemberAmountStub, groupId);
+      assert.notCalled(findUserUsernameStub);
+      assert.calledOnceWithExactly(
+          createInviteStub,
+          userId,
+          groupId,
+          currentUser.id,
+      );
+    });
+
+    it('if username specified, retrieve user and ' +
+      'use user id instead', async function() {
+      const username = 'TEST_USER';
+      const groupId = 88;
+
+      const membership = {
+        userId: currentUser.id,
+        groupId,
+        isAdmin: true,
+      } as Membership;
+
+      const user = {
+        id: 11,
+        username,
+      } as User;
+
+      findUserUsernameStub.resolves(user);
+      getMembershipStub.resolves(membership);
+      isInvitedStub.resolves(false);
+      isMemberStub.resolves(false);
+      getMemberAmountStub.resolves(1);
+      getInvitesAmountStub.resolves(0);
+
+      const invite = {
+        userId: user.id,
+        groupId,
+        invitedBy: currentUser.id,
+      } as Invite;
+      const response = {
+        ...invite,
+        get: sinon.stub().returns(invite),
+      };
+      createInviteStub.resolves(response);
+
+      const actual = await GroupService
+          .inviteUser(currentUser, groupId, username);
+
+      expect(actual).to.eq(invite);
+
+      assert.calledOnceWithExactly(
+          getMembershipStub,
+          {groupId, userId: currentUser.id},
+      );
+      assert.notCalled(findUserByIdStub);
+      assert.calledOnceWithExactly(isInvitedStub, {groupId, userId: user.id});
+      assert.calledOnceWithExactly(isMemberStub, {groupId, userId: user.id});
+      assert.calledOnceWithExactly(getInvitesAmountStub, groupId);
+      assert.calledOnceWithExactly(getMemberAmountStub, groupId);
+      assert.calledOnceWithExactly(findUserUsernameStub, username);
+      assert.calledOnceWithExactly(
+          createInviteStub,
+          user.id,
+          groupId,
+          currentUser.id,
+      );
     });
   });
 });

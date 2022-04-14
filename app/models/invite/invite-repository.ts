@@ -3,7 +3,7 @@ import {InviteNotFoundError} from '@errors';
 import {RepositoryQueryOptions} from 'typings';
 import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 import debug from 'debug';
-import {isTransaction} from '@util/is-transaction';
+import {containsTransaction, isTransaction} from '@util/is-transaction';
 
 export type InviteId = {userId: number, groupId: number};
 
@@ -157,6 +157,72 @@ export class InviteRepository {
       },
       include,
     });
+  }
+
+  /**
+   * Gets the amount of invites of a group.
+   * @param groupId - ID of the group
+   * @param options - Additional options
+   * @returns Amount of invites for the given group as a Promise
+   */
+  public static async countForGroup(
+      groupId: number,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<number> {
+    return Invite.count({
+      where: {
+        groupId,
+      },
+      transaction: isTransaction(options?.transaction),
+    });
+  }
+
+  /**
+   * Creates an invite for the given id.
+   * @param userId    - ID of the user to invite
+   * @param groupId   - ID of the group
+   * @param invitedBy - ID of the user which created the invite
+   * @param options - Additional options
+   */
+  public static async create(
+      userId: number,
+      groupId: number,
+      invitedBy: number,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<Invite> {
+    return Invite.create(
+        {
+          userId,
+          groupId,
+          invitedBy,
+        }, {
+          ...containsTransaction(options),
+        },
+    );
+  }
+
+  /**
+   * Checks if the invite with the given id exists.
+   *
+   * This is basically equivalent to checking if the user
+   * is invited to the group.
+   * @param groupId - ID of the user
+   * @param userId  - ID of the group
+   * @param options - Additional options
+   */
+  public static async exists(
+      {groupId, userId}: InviteId,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<boolean> {
+    const invite = await Invite.findOne({
+      where: {
+        groupId,
+        userId,
+      },
+      transaction: isTransaction(options?.transaction),
+    });
+
+    return invite !== null;
   }
 
   /**
