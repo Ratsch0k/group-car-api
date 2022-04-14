@@ -18,7 +18,7 @@ import {
   AlreadyMemberError,
   GroupIsFullError,
 } from '../../errors';
-import {GroupRepository} from './group-repository';
+import {CreateGroupValues, GroupRepository} from './group-repository';
 import {Membership, MembershipService} from '../membership';
 import {MembershipRepository} from '../membership';
 import {User, UserRepository} from '../user';
@@ -1292,6 +1292,97 @@ describe('GroupService', function() {
           user.id,
           groupId,
           currentUser.id,
+      );
+    });
+  });
+
+  describe('update', function() {
+    let getMembershipStub: sinon.SinonStub;
+    let updateStub: sinon.SinonStub;
+    let currentUser: Express.User;
+    let values: Partial<CreateGroupValues>;
+
+    beforeEach(function() {
+      getMembershipStub = sinon.stub(MembershipRepository, 'findById');
+      updateStub = sinon.stub(GroupRepository, 'update');
+
+      /*
+       * Only stub necessary fields
+       */
+      currentUser = {
+        id: 89,
+      } as Express.User;
+
+      values = {
+        description: 'NEW_DESC',
+        name: 'NEW_NAME',
+      };
+    });
+
+    it('throw NotMemberOfGroupError if logged-in user not a member ' +
+      'of the group', async function() {
+      const groupId = 12;
+      getMembershipStub.callsFake(() =>
+        Promise.reject(new MembershipNotFoundError(
+            {groupId, userId: currentUser.id})));
+
+      await expect(GroupService.update(currentUser, groupId, values))
+          .to.eventually.be.rejectedWith(NotMemberOfGroupError);
+
+      assert.notCalled(updateStub);
+      assert.calledOnceWithExactly(
+          getMembershipStub,
+          {groupId, userId: currentUser.id},
+      );
+    });
+
+    it('throws NotAdminOfGroupError if logged-in user is a member but ' +
+      'not an admin of the group', async function() {
+      const groupId = 12;
+      const membership = {
+        groupId,
+        userId: currentUser.id,
+        isAdmin: false,
+      };
+      getMembershipStub.resolves(membership);
+
+      await expect(GroupService.update(currentUser, groupId, values))
+          .to.eventually.be.rejectedWith(NotAdminOfGroupError);
+
+      assert.notCalled(updateStub);
+      assert.calledOnceWithExactly(
+          getMembershipStub,
+          {groupId, userId: currentUser.id},
+      );
+    });
+
+    it('calls the GroupRepository.update with correct values if ' +
+      'logged-in user is an admin of the group', async function() {
+      const groupId = 12;
+      const membership = {
+        groupId,
+        userId: currentUser.id,
+        isAdmin: true,
+      };
+      getMembershipStub.resolves(membership);
+      const group = {
+        id: groupId,
+        name: values.name,
+        description: values.description,
+      };
+
+      updateStub.resolves({
+        ...group,
+        get: sinon.stub().returns(group),
+      });
+
+      await expect(GroupService.update(currentUser, groupId, values))
+          .to.eventually.eql(group);
+
+      assert.calledOnceWithExactly(updateStub, groupId, values);
+      assert.calledOnceWithExactly(
+          getMembershipStub,
+          {groupId, userId: currentUser.id},
       );
     });
   });

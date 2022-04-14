@@ -4,7 +4,7 @@ import {buildFindQueryOptionsMethod} from '@app/util/build-find-query-options';
 import {Group, User} from '@models';
 import debug from 'debug';
 import Sequelize from 'sequelize';
-import {containsTransaction} from '@util/is-transaction';
+import {containsTransaction, isTransaction} from '@util/is-transaction';
 
 const Op = Sequelize.Op;
 
@@ -151,6 +151,7 @@ export class GroupRepository {
       values: CreateGroupValues,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<Group> {
+    log('Create new group with name %s', values.name);
     return Group.create(
         {
           name: values.name,
@@ -161,6 +162,58 @@ export class GroupRepository {
           ...containsTransaction(options),
         },
     );
+  }
+
+  /**
+   * Updates fields of the given group.
+   *
+   * Only the expected values will be updated and all other given fields
+   * will be ignored.
+   *
+   * Only allows to update the following fields:
+   *  - `description`
+   *  - `name`
+   * @param id      - ID of the group
+   * @param values  - Values to update
+   * @param options - Additional options
+   *
+   * @throws {@link GroupNotFoundError}
+   * If the specified group doesn't exist
+   */
+  public static async update(
+      id: number,
+      values: Partial<Pick<Group, 'description' |'name'>>,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<Group> {
+    log('Update group %d', id);
+
+    const amountChanged = await Group.update(
+        {
+          name: values.name,
+          description: values.description,
+        },
+        {
+          where: {
+            id,
+          },
+          limit: 1,
+          transaction: isTransaction(options?.transaction),
+          returning: true,
+        },
+    );
+
+    /*
+     * The first element is the amount of changed rows.
+     * If it's 0 we know that no group with the id exists.
+     * Therefore, we throw an exception
+     */
+    if (amountChanged[0] === 0) {
+      throw new GroupNotFoundError(id);
+    }
+
+    // The second element is an array of all updated groups.
+    // We know only one was updated.
+    return amountChanged[1][0];
   }
 
   /**

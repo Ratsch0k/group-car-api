@@ -4,6 +4,7 @@ import {
   createValidationRouter,
 } from '@app/validators';
 import {body} from 'express-validator';
+import {asyncWrapper} from '@util/async-wrapper';
 
 export {default as updateGroupController} from './update-group-controller';
 
@@ -27,7 +28,7 @@ const updateGroupRouter = Router({mergeParams: true}).use(
         ],
         'update group',
     ),
-    updateGroupController,
+    asyncWrapper(updateGroupController),
 );
 
 export default updateGroupRouter;

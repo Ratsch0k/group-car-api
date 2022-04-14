@@ -40,7 +40,7 @@ export class GroupService {
    * Returns the group with the specified id only if the specified
    * current user is either a member of the group or has an invite
    * for it.
-   * @param currentUser - The currently logged in user
+   * @param currentUser - The currently logged-in user
    * @param id          - The id to search for
    */
   public static async findById(
@@ -340,20 +340,37 @@ export class GroupService {
       currentUser: Express.User,
       groupId: number,
   ): Promise<void> {
+    const userLog = bindToLog(log, {args: [currentUser.id]});
+    const userError = bindToLog(error, {args: [currentUser.id]});
+
+    userLog('Requesting to delete group %d', groupId);
     // Check if user is a member of the group
+
+    userLog('Check if a member');
     if (!await MembershipService.isMember(currentUser, groupId)) {
+      userError('Not a member of the group %d', groupId);
       throw new NotMemberOfGroupError();
     }
 
+    userLog('Get group %d', groupId);
     // Get the group and check if the user is the owner
     const group = await GroupRepository.findById(groupId);
 
+    userLog('Check if user the owner of the group %d', groupId);
     if (group.ownerId !== currentUser.id) {
+      userError('Is not the owner');
       throw new NotOwnerOfGroupError();
     }
 
     // Delete the group
-    await group.destroy();
+    userLog('Delete the group');
+    try {
+      await group.destroy();
+    } catch (e) {
+      // Log exception and rethrow
+      userError('Unexpected error while deleting the group %d', groupId);
+      throw e;
+    }
   }
 
   /**
@@ -396,11 +413,17 @@ export class GroupService {
       groupId: number,
       user: string | number,
   ): Promise<Invite> {
+    const userLog = bindToLog(log, {args: [currentUser.id]});
+    const userError = bindToLog(log, {args: [currentUser.id]});
+
+    userLog('Starting: Invite user %s to group %d', user, groupId);
+
     // Check that logged-in user doesn't invite themselves
     if (
       (typeof user === 'string' && currentUser.username === user) ||
       (typeof user === 'number' && currentUser.id === user)
     ) {
+      userError('Tries to invite themselves');
       throw new NoSelfInviteError();
     }
 
@@ -411,12 +434,16 @@ export class GroupService {
           {groupId, userId: currentUser.id});
     } catch (e) {
       if (e instanceof MembershipNotFoundError) {
+        userError('Is not a member');
         throw new NotMemberOfGroupError();
       }
+      userError('Unexpected error while getting the membership ' +
+        'of the logged-in user: %s', e);
       throw e;
     }
 
     if (!loggedInUserMembership.isAdmin) {
+      userError('Is not an admin');
       throw new NotAdminOfGroupError();
     }
     /*
@@ -437,15 +464,19 @@ export class GroupService {
     let userId: number;
 
     if (typeof user === 'number') {
+      userLog('userId was provided, simply checking if user exists');
       // Check if a user with that id exists
       await UserRepository.findById(user);
 
       userId = user;
     } else if (typeof user === 'string') {
+      userLog('username was provided, getting userId');
       const toInviteUser = await UserRepository.findByUsername(user);
 
       userId = toInviteUser.id;
     } else {
+      userError('Neither the username nor the userId' +
+        'were provided, this should have been caught earlier');
       throw new InternalError('Unexpected behaviour');
     }
 
@@ -460,18 +491,23 @@ export class GroupService {
      */
 
     // Check if user is already invited to group
+    userLog('Check if user %d is invited to group %d', userId, groupId);
     if (await InviteRepository.exists({groupId, userId})) {
+      userError('User %d is already invited to group %d', userId, groupId);
       throw new AlreadyInvitedError(userId, groupId);
     }
 
     // Check that the user is not a member of the group
+    userLog('Check if user %d is a member of group %d', userId, groupId);
     if (await MembershipRepository.exists({groupId, userId})) {
+      userError('User %d is already a member of the group %d', userId, groupId);
       throw new AlreadyMemberError(userId, groupId);
     }
 
     // Get member count of group. The relevant count includes all members
     // but also all invited users because it should not be possible ot invite
     // more users than the group is allowed to contain.
+    userLog('Get amount of invites and members of group %d', groupId);
     const [memberCount, inviteCount] = await Promise.all([
       MembershipRepository.countForGroup(groupId),
       InviteRepository.countForGroup(groupId),
@@ -480,17 +516,85 @@ export class GroupService {
     const totalAmount = memberCount + inviteCount;
 
     if (totalAmount >= config.group.maxMembers) {
+      userError('Group %d is already full', groupId);
       throw new GroupIsFullError();
     }
 
     // At this point, all checks have passed and the invite
     // for the user is created
+    userLog('Inviting user %d to group %d', userId, groupId);
     const invite = await InviteRepository.create(
         userId,
         groupId,
         currentUser.id,
     );
+    userLog('Successfully invited user %d to group %d', userId, groupId);
 
     return invite.get({plain: true}) as Invite;
+  }
+
+  /**
+   * Update fields of the specified group.
+   *
+   * `currentUser` has to be an admin of the group.
+   * Only the following fields can be updated:
+   *  - `description`
+   *  - `name`
+   *
+   * Other fields require more checks and can only be
+   * changed via their respected methods.
+   * @param currentUser - Logged-in user
+   * @param groupId     - ID of the group
+   * @param values      - Values to change
+   */
+  public static async update(
+      currentUser: Express.User,
+      groupId: number,
+      values: Partial<Omit<CreateGroupValues, 'ownerId'>>,
+  ): Promise<Group> {
+    const userLog = bindToLog(log, {args: [currentUser.id]});
+    const userError = bindToLog(error, {args: [currentUser.id]});
+
+    userLog('Request to update fields of group %d', groupId);
+
+    // Get membership of logged-in user to group
+    userLog('Check membership: user %d -> group %d', currentUser.id, groupId);
+    let membership;
+
+    try {
+      membership = await MembershipRepository
+          .findById({groupId, userId: currentUser.id});
+    } catch (e) {
+      // Only catch if the membership doesn't exist, otherwise rethrow
+      if (e instanceof MembershipNotFoundError) {
+        userError('Is not a member of the group');
+        // Throw other exception
+        throw new NotMemberOfGroupError();
+      }
+      userError('Unexpected error while getting membership: %s', e);
+      throw e;
+    }
+
+    // Check if logged-in user is an admin
+    if (!membership.isAdmin) {
+      userError('Is not an admin');
+      throw new NotAdminOfGroupError();
+    }
+
+    userLog('User is authorized to update the group');
+
+    try {
+      const updatedGroup = await GroupRepository.update(
+          groupId,
+          {description: values.description, name: values.name},
+      );
+      userLog('Successfully updated group %d', groupId);
+
+      return updatedGroup.get({plain: true}) as Group;
+    } catch (e) {
+      // Log error and rethrow
+      userError('Unexpected error while updating the group: %s', e);
+      throw e;
+    }
   }
 }

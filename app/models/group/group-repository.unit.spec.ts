@@ -198,4 +198,107 @@ describe('GroupRepository', function() {
       );
     });
   });
+
+  describe('update', function() {
+    let updateStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      updateStub = sinon.stub(Group, 'update');
+    });
+
+    it('calls Group.update with the correct arguments', async function() {
+      const groupId = 61;
+      const values = {
+        description: 'NEW_DESC',
+        name: 'NEW_NAME',
+      };
+      const options = {
+        transaction: 8,
+      };
+      const group = {
+        name: values.name,
+        description: values.description,
+        id: groupId,
+      };
+      updateStub.resolves([1, [group]]);
+
+      await expect(GroupRepository.update(groupId, values, options as any))
+          .to.eventually.be.fulfilled;
+
+      assert.calledOnceWithExactly(
+          updateStub,
+          values,
+          match({
+            where: {id: groupId},
+            limit: 1,
+            transaction: options.transaction,
+            returning: true,
+          }),
+      );
+    });
+
+    it('only updates description and name and no ' +
+      'other field', async function() {
+      const groupId = 61;
+      const values = {
+        description: 'NEW_DESC',
+        name: 'NEW_NAME',
+        ownerId: 45,
+        other: 'MALICIOUS_FIELD',
+      };
+      const options = {
+        transaction: 8,
+      };
+      const group = {
+        name: values.name,
+        description: values.description,
+        id: groupId,
+      };
+      updateStub.resolves([1, [group]]);
+
+      await expect(GroupRepository.update(groupId, values, options as any))
+          .to.eventually.eql(group);
+
+      assert.calledOnceWithExactly(
+          updateStub,
+          {
+            description: values.description,
+            name: values.name,
+          },
+          match({
+            where: {id: groupId},
+            limit: 1,
+            transaction: options.transaction,
+            returning: true,
+          }),
+      );
+    });
+
+    it('throws GroupNotFoundError if the specified group ' +
+      'doesn\'t exist', async function() {
+      const groupId = 61;
+      const values = {
+        description: 'NEW_DESC',
+        name: 'NEW_NAME',
+      };
+      const options = {
+        transaction: 8,
+      };
+      updateStub.resolves([0]);
+
+      await expect(GroupRepository.update(groupId, values, options as any))
+          .to.eventually.be.rejectedWith(GroupNotFoundError);
+
+      assert.calledOnceWithExactly(
+          updateStub,
+          values,
+          match({
+            where: {id: groupId},
+            limit: 1,
+            transaction: options.transaction,
+            returning: true,
+          }),
+      );
+    });
+  });
 });

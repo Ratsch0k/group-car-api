@@ -111,8 +111,8 @@ describe('put /api/group/:groupId', function() {
 
       // Stub Group.findByPk to simulate that the group somehow doesn't
       // exist. Could be an extreme edge case
-      const groupFindByPkStub: any = sinon.stub(Group, 'findByPk')
-          .usingPromise(Bluebird).resolves(null as any);
+      const groupFindByPkStub: any = sinon.stub(Group, 'update')
+          .usingPromise(Bluebird).resolves([0, []]);
 
       return Group.create(groupData)
           .then((group) =>
@@ -235,7 +235,7 @@ describe('put /api/group/:groupId', function() {
         ownerId: user.id,
       };
       const requestBody = {
-        ownerId: 'new desc',
+        ownerId: 6,
       };
       return Group.create(groupData)
           .then((group) =>
