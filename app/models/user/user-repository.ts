@@ -62,6 +62,9 @@ export class UserRepository {
    * Find a user by their id
    * @param id - The user id
    * @param options - Additional query options
+   *
+   * @throws {@link UserNotFoundError}
+   * If no user with the id exists
    */
   public static async findById(
       id: number,
@@ -83,7 +86,8 @@ export class UserRepository {
    * @param username -  The username to look for
    * @param options -  Additional query options
    *
-   * @throws UserNotFoundError if no username exists with that username
+   * @throws {@link UserNotFoundError}
+   * if no username exists with that username
    */
   public static async findByUsername(
       username: string,
