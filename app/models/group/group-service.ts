@@ -26,7 +26,7 @@ import {
   GroupIsFullError,
 } from '@errors';
 import debug from 'debug';
-import bindToLog from '@util/user-bound-logging';
+import bindToLog, {bindUser} from '@util/user-bound-logging';
 import config from '@config';
 
 const log = debug('group-car:group:service');
@@ -35,7 +35,7 @@ const error = debug('group-car:group:service:error');
 /**
  * Service for complex group operations.
  */
-export class GroupService {
+export const GroupService = {
   /**
    * Returns the group with the specified id only if the specified
    * current user is either a member of the group or has an invite
@@ -43,7 +43,7 @@ export class GroupService {
    * @param currentUser - The currently logged-in user
    * @param id          - The id to search for
    */
-  public static async findById(
+  async findById(
       currentUser: Express.User,
       id: number,
   ): Promise<Group> {
@@ -87,7 +87,7 @@ export class GroupService {
 
     // If neither is the case, user is not authorized
     throw new UnauthorizedError();
-  }
+  },
 
   /**
    * Transfers the ownership of a group to another user.
@@ -102,7 +102,7 @@ export class GroupService {
    * @param groupId     - The group of which the ownership should be transferred
    * @param toId        - The user to which the ownership should be transferred
    */
-  public static async transferOwnership(
+  async transferOwnership(
       currentUser: Express.User,
       groupId: number,
       toId: number,
@@ -172,7 +172,7 @@ export class GroupService {
     );
 
     return this.findById(currentUser, groupId);
-  }
+  },
 
   /**
    * Kicks the specified user from the specified group.
@@ -195,7 +195,7 @@ export class GroupService {
    * @returns A promise which resolves in the updated group data or rejected
    *  by an error
    */
-  public static async kickUser(
+  async kickUser(
       currentUser: Express.User,
       groupId: number,
       userId: number,
@@ -264,13 +264,13 @@ export class GroupService {
 
     // Return new group data
     return MembershipRepository.findAllForGroup(groupId, {withUserData: true});
-  }
+  },
 
   /**
    * Returns a list of all groups the current user is a member of.
    * @param currentUser - The currently logged in user.
    */
-  public static async findAllForUser(
+  async findAllForUser(
       currentUser: Express.User,
   ): Promise<Group[]> {
     log('User %d: Get all groups', currentUser.id);
@@ -286,7 +286,7 @@ export class GroupService {
         currentUser.id,
         groupIdArray.length);
     return GroupRepository.findAllWithIds(groupIdArray);
-  }
+  },
 
   /**
    * Create a new group with the given values.
@@ -296,7 +296,7 @@ export class GroupService {
    * @param currentUser - Currently logged-in
    * @param values      - Values of the group
    */
-  public static async create(
+  async create(
       currentUser: Express.User,
       values: Omit<CreateGroupValues, 'ownerId'>,
   ): Promise<Group> {
@@ -314,7 +314,7 @@ export class GroupService {
 
     // Only return plain version
     return group.get({plain: true}) as Group;
-  }
+  },
 
   /**
    * Deletes the group with the given id if the user is the owner.
@@ -336,7 +336,7 @@ export class GroupService {
    * @throws {@link NotOwnerOfGroupError}
    * If the user is a member of the group but not the owner.
    */
-  public static async delete(
+  async delete(
       currentUser: Express.User,
       groupId: number,
   ): Promise<void> {
@@ -371,7 +371,7 @@ export class GroupService {
       userError('Unexpected error while deleting the group %d', groupId);
       throw e;
     }
-  }
+  },
 
   /**
    * Invites a user to the given group.
@@ -408,13 +408,13 @@ export class GroupService {
    * @throws {@link GroupIsFullError}
    * If the group has already reached to maximum amount of allowed members
    */
-  public static async inviteUser(
+  async inviteUser(
       currentUser: Express.User,
       groupId: number,
       user: string | number,
   ): Promise<Invite> {
-    const userLog = bindToLog(log, {args: [currentUser.id]});
-    const userError = bindToLog(log, {args: [currentUser.id]});
+    const userLog = bindUser(log, currentUser.id);
+    const userError = bindUser(error, currentUser.id);
 
     userLog('Starting: Invite user %s to group %d', user, groupId);
 
@@ -531,7 +531,7 @@ export class GroupService {
     userLog('Successfully invited user %d to group %d', userId, groupId);
 
     return invite.get({plain: true}) as Invite;
-  }
+  },
 
   /**
    * Update fields of the specified group.
@@ -547,13 +547,13 @@ export class GroupService {
    * @param groupId     - ID of the group
    * @param values      - Values to change
    */
-  public static async update(
+  async update(
       currentUser: Express.User,
       groupId: number,
       values: Partial<Omit<CreateGroupValues, 'ownerId'>>,
   ): Promise<Group> {
-    const userLog = bindToLog(log, {args: [currentUser.id]});
-    const userError = bindToLog(error, {args: [currentUser.id]});
+    const userLog = bindUser(log, currentUser.id);
+    const userError = bindUser(error, currentUser.id);
 
     userLog('Request to update fields of group %d', groupId);
 
@@ -596,5 +596,5 @@ export class GroupService {
       userError('Unexpected error while updating the group: %s', e);
       throw e;
     }
-  }
-}
+  },
+};

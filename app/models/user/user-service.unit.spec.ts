@@ -5,7 +5,6 @@ import bcrypt from 'bcrypt';
 import * as generateProfilePic from '../../util/generate-profile-pic';
 import {
   OwnerCannotLeaveError,
-  NotLoggedInError,
   NewPasswordMustBeDifferentError,
   IncorrectPasswordError, ProfilePictureNotFoundError, UserNotFoundError,
 } from '../../errors';
@@ -85,38 +84,6 @@ describe('UserService', function() {
     beforeEach(function() {
       userRepFindLimitedWithFilterStub =
           sinon.stub(UserRepository, 'findLimitedWithFilter');
-    });
-
-    describe('throws NotLoggedInError if', function() {
-      it('currentUser is not an object', async function() {
-        currentUser = 'test';
-        startsWith = 'test';
-        limit = 10;
-
-        await expect(UserService.findLimitedWithFilter(
-            currentUser,
-            startsWith,
-            limit,
-        ))
-            .to.be.eventually.rejectedWith(NotLoggedInError);
-
-        assert.notCalled(userRepFindLimitedWithFilterStub);
-      });
-
-      it('currentUser.id is not an number', async function() {
-        currentUser = {id: 'test'};
-        startsWith = 'test';
-        limit = 10;
-
-        await expect(UserService.findLimitedWithFilter(
-            currentUser,
-            startsWith,
-            limit,
-        ))
-            .to.be.eventually.rejectedWith(NotLoggedInError);
-
-        assert.notCalled(userRepFindLimitedWithFilterStub);
-      });
     });
 
     describe('throws TypeError if', function() {

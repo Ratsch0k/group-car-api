@@ -16,12 +16,12 @@ const error = debug('group-car:group:repository:error');
  */
 interface GroupQueryOptions extends RepositoryQueryOptions {
   /**
-   * Whether or not the owner data should be included.
+   * Whether the owner data should be included.
    */
   withOwnerData: boolean;
 
   /**
-   * Wether or not the group should only contain attributes of a simple group.
+   * Whether the group should only contain attributes of a simple group.
    */
   simple: boolean;
 }
@@ -41,9 +41,24 @@ const defaultOptions: GroupQueryOptions = {
 };
 
 /**
+ * Build options for the query builder.
+ */
+const queryBuildOptions = buildFindQueryOptionsMethod(
+    [{
+      key: 'withOwnerData',
+      include: [{
+        model: User,
+        as: 'Owner',
+        attributes: User.simpleAttributes,
+      }],
+    }],
+    defaultOptions,
+);
+
+/**
  * Repository for groups.
  */
-export class GroupRepository {
+export const GroupRepository = {
   /**
    * Searches for a group with the specified id.
    * @param id      - The id of the group to search for
@@ -52,7 +67,7 @@ export class GroupRepository {
    * @throws {@link GroupNotFoundError}
    * If the group doesn't exist
    */
-  public static async findById(
+  async findById(
       id: number,
       options?: Partial<GroupQueryOptions>,
   ): Promise<Group> {
@@ -67,7 +82,7 @@ export class GroupRepository {
     let include;
     let attributes;
     if (!options?.simple) {
-      const buildOptions = this.queryBuildOptions(options);
+      const buildOptions = queryBuildOptions(options);
       include = buildOptions.include;
     } else {
       attributes = Group.simpleAttributes;
@@ -87,7 +102,7 @@ export class GroupRepository {
       throw new GroupNotFoundError(id);
     }
     return group;
-  }
+  },
 
   /**
    * Changes the owner of the specified group to the specified user.
@@ -95,16 +110,17 @@ export class GroupRepository {
    * @param newOwnerId  - The new id of the owner
    * @param options     - Options
    */
-  public static async changeOwnership(
+  async changeOwnership(
       groupId: number,
       newOwnerId: number,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<Group> {
+    log('Change ownership of group %d to user %d', groupId, newOwnerId);
     const group = await this.findById(groupId, options);
     return group.update({
       ownerId: newOwnerId,
     }, containsTransaction(options));
-  }
+  },
 
   /**
    * Gets all groups with the specified ids
@@ -112,7 +128,7 @@ export class GroupRepository {
    * @param options - Additional query options
    * @returns A promise which resolved to the list of all groups of the user
    */
-  public static async findAllWithIds(
+  async findAllWithIds(
       ids: number[],
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<Group[]> {
@@ -131,7 +147,7 @@ export class GroupRepository {
     }
     log('Build array with %d entries', orArray.length);
 
-    const {include} = this.queryBuildOptions({withOwnerData: true});
+    const {include} = queryBuildOptions({withOwnerData: true});
 
     return Group.findAll({
       where: {
@@ -140,14 +156,14 @@ export class GroupRepository {
       include,
       ...containsTransaction(options),
     });
-  }
+  },
 
   /**
    * Creates a group with the given values.
    * @param values  - Values ({@link CreateGroupValues})
    * @param options - Additional options
    */
-  public static async create(
+  async create(
       values: CreateGroupValues,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<Group> {
@@ -162,7 +178,7 @@ export class GroupRepository {
           ...containsTransaction(options),
         },
     );
-  }
+  },
 
   /**
    * Updates fields of the given group.
@@ -180,7 +196,7 @@ export class GroupRepository {
    * @throws {@link GroupNotFoundError}
    * If the specified group doesn't exist
    */
-  public static async update(
+  async update(
       id: number,
       values: Partial<Pick<Group, 'description' |'name'>>,
       options?: Partial<RepositoryQueryOptions>,
@@ -208,26 +224,12 @@ export class GroupRepository {
      * Therefore, we throw an exception
      */
     if (amountChanged[0] === 0) {
+      error('Group %d doesn\'t exist', id);
       throw new GroupNotFoundError(id);
     }
 
     // The second element is an array of all updated groups.
     // We know only one was updated.
     return amountChanged[1][0];
-  }
-
-  /**
-   * Build options for the query builder.
-   */
-  private static readonly queryBuildOptions = buildFindQueryOptionsMethod(
-      [{
-        key: 'withOwnerData',
-        include: [{
-          model: User,
-          as: 'Owner',
-          attributes: User.simpleAttributes,
-        }],
-      }],
-      defaultOptions,
-  )
-}
+  },
+};

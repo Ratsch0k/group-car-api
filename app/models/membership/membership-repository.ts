@@ -18,11 +18,27 @@ export interface MembershipId {
 }
 
 /**
+ * Build options for the query builder.
+ */
+const queryBuildOptions = buildFindQueryOptionsMethod(
+    [
+      {
+        key: 'withUserData',
+        include: [{
+          model: User,
+          as: 'User',
+          attributes: User.simpleAttributes,
+        }],
+      },
+    ],
+);
+
+/**
  * Query options.
  */
 export interface MembershipQueryOptions extends RepositoryQueryOptions {
   /**
-   * Whether or not user data should be included in the query.
+   * Whether user data should be included in the query.
    */
   withUserData: boolean;
 }
@@ -33,22 +49,29 @@ export interface MembershipQueryOptions extends RepositoryQueryOptions {
  * Provides abstraction and security over direct
  * model interaction.
  */
-export class MembershipRepository {
+export const MembershipRepository = {
   /**
    * Creates a new membership for the given user and given group with the given
    * permission.
    * @param user    - The user for which the membership should be created
    * @param groupId - The group for which the membership should be
-   * @param isAdmin - Whether or not the user is an admin of the group
+   * @param isAdmin - Whether the user is an admin of the group
    * @param options - Options for the query
    */
-  public static async create(
+  async create(
       user: Express.User | number,
       groupId: number,
       isAdmin: boolean,
       options?: RepositoryQueryOptions,
   ): Promise<Membership> {
     const userId = getIdFromModelOrId(user);
+
+    log(
+        'Create %s membership for user %d and group %d',
+      isAdmin ? 'non-admin' : 'admin',
+      userId,
+      groupId,
+    );
 
     return Membership.create({
       userId,
@@ -57,20 +80,20 @@ export class MembershipRepository {
     }, {
       transaction: isTransaction(options?.transaction),
     });
-  }
+  },
 
   /**
-   * Finds a membership by it's id.
+   * Finds a membership by its id.
    * @param id      - The id of the membership
    * @param options - Options for the query
    */
-  public static async findById(
+  async findById(
       id: MembershipId,
       options?: Partial<MembershipQueryOptions>,
   ): Promise<Membership> {
     log('Find membership %o', id);
 
-    const {include} = this.queryBuildOptions(options);
+    const {include} = queryBuildOptions(options);
 
     const membership = await Membership.findOne({
       where: {
@@ -87,7 +110,7 @@ export class MembershipRepository {
     } else {
       return membership;
     }
-  }
+  },
 
   /**
    * Returns a list of all users which are members of the specified group.
@@ -95,11 +118,12 @@ export class MembershipRepository {
    * @param options - Query options
    * @returns Promise of a list of members
    */
-  public static async findAllForGroup(
+  async findAllForGroup(
       groupId: number,
       options?: Partial<MembershipQueryOptions>,
   ): Promise<Membership[]> {
-    const {include} = this.queryBuildOptions(options);
+    const {include} = queryBuildOptions(options);
+    log('Find all membership of group %d', groupId);
 
     const memberships = await Membership.findAll({
       where: {
@@ -110,7 +134,7 @@ export class MembershipRepository {
     });
 
     return memberships;
-  }
+  },
 
   /**
    * Gets all memberships of the specified user.
@@ -118,15 +142,16 @@ export class MembershipRepository {
    *    memberships should be returned
    * @param options - Additional query options.
    */
-  public static async findAllForUser(
+  async findAllForUser(
       userId: number,
       options?: Partial<MembershipQueryOptions>,
   ): Promise<Membership[]> {
     if (typeof userId !== 'number') {
       throw new TypeError('userId has to be a number');
     }
+    log('Find all membership of user %d', userId);
 
-    const {include} = this.queryBuildOptions(options);
+    const {include} = queryBuildOptions(options);
 
     return Membership.findAll({
       where: {
@@ -135,20 +160,21 @@ export class MembershipRepository {
       include,
       ...containsTransaction(options),
     });
-  }
+  },
 
   /**
    * Removes every membership of the specified user from the specified group.
-   * @param userId  - Id of the user to delete from group
-   * @param groupId - Id of the group from which the user should be removed
+   * @param userId  - ID of the user to delete from group
+   * @param groupId - ID of the group from which the user should be removed
    * @param options - Additional options for query
    * @returns The amount of memberships which got destroyed
    */
-  public static async removeUserFromGroup(
+  async removeUserFromGroup(
       userId: number,
       groupId: number,
       options?: RepositoryQueryOptions,
   ): Promise<number> {
+    log('Delete membership for user %d and group %d', userId, groupId);
     return Membership.destroy({
       where: {
         userId,
@@ -156,26 +182,32 @@ export class MembershipRepository {
       },
       ...containsTransaction(options),
     });
-  }
+  },
 
   /**
    * Changes the isAdmin field of the membership with the
    * specified id to the specified value.
-   * @param id      - Id of the membership
+   * @param id      - ID of the membership
    * @param isAdmin - New value of the isAdmin field
    * @param options - Options
    */
-  public static async changeAdminPermission(
+  async changeAdminPermission(
       id: MembershipId,
       isAdmin: boolean,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<Membership> {
+    log(
+        'Change membership for user %d and group %d to be %s',
+        id.userId,
+        id.groupId,
+      isAdmin ? 'admin' : 'non-admin',
+    );
     // Get membership of user
     const membership = await this.findById(id, containsTransaction(options));
 
     // Update membership to admin
     return membership.update({isAdmin}, containsTransaction(options));
-  }
+  },
 
   /**
    * Get the amount of members of a group.
@@ -183,15 +215,16 @@ export class MembershipRepository {
    * @param options - Additional options
    * @returns The amount of members as a Promise
    */
-  public static async countForGroup(
+  async countForGroup(
       groupId: number,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<number> {
+    log('Count membership of group %d', groupId);
     return Membership.count({
       where: {groupId},
       transaction: isTransaction(options?.transaction)},
     );
-  }
+  },
 
   /**
    * Checks if a membership of a user for a group exists.
@@ -199,10 +232,11 @@ export class MembershipRepository {
    * @param userId - ID of the user
    * @param options - Additional options
    */
-  public static async exists(
+  async exists(
       {groupId, userId}: MembershipId,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<boolean> {
+    log('Check if membership for user %d and group %d exists', userId, groupId);
     const membership = await Membership.findOne({
       where: {
         groupId,
@@ -212,21 +246,7 @@ export class MembershipRepository {
     });
 
     return membership !== null;
-  }
+  },
+};
 
-  /**
-   * Build options for the query builder.
-   */
-  private static readonly queryBuildOptions = buildFindQueryOptionsMethod(
-      [
-        {
-          key: 'withUserData',
-          include: [{
-            model: User,
-            as: 'User',
-            attributes: User.simpleAttributes,
-          }],
-        },
-      ],
-  );
-}
+export default MembershipRepository;

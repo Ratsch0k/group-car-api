@@ -13,16 +13,16 @@ const Op = sequelize.Op;
 /**
  * Repository for the {@link User} model.
  */
-export class UserRepository {
+export const UserRepository = {
   /**
-   * Finds a limited amount of users who's username
+   * Finds a limited amount of users whose username
    * start with the specified string.
    * @param startsWith  - The string with which the usernames should start
    * @param limit       - The limit of how many users should be returns. Has
    *          a default and a max value.
    * @param options - Options
    */
-  public static async findLimitedWithFilter(
+  async findLimitedWithFilter(
       startsWith: string,
       limit: number = config.user.maxLimitQuery,
       options?: Partial<RepositoryQueryOptions>,
@@ -56,7 +56,7 @@ export class UserRepository {
       limit,
       ...containsTransaction(options),
     });
-  }
+  },
 
   /**
    * Find a user by their id
@@ -66,10 +66,11 @@ export class UserRepository {
    * @throws {@link UserNotFoundError}
    * If no user with the id exists
    */
-  public static async findById(
+  async findById(
       id: number,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<User> {
+    log('Find user %d', id);
     const user = await User.findByPk(id, containsTransaction(options));
 
     if (user === null) {
@@ -78,7 +79,7 @@ export class UserRepository {
     }
 
     return user;
-  }
+  },
 
   /**
    * Search for user by their username.
@@ -89,10 +90,11 @@ export class UserRepository {
    * @throws {@link UserNotFoundError}
    * if no username exists with that username
    */
-  public static async findByUsername(
+  async findByUsername(
       username: string,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<User> {
+    log('Find user "%s"', username);
     const user = await User.findOne(
         {where: {username},
           ...containsTransaction(options)},
@@ -104,17 +106,18 @@ export class UserRepository {
     }
 
     return user;
-  }
+  },
 
   /**
    * Gets the profile picture of the user with the given id.
    * @param userId - The ID of the user
    * @param options - Additional options (only transaction is used)
    */
-  public static async findProfilePictureById(
+  async findProfilePictureById(
       userId: number,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<ProfilePic> {
+    log('Find profile picture of user %d', userId);
     const pb = await ProfilePic.findByPk(
         userId,
         {transaction: isTransaction(options?.transaction)},
@@ -125,5 +128,7 @@ export class UserRepository {
     }
 
     return pb;
-  }
-}
+  },
+};
+
+export default UserRepository;

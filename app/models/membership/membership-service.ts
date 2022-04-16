@@ -13,22 +13,22 @@ import {
   InternalError,
 } from '@errors';
 import debug from 'debug';
+import {bindUser} from '@util/user-bound-logging';
+
+/**
+ * Logging method.
+ */
+const log = debug('group-car:membership:service');
+
+/**
+ * Logging method for errors.
+ */
+const error = debug('group-car:membership:service:error');
 
 /**
  * Service for complex membership operations.
  */
-export class MembershipService {
-  /**
-   * Logging method.
-   */
-  private static log = debug('group-car:membership:service');
-
-  /**
-   * Logging method for errors.
-   */
-  private static error = debug('group-car:membership:service:error');
-
-
+export const MembershipService = {
   /**
    * Retrieves a membership by its ID.
    *
@@ -57,19 +57,21 @@ export class MembershipService {
    * logged-in user is authorized to access the membership,
    * but it doesn't exist
    */
-  public static async findById(
+  async findById(
       currentUser: Express.User,
       id: MembershipId,
       options?: Partial<MembershipQueryOptions>,
   ): Promise<Membership> {
     const userId = currentUser.id;
+    const userLog = bindUser(log, userId);
+    const userError = bindUser(error, userId);
 
     // Check if parameter has correct type
     if (typeof userId !== 'number') {
       throw new TypeError('Id of current user has to be a number');
     }
 
-    this.log(`User %d: Find membership with %o`, currentUser.id, id);
+    userLog('Find membership with %o', id);
 
     /*
      * Check if logged-in user is the specified user.
@@ -77,8 +79,8 @@ export class MembershipService {
      * If no, check if the logged-in user is a member of the group.
      */
     if (userId !== id.userId) {
-      this.log('User %d: not user of membership. ' +
-      'Check if member of group', currentUser.id);
+      userLog('Not user of membership. ' +
+      'Check if member of group');
 
       // Check if the logged-in user is member of that group
       try {
@@ -88,50 +90,52 @@ export class MembershipService {
               groupId: id.groupId,
             },
         );
-        this.log('User %d: is member of group referenced in membership',
-            currentUser.id);
+        userLog('Is member of group referenced in membership');
       } catch (err) {
         if (err instanceof MembershipNotFoundError) {
           // Logged-in user is not a member, throw an UnauthorizedError
-          this.error('User %d: not member of group referenced ' +
-          'in membership $o', currentUser.id, id);
+          userError('Not member of group referenced ' +
+          'in membership $o', id);
           throw new NotMemberOfGroupError();
         } else {
           // Something else went wrong, rethrow the error
-          this.error('Unexpected error', err);
+          userError('Unexpected error', err);
           throw err;
         }
       }
     }
 
-    this.log('User %d: can access membership %o', currentUser.id, id);
+    userLog('Can access membership %o', id);
 
     // Call the repository method
     return MembershipRepository.findById(id, options);
-  }
+  },
 
   /**
-   * Updates whether or not the specified user is an admin
+   * Updates whether the specified user is an admin
    * of the specified group.
-   *
-   * Throws {@link UnauthorizedError} if the currently logged in user is neither
-   * the user for which the admin permission should be changed nor an admin of
-   * the referenced group.
-   * @param currentUser - Currently logged in user
+   * @param currentUser - Currently logged-in user
    * @param id          - The id of the membership which should be updated
-   * @param isAdmin     - Whether or not the user should be admin of the group
+   * @param isAdmin     - Whether the user should be admin of the group
+   *
+   * @throws {@link UnauthorizedError} if the currently logged-in
+   * user is neither the user for which the admin permission should
+   * be changed nor an admin of the referenced group.
    */
-  public static async changeAdminPermission(
+  async changeAdminPermission(
       currentUser: Express.User,
       id: MembershipId,
       isAdmin: boolean,
   ): Promise<Membership> {
+    const userLog = bindUser(log, currentUser.id);
+    const userError = bindUser(error, currentUser.id);
+
     // Check if parameter has correct type
     if (typeof currentUser.id !== 'number') {
       throw new TypeError('Id of current user has to be a number');
     }
 
-    this.log('User %d: change admin of membership %o', currentUser.id, id);
+    userLog('Change admin of membership %o', id);
 
     // Check if current user is an admin of the group
     let currentMembership;
@@ -142,21 +146,20 @@ export class MembershipService {
             groupId: id.groupId,
           },
       );
-      this.log('User %d: member of group %d', currentUser.id, id.groupId);
+      userLog('Is member of group %d', id.groupId);
     } catch (err) {
       if (err instanceof MembershipNotFoundError) {
-        this.error('User %d: not member of group %d',
-            currentUser.id, id.groupId);
+        userError('Is not member of group %d', id.groupId);
         throw new NotMemberOfGroupError();
       } else {
-        this.error('Unknown error', err);
+        userError('Unknown error', err);
         throw err;
       }
     }
 
     if (!currentMembership.isAdmin) {
-      this.error('User %d: not admin of group %d. ' +
-      'Can\'t give or take admin', currentUser.id, id.groupId);
+      userError('Is not admin of group %d. ' +
+      'Can\'t give or take admin', id.groupId);
       throw new NotAdminOfGroupError();
     }
 
@@ -164,54 +167,62 @@ export class MembershipService {
     const group = await GroupService.findById(currentUser, id.groupId);
 
     if (group.ownerId == id.userId || group.Owner?.id === id.userId) {
-      this.error('User %d: can\'t change admin of ' +
-      'owner of group %d', currentUser.id, id.groupId);
+      userError('Can\'t change admin of ' +
+      'owner of group %d', id.groupId);
       throw new CannotChangeOwnerMembershipError();
     }
 
-    this.log('User %d: forward to repository');
+    userLog('Change admin permission');
     return MembershipRepository.changeAdminPermission(id, isAdmin);
-  }
+  },
 
   /**
-   * Gets all memberships of the currently logged in user.
-   * @param currentUser - The currently logged in user.
+   * Gets all memberships of the currently logged-in user.
+   * @param currentUser - The currently logged-in user.
    */
-  public static async findAllForUser(
+  async findAllForUser(
       currentUser: Express.User,
   ): Promise<Membership[]> {
+    const userLog = bindUser(log, currentUser.id);
+    userLog('Requests to get all their membership');
+
     return MembershipRepository.findAllForUser(
         currentUser.id,
         {
           withUserData: true,
         },
     );
-  }
+  },
 
   /**
    * Gets all memberships for the specified group.
    * @param currentUser - The currently logged in user
    * @param groupId     - The id of the group
    */
-  public static async findAllForGroup(
+  async findAllForGroup(
       currentUser: Express.User,
       groupId: number,
   ): Promise<Membership[]> {
+    const userLog = bindUser(log, currentUser.id);
+    const userError = bindUser(error, currentUser.id);
+
     // Check if user is member of group
-    this.log('User %d: find all memberships for group %d',
-        currentUser.id, groupId);
+    userLog('Request to find all memberships for group %d', groupId);
 
     try {
       await MembershipRepository.findById({userId: currentUser.id, groupId});
-      this.log('User %d: user is not a member of group %d',
-          currentUser.id, groupId);
+      userLog('User is a member of group %d', groupId);
     } catch (e) {
       if (e instanceof MembershipNotFoundError) {
+        userError('Is not a member of group %d', groupId);
         throw new NotMemberOfGroupError();
       } else {
+        userError('Unexpected error while checking membership: %s', e);
         throw e;
       }
     }
+
+    userLog('Get all memberships for group %d', groupId);
 
     return MembershipRepository.findAllForGroup(
         groupId,
@@ -219,7 +230,7 @@ export class MembershipService {
           withUserData: true,
         },
     );
-  }
+  },
 
   /**
    * Checks if the current user is a member
@@ -227,10 +238,14 @@ export class MembershipService {
    * @param currentUser - The currently logged-in user
    * @param groupId     - The if of the group.
    */
-  public static async isMember(
+  async isMember(
       currentUser: Express.User,
       groupId: number,
   ): Promise<boolean> {
+    const userLog = bindUser(log, currentUser.id);
+    const userError = bindUser(error, currentUser.id);
+
+    userLog('Requests to check if they are a member of group %d', groupId);
     try {
       await MembershipRepository.findById({groupId, userId: currentUser.id});
       return true;
@@ -238,8 +253,14 @@ export class MembershipService {
       if (e instanceof MembershipNotFoundError) {
         return false;
       } else {
+        userError(
+            'Unexpected error while checking membership for group %d',
+            groupId,
+        );
         throw new InternalError('Couldn\'t check membership');
       }
     }
-  }
-}
+  },
+};
+
+export default MembershipService;
