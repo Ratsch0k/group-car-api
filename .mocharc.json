@@ -5,7 +5,7 @@
     "tsconfig-paths/register"
   ],
   "file": [
-    "test/inject-custom-checks.ts"
+    "scripts/inject-custom-checks.ts"
   ],
   "recursive": true,
   "extensions": ["ts"], 
