@@ -137,46 +137,6 @@ describe('InviteRepository', function() {
     });
   });
 
-  describe('existsById', function() {
-    it('returns true if an invite with the specified id exists', function() {
-      const id = {
-        userId: 10,
-        groupId: 14,
-      };
-
-      const invite = {
-        userId: id.userId,
-        groupId: id.groupId,
-        invitedBy: 5,
-      };
-
-      const inviteFindOne = sinon.stub(Invite, 'findOne')
-          .resolves(invite as any);
-
-      expect(InviteRepository.existsById(id)).to.eventually.be.true;
-
-      assert.calledOnceWithExactly(inviteFindOne, match({
-        where: id,
-      }));
-    });
-
-    it('returns false if no invite with the specified id exists', function() {
-      const id = {
-        userId: 10,
-        groupId: 14,
-      };
-
-      const inviteFindOne = sinon.stub(Invite, 'findOne')
-          .resolves(null as any);
-
-      expect(InviteRepository.existsById(id)).to.eventually.be.false;
-
-      assert.calledOnceWithExactly(inviteFindOne, match({
-        where: id,
-      }));
-    });
-  });
-
   describe('findAllForGroup', function() {
     it('returns invites for specified group', async function() {
       const groupId = 51;
@@ -207,6 +167,63 @@ describe('InviteRepository', function() {
           inviteFindAll,
           match({
             where: {groupId},
+          }),
+      );
+    });
+  });
+
+  describe('exists', function() {
+    let findInviteStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      findInviteStub = sinon.stub(Invite, 'findOne');
+    });
+
+    it('returns true if the invite exists', async function() {
+      const groupId = 42;
+      const userId = 55;
+      const invite = {
+        userId,
+        groupId,
+        invitedBy: 88,
+      };
+
+      findInviteStub.resolves(invite);
+
+      const options = {
+        transaction: {},
+      };
+
+      await expect(InviteRepository.exists({groupId, userId}, options as any))
+          .to.eventually.be.true;
+
+      assert.calledOnceWithExactly(
+          findInviteStub,
+          match({
+            where: {groupId, userId},
+            transaction: options.transaction,
+          }),
+      );
+    });
+
+    it('returns false if no invite exists', async function() {
+      const groupId = 42;
+      const userId = 55;
+
+      findInviteStub.resolves(null);
+
+      const options = {
+        transaction: {},
+      };
+
+      await expect(InviteRepository.exists({groupId, userId}, options as any))
+          .to.eventually.be.false;
+
+      assert.calledOnceWithExactly(
+          findInviteStub,
+          match({
+            where: {groupId, userId},
+            transaction: options.transaction,
           }),
       );
     });

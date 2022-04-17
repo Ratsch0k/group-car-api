@@ -2,11 +2,11 @@
 import {expect} from 'chai';
 import sinon, {assert} from 'sinon';
 import bcrypt from 'bcrypt';
+import * as generateProfilePic from '../../util/generate-profile-pic';
 import {
   OwnerCannotLeaveError,
-  NotLoggedInError,
   NewPasswordMustBeDifferentError,
-  IncorrectPasswordError,
+  IncorrectPasswordError, ProfilePictureNotFoundError, UserNotFoundError,
 } from '../../errors';
 import {UserRepository} from './user-repository';
 import config from '../../config';
@@ -84,38 +84,6 @@ describe('UserService', function() {
     beforeEach(function() {
       userRepFindLimitedWithFilterStub =
           sinon.stub(UserRepository, 'findLimitedWithFilter');
-    });
-
-    describe('throws NotLoggedInError if', function() {
-      it('currentUser is not an object', async function() {
-        currentUser = 'test';
-        startsWith = 'test';
-        limit = 10;
-
-        await expect(UserService.findLimitedWithFilter(
-            currentUser,
-            startsWith,
-            limit,
-        ))
-            .to.be.eventually.rejectedWith(NotLoggedInError);
-
-        assert.notCalled(userRepFindLimitedWithFilterStub);
-      });
-
-      it('currentUser.id is not an number', async function() {
-        currentUser = {id: 'test'};
-        startsWith = 'test';
-        limit = 10;
-
-        await expect(UserService.findLimitedWithFilter(
-            currentUser,
-            startsWith,
-            limit,
-        ))
-            .to.be.eventually.rejectedWith(NotLoggedInError);
-
-        assert.notCalled(userRepFindLimitedWithFilterStub);
-      });
     });
 
     describe('throws TypeError if', function() {
@@ -417,6 +385,83 @@ describe('UserService', function() {
           user.update,
           sinon.match({password: newPassword}),
       );
+    });
+  });
+
+  describe('generateProfilePicture', function() {
+    let generateProfilePicStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      generateProfilePicStub = sinon.stub(generateProfilePic, 'default');
+    });
+
+    it('uses generateProfilePic utility function to generate ' +
+      'profile picture', async function() {
+      const ip = 'TEST_IP';
+      const username = 'TEST_USERNAME';
+      const offset = 1;
+
+      await UserService.generateProfilePicture(ip, username, offset);
+
+      assert.calledOnceWithExactly(
+          generateProfilePicStub,
+          config.user.pb.dimensions,
+          username,
+          offset,
+      );
+    });
+  });
+
+  describe('getProfilePicture', function() {
+    let findProfilePictureStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      findProfilePictureStub = sinon.stub(
+          UserRepository,
+          'findProfilePictureById',
+      );
+    });
+
+    it('calls UserRepository.findProfilePictureById with ' +
+      'correct arguments', async function() {
+      const fakePb = 'TEST_PROFILE_PICTURE';
+      const userId = 51;
+      const user = {id: 10};
+
+      findProfilePictureStub.resolves(fakePb);
+
+      const actual = await UserService.getProfilePicture(user as any, userId);
+
+      expect(actual).to.eq(fakePb);
+
+      assert.calledOnceWithExactly(findProfilePictureStub, userId);
+    });
+
+    it('throws UserNotFoundError if the ProfilePicture ' +
+      'exists', async function() {
+      const userId = 61;
+      findProfilePictureStub.callsFake(() =>
+        Promise.reject(new ProfilePictureNotFoundError(userId)));
+
+      const user = {id: 11};
+
+      await expect(UserService.getProfilePicture(user as any, userId))
+          .to.eventually.be.rejectedWith(UserNotFoundError);
+
+      assert.calledOnceWithExactly(findProfilePictureStub, userId);
+    });
+
+    it('rethrows any other error', async function() {
+      const error = new Error('TEST_ERROR');
+      const userId = 66;
+      findProfilePictureStub.callsFake(() => Promise.reject(error));
+
+      const user = {id: 12};
+
+      await expect(UserService.getProfilePicture(user as any, userId))
+          .to.eventually.be.rejectedWith(error);
+
+      assert.calledOnceWithExactly(findProfilePictureStub, userId);
     });
   });
 });

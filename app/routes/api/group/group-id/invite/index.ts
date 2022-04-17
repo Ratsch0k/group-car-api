@@ -1,9 +1,10 @@
 import {Router} from 'express';
-import inviteUserToGroupController from './invite-user-to-group-controller';
+import inviteUserController from './invite-user-to-group-controller';
 import {
   createValidationRouter,
 } from '@app/validators';
 import {body, oneOf} from 'express-validator';
+import {asyncWrapper} from '@util/async-wrapper';
 
 const inviteUserToGroupRouter = Router({mergeParams: true}).post(
     '/',
@@ -20,7 +21,7 @@ const inviteUserToGroupRouter = Router({mergeParams: true}).post(
         ]),
         'invite user',
     ),
-    inviteUserToGroupController,
+    asyncWrapper(inviteUserController),
 );
 
 export default inviteUserToGroupRouter;

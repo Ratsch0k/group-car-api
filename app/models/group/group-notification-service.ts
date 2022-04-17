@@ -39,39 +39,39 @@ export enum GroupCarAction {
 }
 
 /**
+ * Logger.
+ */
+const log = debug('group-car:group:notification');
+
+/**
+ * Logger for logging socket details.
+ */
+const ioLog = debug('group-car:socket');
+
+/**
+ * Namespace which is used for groups.
+ */
+let nsp: socketIo.Namespace;
+
+/**
+ * Socket.io server instance.
+ */
+let io: socketIo.Server;
+
+/**
  * Notification service for group actions.
  */
-export class GroupNotificationService {
-  /**
-   * Logger.
-   */
-  private static readonly log = debug('group-car:group:notification');
-
-  /**
-   * Logger for logging socket details.
-   */
-  private static readonly ioLog = debug('group-car:socket');
-
-  /**
-   * Namespace which is used for groups.
-   */
-  private static nsp: socketIo.Namespace;
-
-  /**
-   * Socket.io server instance.
-   */
-  private static io: socketIo.Server;
-
+export const GroupNotificationService = {
   /**
    * Setter of io server.
-   * @param io - io server
+   * @param _io - io server
    */
-  public static setIo(io: socketIo.Server): void {
-    this.io = io;
-    this.nsp = io.of(/^\/group\/\w+/);
-    this.nsp.use(this.logConnection.bind(this));
-    this.nsp.use(wrapSocketMiddleware(cookieParser()));
-    this.nsp.use((socket, next) => {
+  setIo(_io: socketIo.Server): void {
+    io = _io;
+    nsp = io.of(/^\/group\/\w+/);
+    nsp.use(this.logConnection.bind(this));
+    nsp.use(wrapSocketMiddleware(cookieParser()));
+    nsp.use((socket, next) => {
       wrapSocketMiddleware((() => {
         const jwtMiddleware = jwtCsrf();
 
@@ -84,59 +84,58 @@ export class GroupNotificationService {
            * provide the cookie or if the cookie has expired.
            */
           // eslint-disable-next-line @typescript-eslint/no-this-alias
-          const self = this;
           res.cookie = function() {
-            self.ioLog('Client %s is missing jwt', socket.client.id);
+            ioLog('Client %s is missing jwt', socket.client.id);
             next(new UnauthorizedError('Missing credentials'));
             return this;
           };
           try {
             jwtMiddleware(req, res, next);
           } catch (e) {
-            this.ioLog('Error in jwt csrf middleware: ', e);
+            ioLog('Error in jwt csrf middleware: ', e);
             next(new InternalError());
           }
         };
       })())(socket, next);
     });
-    this.nsp.use(wrapSocketMiddleware(expressJwt({
+    nsp.use(wrapSocketMiddleware(expressJwt({
       secret: config.jwt.secret,
       getToken: config.jwt.getToken,
       requestProperty: 'auth',
       algorithms: ['HS512'],
     })));
-    this.nsp.use(wrapSocketMiddleware(postLoginJwtValidator));
-    this.nsp.use(this.checkUserAuthorization);
-    this.nsp.on('connection', (socket) => {
-      this.ioLog(
+    nsp.use(wrapSocketMiddleware(postLoginJwtValidator));
+    nsp.use(this.checkUserAuthorization);
+    nsp.on('connection', (socket) => {
+      ioLog(
           'Client %s successfully connected to namespace %s',
           socket.client.id,
           socket.nsp.name,
       );
     });
-  }
+  },
 
   /**
    * Logs the connection of the socket.
    * @param socket  - The socket
    * @param next    - Next function
    */
-  private static logConnection(socket: Socket, next: NextFunction) {
-    this.ioLog(
+  logConnection(socket: Socket, next: NextFunction): void {
+    ioLog(
         'Client %s connecting to namespace %s',
         socket.client.id,
         socket.nsp.name,
     );
 
     next();
-  }
+  },
 
   /**
    * Checks if the client is authorized to access the request group.
    * @param socket  - The socket with client information
    * @param next    - Next function
    */
-  private static async checkUserAuthorization(
+  async checkUserAuthorization(
       socket: Socket,
       next: NextFunction,
   ): Promise<void> {
@@ -152,7 +151,7 @@ export class GroupNotificationService {
     } else {
       next(new NotMemberOfGroupError());
     }
-  }
+  },
 
   /**
    * Notifies namespace of the specified group to the specified updateö
@@ -161,16 +160,16 @@ export class GroupNotificationService {
    * @param type      - The type of update
    * @param car       - Data of the car
    */
-  public static notifyCarUpdate(
+  notifyCarUpdate(
       groupId: number,
       carId: number,
       type: GroupCarAction,
       car: Car,
   ): void {
-    this.log('Notify nsp %s with update to car %d', `/group/${groupId}`, carId);
+    log('Notify nsp %s with update to car %d', `/group/${groupId}`, carId);
 
-    this.io.of(`/group/${groupId}`).emit('update', {action: type, car});
-  }
-}
+    io.of(`/group/${groupId}`).emit('update', {action: type, car});
+  },
+};
 
 export default GroupNotificationService;

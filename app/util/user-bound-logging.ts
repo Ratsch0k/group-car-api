@@ -76,4 +76,16 @@ function bindToLog(
   return debug as unknown as debug.Debugger;
 }
 
+/**
+ * Helper function to bind a user to a debugger.
+ * @param log - Debugger function
+ * @param id  - User ID
+ */
+export function bindUser(
+    log: debug.Debugger,
+    id: number,
+): ReturnType<typeof bindToLog> {
+  return bindToLog(log, {args: [id]});
+}
+
 export default bindToLog;

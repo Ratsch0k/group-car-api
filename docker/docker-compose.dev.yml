@@ -6,7 +6,7 @@ services:
     user: node
     build: .
     volumes:
-      - ../group-car/build:/home/node/group-car-api/frontend
+      - ../../group-car/build:/home/node/group-car-api/frontend
     environment:
       NODE_ENV: "development"
       HTML_STATIC: "/home/node/group-car-api/frontend"

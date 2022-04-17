@@ -114,7 +114,7 @@ jobs:
       SERVER_USER: 'deploy-dev'
       SERVER_NAME: 'group-car-dev'
       PASSWORD: ${{secrets.GITHUB_TOKEN}}
-      COMPOSE_CONFIG: dev.yml
+      COMPOSE_CONFIG: docker/dev.yml
       PORT: 8082
       FRONTEND_PATH: /home/deploy-dev/dev.my-group-car.de/html
       ACCESS_PATH: /etc/dev.my-group-car.de/access_token.txt
@@ -172,7 +172,7 @@ jobs:
       SERVER_SERVICE_USER: 'group-car-beta'
       SERVER_NAME: 'group-car-beta'
       PASSWORD: ${{secrets.GITHUB_TOKEN}}
-      COMPOSE_CONFIG: beta.yml
+      COMPOSE_CONFIG: docker/beta.yml
       PORT: 8081
       FRONTEND_PATH: /home/deploy-beta/beta.my-group-car.de/html
       ACCESS_PATH: /etc/beta.my-group-car.de/access_token.txt
@@ -230,7 +230,7 @@ jobs:
       SERVER_SERVICE_USER: 'group-car'
       SERVER_NAME: 'group-car'
       PASSWORD: ${{secrets.GITHUB_TOKEN}}
-      COMPOSE_CONFIG: prod.yml
+      COMPOSE_CONFIG: docker/prod.yml
       PORT: 8080
       FRONTEND_PATH: /home/deploy/my-group-car.de/html
       ACCESS_PATH: /etc/my-group-car.de/access_token.txt

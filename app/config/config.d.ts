@@ -3,7 +3,6 @@ import {Config as SequelizeConfig} from 'sequelize/types';
 
 export interface AuthConfig {
   saltRounds: number;
-  waitOnLogin: number;
 }
 
 export interface StaticConfig {

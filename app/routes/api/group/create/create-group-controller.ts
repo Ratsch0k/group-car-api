@@ -1,5 +1,6 @@
-import {Group} from '@app/models';
+import {GroupService} from '@app/models';
 import {RequestHandler} from 'express';
+import {BadRequestError} from '@errors';
 
 /**
  * Controller for handling create group request.
@@ -13,14 +14,22 @@ import {RequestHandler} from 'express';
  * @param res  - Express response
  * @param next - Next function
  */
-const createGroupController: RequestHandler = (req, res, next) => {
-  Group.create({
-    name: req.body.name,
-    description: req.body.description,
-    ownerId: req.user?.id,
-  }).then((group: Group) => {
-    res.status(201).send(group);
-  }).catch(next);
+const createGroupController: RequestHandler = async (req, res, next) => {
+  const name = req.body.name;
+  const description = req.body.description;
+  const user = req.user;
+
+  if (
+    typeof name !== 'string' ||
+    (typeof description !== 'string' && description) ||
+     typeof user !== 'object'
+  ) {
+    throw new BadRequestError('Incorrect arguments');
+  }
+
+  const group = await GroupService.create(user, {name, description});
+
+  res.status(201).send(group);
 };
 
 export default createGroupController;

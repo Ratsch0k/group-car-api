@@ -47,7 +47,10 @@ export const defaultOptions = {
  */
 export const createValidationRouter = (
     name: string,
-    validationChain: ValidationChain | ValidationChain[] | Middleware,
+    validationChain: ValidationChain |
+      ValidationChain[] |
+      Middleware |
+      Middleware[],
     message: ((req: Request) => string) | string,
     options?: CreateValidationRouterOptions,
 ): Router => {

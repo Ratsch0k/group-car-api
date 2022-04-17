@@ -15,7 +15,6 @@ const defaultConfig: Config = {
   },
   auth: {
     saltRounds: 8,
-    waitOnLogin: 500,
   },
   static: {
     path: path.resolve('./static'),

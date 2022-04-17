@@ -6,7 +6,6 @@ import {User, Group, Membership, Invite} from '../../../../../models';
 import {
   NotMemberOfGroupError,
   NotAdminOfGroupError,
-  GroupNotFoundError,
   UserNotFoundError,
   GroupIsFullError,
   AlreadyInvitedError,
@@ -14,7 +13,6 @@ import {
 } from '../../../../../errors';
 import request from 'supertest';
 import config from '../../../../../config';
-import Bluebird from 'bluebird';
 import sinon from 'sinon';
 
 const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
@@ -129,30 +127,6 @@ describe('post /api/group/:groupId/invite', function() {
           expect(res.body.message).to
               .contain(new NotAdminOfGroupError().message);
         });
-  });
-
-  it('responses with 404 and GroupNotFoundError if user is admin ' +
-  'of group but group doesn\'t exist', async function() {
-    const group = await Group.create({
-      ownerId: user.id,
-      name: 'NAME',
-      description: 'DESC',
-    });
-
-    const groupFindByPk = sinon.stub(Group, 'findByPk')
-        .usingPromise(Bluebird).resolves(null as any);
-
-    await agent
-        .post(`/api/group/${group.id}/invite`)
-        .set(csrfHeaderName, csrf)
-        .send({userId: user.id + 1})
-        .expect(404)
-        .then((res) => {
-          expect(res.body.message).to.be
-              .eql(new GroupNotFoundError(group.id).message);
-        });
-
-    sinon.assert.calledOnceWithExactly(groupFindByPk as any, group.id);
   });
 
   it('responses with 404 and UserNotFound if user is admin ' +

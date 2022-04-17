@@ -1,29 +1,10 @@
 import express from 'express';
-import debug from 'debug';
-import {validationResult, query, oneOf} from 'express-validator';
-import {InvalidRequestError} from '@errors';
 import generateProfilePicController from './generate-profile-pic-controller';
+import {asyncWrapper} from '@util/async-wrapper';
+import {createValidationRouter} from '@app/validators';
+import {oneOf, query} from 'express-validator';
 
-const log = debug('group-car:generate-pb');
-const error = debug('group-car:generate-pb:error');
 const generatePbRouter: express.Router = express.Router();
-
-/**
- * Handler for generating profile pictures.
- * @param req - Http request
- * @param res - Http response
- */
-const generatePbHandler: express.RequestHandler = (req, res, next) => {
-  log('IP %s requested generation of profile picture', req.ip);
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error('Request of IP %s for generation of profile ' +
-        'picture denied, because request is malformed', req.ip);
-    throw new InvalidRequestError(errors);
-  } else {
-    next();
-  }
-};
 
 export const generatePbValidator = [
   query('username').notEmpty()
@@ -37,14 +18,14 @@ export const generatePbValidator = [
 ];
 
 
-/**
- * Add the {@link generatePbHandler} to the get route
- */
 generatePbRouter.get(
     '/',
-    generatePbValidator,
-    generatePbHandler,
-    generateProfilePicController,
+    createValidationRouter(
+        'user:pb',
+        generatePbValidator,
+        'generate profile picture',
+    ),
+    asyncWrapper(generateProfilePicController),
 );
 
 export default generatePbRouter;

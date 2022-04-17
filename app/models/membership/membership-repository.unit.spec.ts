@@ -298,4 +298,56 @@ describe('MembershipRepository', function() {
       }));
     });
   });
+
+  describe('exists', function() {
+    let findMembershipStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      findMembershipStub = sinon.stub(Membership, 'findOne');
+    });
+
+    it('returns false if no membership exists', async function() {
+      findMembershipStub.resolves(null);
+      const groupId = 66;
+      const userId = 98;
+      const options = {
+        transaction: {},
+      };
+
+      await expect(MembershipRepository.exists(
+          {groupId, userId}, options as any))
+          .to.eventually.be.false;
+
+      assert.calledOnceWithExactly(
+          findMembershipStub,
+          match({where: {groupId, userId}, transaction: options.transaction}),
+      );
+    });
+
+    it('returns true if a membership exists', async function() {
+      const groupId = 66;
+      const userId = 98;
+
+      const fakeMembership = {
+        groupId,
+        userId,
+        isAdmin: false,
+      };
+
+      findMembershipStub.resolves(fakeMembership);
+
+      const options = {
+        transaction: {},
+      };
+
+      await expect(MembershipRepository.exists(
+          {groupId, userId}, options as any))
+          .to.eventually.be.true;
+
+      assert.calledOnceWithExactly(
+          findMembershipStub,
+          match({where: {groupId, userId}, transaction: options.transaction}),
+      );
+    });
+  });
 });

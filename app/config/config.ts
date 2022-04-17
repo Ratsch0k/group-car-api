@@ -39,7 +39,6 @@ log('Server: %s', serverType);
  */
 const auth: AuthConfig = {
   saltRounds: 8,
-  waitOnLogin: 500,
 };
 /**
  * Initialize ErrorConfig with default value

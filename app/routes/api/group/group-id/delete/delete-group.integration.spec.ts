@@ -5,11 +5,11 @@ import app from '../../../../../app';
 import db, {syncPromise} from '../../../../../db';
 import {expect} from 'chai';
 import {
+  GroupNotFoundError,
   NotMemberOfGroupError,
   NotOwnerOfGroupError,
 } from '../../../../../errors';
-import {Group, Membership, User} from '../../../../../models';
-import Bluebird from 'bluebird';
+import {Group, GroupService, Membership, User} from '../../../../../models';
 import sinon from 'sinon';
 
 describe('delete /api/group/:groupId', function() {
@@ -134,8 +134,8 @@ describe('delete /api/group/:groupId', function() {
     });
 
     // Stub Group.findByPk to simulate that group doesn't exist
-    const groupFindByPk = sinon.stub(Group, 'findByPk')
-        .usingPromise(Bluebird).resolves(null as any);
+    const deleteStub = sinon.stub(GroupService, 'delete')
+        .callsFake(() => Promise.reject(new GroupNotFoundError(group.id)));
 
     await agent
         .delete(`/api/group/${group.id}`)
@@ -145,7 +145,7 @@ describe('delete /api/group/:groupId', function() {
           expect(res.body.message).to.include(`Group with id ${group.id}`);
         });
 
-    sinon.assert.calledOnceWithExactly(groupFindByPk as any, group.id);
+    sinon.assert.calledOnce(deleteStub);
   });
 
   it('deletes all memberships with groups and the group and' +

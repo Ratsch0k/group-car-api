@@ -7,6 +7,7 @@ import debug from 'debug';
 import {CarNotFoundError, InternalError} from '@app/errors';
 import sequelize from '@db';
 import Sequelize from 'sequelize';
+import {containsTransaction, isTransaction} from '@util/is-transaction';
 
 /**
  * Primary key for a car.
@@ -27,14 +28,14 @@ export interface CarPk {
  */
 export interface CarQueryOptions extends RepositoryQueryOptions {
   /**
-   * Whether or not the data of the group should be included.
+   * Whether the data of the group should be included.
    *
    * Default value: `false`
    */
   withGroupData: boolean;
 
   /**
-   * Whether or no the user data of the driver should be included.
+   * Whether the user data of the driver should be included.
    *
    * Default value: `true`
    */
@@ -50,19 +51,44 @@ const defaultOptions: CarQueryOptions = {
 };
 
 /**
+ * Logger.
+ */
+const log = debug('group-car:car:repository');
+
+/**
+ * Error logger.
+ */
+const error = debug('group-car:car:repository:error');
+
+/**
+ * Query build options.
+ */
+const queryBuildOptions = buildFindQueryOptionsMethod(
+    [
+      {
+        key: 'withGroupData',
+        include: [{
+          model: Group,
+          as: 'Group',
+          attributes: Group.simpleAttributes,
+        }],
+      },
+      {
+        key: 'withDriverData',
+        include: [{
+          model: User,
+          as: 'Driver',
+          attributes: User.simpleAttributes,
+        }],
+      },
+    ],
+    defaultOptions,
+);
+
+/**
  * Repository for cars.
  */
-export class CarRepository {
-  /**
-   * Logger.
-   */
-  private static log = debug('group-car:car:repository');
-
-  /**
-   * Error logger.
-   */
-  private static error = debug('group-car:car:repository:error');
-
+export const CarRepository = {
   /**
    * Create a new car with the specified values.
    * @param groupId   - Id of the group for which this is
@@ -70,15 +96,15 @@ export class CarRepository {
    * @param color     - Color of the group
    * @param options   - Query options for the return value
    */
-  public static async create(
+  async create(
       groupId: number,
       name: string,
       color: CarColor,
       options?: Partial<CarQueryOptions>,
   ): Promise<Car> {
-    this.log('Create car %s for group %d', name, groupId);
+    log('Create car %s for group %d', name, groupId);
 
-    const buildOptions = this.queryBuildOptions(options);
+    const buildOptions = queryBuildOptions(options);
 
     try {
       const car = await sequelize.transaction(async (t) => {
@@ -88,7 +114,7 @@ export class CarRepository {
             groupId,
           },
           transaction: t,
-          ...options,
+          ...containsTransaction(options),
         }).then((res) => {
           if (res && res.get('max_id')) {
             return res.get('max_id') as number + 1;
@@ -107,14 +133,14 @@ export class CarRepository {
             {
               include: buildOptions.include,
               transaction: t,
-              ...options,
+              ...containsTransaction(options),
             },
         );
       });
 
       return car;
     } catch (e) {
-      this.error(
+      error(
           'Error occurred while creating car %s for group %d',
           name,
           groupId,
@@ -122,20 +148,20 @@ export class CarRepository {
       );
       throw new InternalError('Could not create car');
     }
-  }
+  },
 
   /**
    * Find all cars for the specified group.
    * @param groupId   - Id of the group
    * @param options   - Query options.
    */
-  public static async findByGroup(
+  async findByGroup(
       groupId: number,
       options?: Partial<CarQueryOptions>,
   ): Promise<Car[]> {
-    this.log('Find all cars for group %d', groupId);
+    log('Find all cars for group %d', groupId);
 
-    const queryOptions = this.queryBuildOptions(options);
+    const queryOptions = queryBuildOptions(options);
 
     try {
       const cars = await Car.findAll(
@@ -144,15 +170,15 @@ export class CarRepository {
               groupId,
             },
             include: queryOptions.include,
-            ...options,
+            ...containsTransaction(options),
           },
       );
       return cars;
     } catch (e) {
-      this.error('Error while getting cars for group %d', groupId, e);
+      error('Error while getting cars for group %d', groupId, e);
       throw new InternalError('Couldn\'t get cars');
     }
-  }
+  },
 
   /**
    * Find the car by the specified pk (primary key) or
@@ -160,12 +186,12 @@ export class CarRepository {
    * @param pk      - The pk to search for
    * @param options - Query options
    */
-  public static async findById(
+  async findById(
       pk: CarPk,
       options?: Partial<CarQueryOptions>,
   ): Promise<Car> {
-    this.log('Search for car with pk %o', pk);
-    const queryOptions = this.queryBuildOptions(options);
+    log('Search for car with pk %o', pk);
+    const queryOptions = queryBuildOptions(options);
 
     let car;
     try {
@@ -175,21 +201,21 @@ export class CarRepository {
           groupId: pk.groupId,
         },
         include: queryOptions.include,
-        ...options,
+        ...containsTransaction(options),
       });
     } catch (e) {
-      this.error('Error while finding car with pk %o: ', pk, e);
+      error('Error while finding car with pk %o: ', pk, e);
       throw new InternalError('An error occurred while searching for the car');
     }
 
     if (car === null) {
-      this.log('Car with pk %o doesn\'t exist');
+      log('Car with pk %o doesn\'t exist');
       throw new CarNotFoundError(pk.groupId, pk.carId);
     }
 
-    this.log('Found car with pk %o', pk);
+    log('Found car with pk %o', pk);
     return car;
-  }
+  },
 
   /**
    * Deletes a car of a group.
@@ -200,10 +226,12 @@ export class CarRepository {
    * @throws {@link CarNotFoundError}
    * If there is no car with the given primary key
    */
-  public static async delete(
+  async delete(
       pk: CarPk,
       options?: Partial<RepositoryQueryOptions>,
   ): Promise<void> {
+    log('Delete car %d of group %d', pk.carId, pk.groupId);
+
     // Delete car
     const deletedAmount = await Car.destroy({
       where: {
@@ -211,39 +239,17 @@ export class CarRepository {
         groupId: pk.groupId,
       },
       limit: 1, // Ensure that never more than one car can be deleted.
-      transaction: options?.transaction,
+      transaction: isTransaction(options?.transaction),
     });
 
     // If no row is deleted, throw CarNotFoundError
     if (deletedAmount === 0) {
+      error('Group %d has no car %d', pk.groupId, pk.carId);
       throw new CarNotFoundError(pk.groupId, pk.carId);
     }
-  }
 
-  /**
-   * Query build options.
-   */
-  private static readonly queryBuildOptions = buildFindQueryOptionsMethod(
-      [
-        {
-          key: 'withGroupData',
-          include: [{
-            model: Group,
-            as: 'Group',
-            attributes: Group.simpleAttributes,
-          }],
-        },
-        {
-          key: 'withDriverData',
-          include: [{
-            model: User,
-            as: 'Driver',
-            attributes: User.simpleAttributes,
-          }],
-        },
-      ],
-      defaultOptions,
-  )
-}
+    log('Successfully deleted car %d of group %d', pk.carId, pk.groupId);
+  },
+};
 
 export default CarRepository;
