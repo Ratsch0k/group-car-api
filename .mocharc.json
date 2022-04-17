@@ -4,6 +4,9 @@
     "source-map-support/register",
     "tsconfig-paths/register"
   ],
+  "file": [
+    "test/inject-custom-checks.ts"
+  ],
   "recursive": true,
   "extensions": ["ts"], 
   "timeout": 3000
