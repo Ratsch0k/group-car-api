@@ -8,6 +8,7 @@ import {obfuscateMetrics} from '@util/obfuscateMetrics';
 import debug from 'debug';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
+import compression from 'compression';
 
 // Inject custom checks for **express-validator**.
 // See `validators/inject-custom-checks.ts` for more details.
@@ -37,6 +38,8 @@ app.disable('x-powered-by');
 const nonTraceablePaths = [
   '/swagger-stats/metrics',
 ];
+
+
 /**
  * Initialise sentry. Don't if testing
  */
@@ -125,6 +128,11 @@ app.use(
     postLoginJwtValidator,
     apiRouter,
 );
+
+/**
+ * Add compression for static content
+ */
+app.use(compression());
 
 /**
  * Configure serving of documentation
