@@ -3,10 +3,6 @@ import debug from 'debug';
 import {Car} from '@models';
 import {wrapSocketMiddleware} from '@app/util/socket-middleware-wrapper';
 import cookieParser from 'cookie-parser';
-import jwtCsrf from '@app/routes/auth/jwt/jwt-csrf';
-import expressJwt from 'express-jwt';
-import config from '@app/config';
-import {postLoginJwtValidator} from '@app/routes/auth/jwt/jwt-util';
 import {NextFunction, Request, Response} from 'express';
 import {MembershipService} from '@app/models';
 import {
@@ -70,11 +66,9 @@ export const GroupNotificationService = {
     io = _io;
     nsp = io.of(/^\/group\/\w+/);
     nsp.use(this.logConnection.bind(this));
-    nsp.use(wrapSocketMiddleware(cookieParser()));
+    nsp.use(wrapSocketMiddleware(cookieParser() as never));
     nsp.use((socket, next) => {
       wrapSocketMiddleware((() => {
-        const jwtMiddleware = jwtCsrf();
-
         return (req: Request, res: Response, next: NextFunction) => {
           /*
            * Override res.cookie to throw an error.
@@ -90,7 +84,6 @@ export const GroupNotificationService = {
             return this;
           };
           try {
-            jwtMiddleware(req, res, next);
           } catch (e) {
             ioLog('Error in jwt csrf middleware: ', e);
             next(new InternalError());
@@ -98,13 +91,6 @@ export const GroupNotificationService = {
         };
       })())(socket, next);
     });
-    nsp.use(wrapSocketMiddleware(expressJwt({
-      secret: config.jwt.secret,
-      getToken: config.jwt.getToken,
-      requestProperty: 'auth',
-      algorithms: ['HS512'],
-    })));
-    nsp.use(wrapSocketMiddleware(postLoginJwtValidator));
     nsp.use(this.checkUserAuthorization);
     nsp.on('connection', (socket) => {
       ioLog(

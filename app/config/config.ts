@@ -10,6 +10,7 @@ import {
   UserConfig,
   Config,
   MetricsConfig,
+  RedisConfig,
 } from './config.d';
 import _ from 'lodash';
 import defaultConfig from './defaultConfig';
@@ -39,6 +40,8 @@ log('Server: %s', serverType);
  */
 const auth: AuthConfig = {
   saltRounds: 8,
+  csrfTokenName: 'XSRF-TOKEN',
+  session: defaultConfig.auth.session,
 };
 /**
  * Initialize ErrorConfig with default value
@@ -56,6 +59,7 @@ if (environment === 'production') {
   auth.saltRounds = 10;
   error.withStack = false;
   morgan.formatString = 'common';
+  auth.session.cookieOptions.secure = true;
 } else if (environment === 'test') {
   auth.saltRounds = 4;
   morgan.formatString = null;
@@ -107,9 +111,19 @@ const metrics: Partial<MetricsConfig> = {
   dsn: process.env.SENTRY_DSN || 'https://7d4cc992f614416abcb1007107e12c16@o656739.ingest.sentry.io/5763203',
 };
 
+const redis: RedisConfig = {
+  hostname: process.env.REDIS_HOSTNAME,
+  port: process.env.REDIS_PORT ?
+    parseInt(process.env.REDIS_PORT, 10) :
+    undefined,
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_PASSWORD,
+};
+
 const config: DeepPartial<Config> = {
   user,
   database,
+  redis,
   static: staticConfig,
   auth,
   morgan,

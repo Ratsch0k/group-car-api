@@ -14,6 +14,7 @@ import {
 } from '@errors';
 import debug from 'debug';
 import {bindUser} from '@util/user-bound-logging';
+import {Transaction} from 'typings';
 
 /**
  * Logging method for errors.
@@ -60,7 +61,7 @@ export const InviteService = {
      * To avoid that only one of those is executed (other one throws)
      * do it in a transaction.
      */
-    const transaction = await db.transaction();
+    const transaction = await db.transaction() as unknown as Transaction;
 
     // Delete invitation
 

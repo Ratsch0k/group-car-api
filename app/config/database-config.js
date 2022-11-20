@@ -12,9 +12,9 @@ module.exports = {
     logging: (line) => log(line),
   },
   test: {
-    username: 'groupcarapitest',
-    password: 'groupcarapitest',
-    database: 'groupcarapitest',
+    username: 'groupcartest',
+    password: 'groupcartest',
+    database: 'groupcartest',
     host: '127.0.0.1',
     dialect: 'postgres',
     keepDefaultTimezone: true,

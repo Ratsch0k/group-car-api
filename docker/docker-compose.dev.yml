@@ -4,9 +4,10 @@ services:
   group-car-dev:
     container_name: group-car-dev
     user: node
-    build: .
+    build: ..
     volumes:
       - ../../group-car/build:/home/node/group-car-api/frontend
+      - ../app:/home/node/group-car-api/app:z
     environment:
       NODE_ENV: "development"
       HTML_STATIC: "/home/node/group-car-api/frontend"
@@ -18,10 +19,10 @@ services:
       JWT_SECRET: "groupcartest"
       DEBUG: "group-car*,group-car-db*"
       DISABLE_SIGN_UP_THROUGH_REQUEST: "true"
+      REDIS_HOSTNAME: "redis"
+      REDIS_PORT: "6379"
     working_dir: "/home/node/group-car-api"
     restart: always
-    depends_on:
-      - postgres
     command: /bin/bash -c "yarn sequelize-cli db:migrate && yarn dev"
     ports:
       - "8080:8080"
@@ -34,3 +35,19 @@ services:
       - POSTGRES_PASSWORD=groupcartest
       - POSTGRES_USER=groupcartest
     restart: always
+    ports:
+      - "5432:5432"
+    
+  redis:
+    container_name: group-car-redis
+    image: redislabs/rejson:latest
+    restart: always
+    ports:
+      - "6379:6379"
+
+  redis-commander:
+    image: ghcr.io/joeferner/redis-commander:latest
+    environment:
+      REDIS_HOSTS: "local:redis:6379"
+    ports:
+      - "8081:8081"

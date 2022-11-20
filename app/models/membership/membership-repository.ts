@@ -203,7 +203,7 @@ export const MembershipRepository = {
       isAdmin ? 'admin' : 'non-admin',
     );
     // Get membership of user
-    const membership = await this.findById(id, containsTransaction(options));
+    const membership = await this.findById(id, options);
 
     // Update membership to admin
     return membership.update({isAdmin}, containsTransaction(options));

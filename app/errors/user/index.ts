@@ -8,3 +8,4 @@ export * from './username-not-found-error';
 export * from './new-password-must-be-different-error';
 export * from './incorrect-password-error';
 export * from './profile-picture-not-found-error';
+export * from './email-address-already-used-error';

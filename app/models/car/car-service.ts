@@ -25,6 +25,7 @@ import {
 import debug from 'debug';
 import sequelize from '@db';
 import {bindUser} from '@util/user-bound-logging';
+import {Transaction} from 'typings';
 
 /**
  * Logger.
@@ -222,7 +223,7 @@ export const CarService = {
       // Get car and check if it is already used
       const car = await CarRepository.findById(
           {groupId, carId},
-          {transaction: t},
+          {transaction: t as unknown as Transaction},
       );
 
       if (car.driverId !== null) {
@@ -235,7 +236,8 @@ export const CarService = {
         driverId: currentUser.id,
         latitude: null,
         longitude: null,
-      }, {transaction: t});
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }, {transaction: t as any});
 
       userLog('Send notification that car is being driven');
       GroupNotificationService.notifyCarUpdate(
@@ -314,7 +316,7 @@ export const CarService = {
     try {
       userLog('Check if user is driver of car %d of group %d', carId, groupId);
       const car = await CarRepository
-          .findById(carPk, {transaction: t});
+          .findById(carPk, {transaction: t as unknown as Transaction});
 
       if (car.driverId !== currentUser.id) {
         userError(

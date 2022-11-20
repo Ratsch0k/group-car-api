@@ -5,10 +5,10 @@ import {RequestHandler} from 'express';
  * @param req - Request
  * @param res - Response
  */
-const logoutController: RequestHandler = (req, res) => {
-  res.setJwtToken({});
-  res.status(204);
-  res.send();
+const logoutController: RequestHandler = async (req, res) => {
+  await req.destroySession();
+
+  res.status(204).send();
 };
 
 export default logoutController;

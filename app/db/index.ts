@@ -66,7 +66,7 @@ let syncPromise: Promise<void>;
 if (config.database.withFlush) {
   syncPromise = database.sync({force: true, logging: false}).then(() => {
     httpLog('Flushed database');
-  });
+  }) as unknown as Promise<void>;
 } else {
   syncPromise = Promise.resolve();
 }

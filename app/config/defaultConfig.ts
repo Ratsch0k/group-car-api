@@ -1,6 +1,5 @@
 import {Config} from './config.d';
 import dbConfig from './database-config';
-import jwt from './jwt-config';
 import {Config as SequelizeConfig} from 'sequelize';
 const environment = process.env.NODE_ENV || 'development';
 const sequelize: SequelizeConfig =
@@ -15,6 +14,18 @@ const defaultConfig: Config = {
   },
   auth: {
     saltRounds: 8,
+    csrfTokenName: 'XSRF-TOKEN',
+    session: {
+      cookieName: 'SID',
+      absoluteTimeout: 1000 * 60 * 60 * 24 * 7,
+      inactivityTimeout: 1000 * 60 * 60 * 24,
+      sessionPrefix: 'session',
+      cookieOptions: {
+        secure: false,
+        sameSite: 'lax',
+        httpOnly: true,
+      },
+    },
   },
   static: {
     path: path.resolve('./static'),
@@ -23,7 +34,6 @@ const defaultConfig: Config = {
   error: {
     withStack: false,
   },
-  jwt,
   morgan: {
     formatString: 'dev',
   },
@@ -34,11 +44,14 @@ const defaultConfig: Config = {
     signUpThroughRequest: true,
     maxLimitQuery: 20,
     maxUsernameLength: 25,
+    userPrefix: 'user',
   },
   serverType: 'release',
   group: {
     maxMembers: 25,
     maxCars: 8,
+  },
+  redis: {
   },
   mail: {
     accountRequest: {

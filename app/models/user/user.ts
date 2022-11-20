@@ -69,7 +69,7 @@ export class User extends Model {
    * @param username - The username of the user to find
    */
   public static findByUsername(username: string): Promise<User | null> {
-    return this.findOne({where: {username}});
+    return this.findOne({where: {username}}) as unknown as Promise<User|null>;
   }
 
   /**

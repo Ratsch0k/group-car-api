@@ -150,7 +150,7 @@ export const createMembershipForOwner = (
         err,
     );
     throw new InternalError();
-  });
+  }) as unknown as Promise<void>;
 };
 
 // Create the hooks object

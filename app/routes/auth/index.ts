@@ -1,9 +1,9 @@
 import * as express from 'express';
 import loginRouter from './login';
 import signUpValidator from './signUp/sign-up-validator';
-import csrfRouter from './csrf/csrf-router';
 import tokenRouter from './token/token-router';
 import logoutRouter from './logout/logout-router';
+import csrfRouter from './csrf';
 const router = express.Router();
 
 

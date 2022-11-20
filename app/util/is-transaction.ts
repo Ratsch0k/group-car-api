@@ -9,7 +9,7 @@ import {Transaction} from '../../typings';
 export const isTransaction = (
     t: Transaction | undefined,
 ): sequelize.Transaction | undefined => {
-  return t as sequelize.Transaction;
+  return t as unknown as sequelize.Transaction;
 };
 
 interface ObjectWithT {

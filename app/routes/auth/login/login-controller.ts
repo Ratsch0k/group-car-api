@@ -1,10 +1,7 @@
-import {User, UserDto} from '@models';
-import ModelToDtoConverter from '@util/model-to-dto-converter';
-import bcrypt from 'bcrypt';
 import debug from 'debug';
-import {InvalidLoginError} from '@errors';
-import {convertUserToJwtPayload} from '@app/routes/auth/jwt/jwt-util';
+import {BadRequestError} from '@errors';
 import {RequestHandler} from 'express';
+import {AuthenticationService} from '@app/auth';
 
 const log = debug('group-car:login:controller:log');
 const error = debug('group-car:login:controller:error');
@@ -15,32 +12,22 @@ const error = debug('group-car:login:controller:error');
  * @param password - Password of the login request
  * @returns Whether or not the login was successful
  */
-const loginController: RequestHandler = (req, res, next) => {
-  User.findByUsername(req.body.username)
-      .then((user: User | null) => {
-        if (user === null) {
-          error('User "%s" doesn\'t exist', req.body.username);
-          throw new InvalidLoginError();
-        } else {
-          log('Found user "%s"', req.body.username);
-          // Compare password
-          return bcrypt.compare(req.body.password, user.password)
-              .then((result) => {
-                // Check if sent password is equal to stored user password
-                if (result) {
-                  log('Login successful for IP %s', req.ip);
-                  res.setJwtToken(convertUserToJwtPayload(user), user.username);
-                  res.send(ModelToDtoConverter
-                      .convertSequelizeModel(user, UserDto));
-                } else {
-                  error('Invalid password for IP %s', req.ip);
-                  throw new InvalidLoginError();
-                }
-              });
-        }
-      }).catch((err) => {
-        next(err);
-      });
+const loginController: RequestHandler = async (req, res, next) => {
+  log('Log in request from %s', req.ip);
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    error('Invalid request from %s', req.ip);
+    throw new BadRequestError('Incorrect parameters');
+  }
+
+  const user = await AuthenticationService.login(
+      username, password, {ip: req.ip});
+
+  await req.createSession(user);
+
+  res.send(user);
 };
 
 export default loginController;

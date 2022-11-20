@@ -1,8 +1,18 @@
-import {JWTConfig} from './jwt-config';
+import {CookieOptions} from 'express';
 import {Config as SequelizeConfig} from 'sequelize/types';
+
+export interface SessionConfig {
+  cookieName: string;
+  sessionPrefix: string;
+  absoluteTimeout: number;
+  inactivityTimeout: number;
+  cookieOptions: CookieOptions;
+}
 
 export interface AuthConfig {
   saltRounds: number;
+  csrfTokenName: string;
+  session: SessionConfig;
 }
 
 export interface StaticConfig {
@@ -19,6 +29,13 @@ export interface DBConfig {
   withFlush: boolean;
 }
 
+export interface RedisConfig {
+  hostname?: string;
+  port?: number;
+  username?: string;
+  password?: string;
+}
+
 export interface MorganConfig {
   formatString: string | null;
 }
@@ -32,6 +49,7 @@ export interface UserConfig {
   signUpThroughRequest: boolean;
   maxLimitQuery: number;
   maxUsernameLength: number;
+  userPrefix: string;
 }
 
 export interface GroupConfig {
@@ -63,10 +81,10 @@ export interface MetricsConfig {
 
 export interface Config {
   database: DBConfig;
+  redis: RedisConfig;
   auth: AuthConfig;
   static: StaticConfig;
   error: ErrorConfig;
-  jwt: JWTConfig;
   morgan: MorganConfig;
   user: UserConfig;
   serverType: string;

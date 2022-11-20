@@ -2,13 +2,13 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import errorHandler from '@errors';
-import expressJwt from 'express-jwt';
 import morganDebug from 'morgan-debug';
 import {obfuscateMetrics} from '@util/obfuscateMetrics';
 import debug from 'debug';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import compression from 'compression';
+import SessionManager from './auth/session/session-manager';
 
 // Inject custom checks for **express-validator**.
 // See `validators/inject-custom-checks.ts` for more details.
@@ -20,8 +20,6 @@ injectCustomChecks();
  */
 import config from '@config';
 import authRouter from '@app/routes/auth';
-import jwtCsrf from './routes/auth/jwt/jwt-csrf';
-import {postLoginJwtValidator} from '@routes/auth/jwt/jwt-util';
 import apiRouter from './routes/api';
 import {userRouter} from '@routes/user';
 
@@ -83,12 +81,13 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
-app.use(jwtCsrf());
-
+const sessionManager = new SessionManager();
+app.use(sessionManager.getRouter());
 
 import swaggerStats from 'swagger-stats';
 import fs from 'fs';
 import yaml from 'js-yaml';
+import {csrfMiddleware} from './auth/csrf-middleware';
 
 /*
  * If metrics enabled, configure middleware
@@ -103,12 +102,15 @@ if (config.metrics.enabled) {
       swaggerSpec: spec,
       onResponseFinish: obfuscateMetrics,
     }));
-    log('Metrics initialised');
+    log('Metrics initialized');
   } catch (e) {
-    log('Could not initialise metrics: %s', e.message);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    log('Could not initialize metrics: %s', (e as any).message);
   }
 }
 
+// Attach csrf middleware
+app.use(csrfMiddleware());
 
 // Adding authentication routes
 app.use('/auth', authRouter);
@@ -119,13 +121,6 @@ app.use('/user', userRouter);
 // Add api router
 app.use(
     '/api',
-    expressJwt({
-      secret: config.jwt.secret,
-      getToken: config.jwt.getToken,
-      requestProperty: 'auth',
-      algorithms: ['HS512'],
-    }),
-    postLoginJwtValidator,
     apiRouter,
 );
 

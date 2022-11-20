@@ -11,7 +11,7 @@ class UserNotFoundError extends NotFoundError {
   constructor(idOrName: number | string) {
     if (typeof idOrName === 'string') {
       super(
-          `The user with username "${idOrName} doesn't exist`,
+          `The user with username "${idOrName}" doesn't exist`,
           {username: idOrName},
       );
     } else {

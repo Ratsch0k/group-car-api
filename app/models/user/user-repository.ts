@@ -42,7 +42,8 @@ export const UserRepository = {
           {
             // Only get not deleted users.
             deletedAt: {
-              [Op.is]: null,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              [Op.is]: null as any,
             },
             // Filter for specified startsWith parameter
             username: {
@@ -88,7 +89,7 @@ export const UserRepository = {
    * @param options -  Additional query options
    *
    * @throws {@link UserNotFoundError}
-   * if no username exists with that username
+   *  if no username exists with that username
    */
   async findByUsername(
       username: string,
@@ -128,6 +129,41 @@ export const UserRepository = {
     }
 
     return pb;
+  },
+
+  /**
+   * Check if the given email address is used by any user.
+   * @param email - Email address
+   * @returns Whether or not a user already uses the email address
+   */
+  async isEmailUsed(
+      email: string,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<boolean> {
+    log('Check if email address %s is used', email);
+    const result = await User.count({
+      where: {
+        email,
+      },
+      transaction: isTransaction(options?.transaction),
+    });
+
+    return result > 0;
+  },
+
+  async create(
+      username: string,
+      email: string,
+      password: string,
+      options?: Partial<RepositoryQueryOptions>,
+  ): Promise<User> {
+    log('Create new user with username %s', username);
+
+    return User.create({
+      username,
+      email,
+      password,
+    }, {transaction: isTransaction(options?.transaction)});
   },
 };
 
