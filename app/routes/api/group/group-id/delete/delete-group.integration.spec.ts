@@ -13,7 +13,7 @@ import {Group, GroupService, Membership, User} from '../../../../../models';
 import sinon from 'sinon';
 
 describe('delete /api/group/:groupId', function() {
-  const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+  const csrfHeaderName = config.auth.csrfTokenName;
 
   let csrf: string;
   let user: any;

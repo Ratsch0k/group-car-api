@@ -13,7 +13,6 @@ describe('ChangePasswordController', () => {
       id: 1,
       username: 'test',
       email: 'test@mail.com',
-      isBetaUser: false,
       createdAt: new Date(100),
       updatedAt: new Date(100),
     };

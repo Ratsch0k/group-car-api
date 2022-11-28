@@ -6,7 +6,7 @@ import {expect, assert} from 'chai';
 import config from '../../../../../config';
 import {User, Group, Invite} from '../../../../../models';
 
-const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+const csrfHeaderName = config.auth.csrfTokenName;
 
 describe('get /api/user/invite', function() {
   let agent: request.SuperTest<request.Test>;
@@ -50,7 +50,7 @@ describe('get /api/user/invite', function() {
 
     it('responses with correct invites', async function() {
       // Creates users and groups for which the invites can be generated
-      const groupIds = [];
+      const groupIds: number[] = [];
       for (let i = 0; i < 5; i++) {
         const testUser = await User.create({
           username: `test-user-${i}-name`,

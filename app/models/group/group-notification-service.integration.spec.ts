@@ -12,7 +12,7 @@ import Group from './group';
 import http from 'http';
 
 describe('GroupNotificationService', function() {
-  const csrfName = config.auth.csrfTokenName.toLowerCase();
+  const csrfName = config.auth.csrfTokenName;
   let io: Server;
   let port: number;
   let csrf: string;

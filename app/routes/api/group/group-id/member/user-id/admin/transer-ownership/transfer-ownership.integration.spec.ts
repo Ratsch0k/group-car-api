@@ -13,7 +13,7 @@ import {
 } from '../../../../../../../../errors';
 import {Group, Invite, Membership, User} from '../../../../../../../../models';
 
-const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+const csrfHeaderName = config.auth.csrfTokenName;
 
 describe('post /api/group/:groupId/member/' +
 ':userId/admin/transfer-ownership', function() {

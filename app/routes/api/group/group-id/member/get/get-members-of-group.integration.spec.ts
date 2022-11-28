@@ -9,7 +9,7 @@ import {Group, Membership, User} from '../../../../../../models';
 import {TestUtils} from '../../../../../../util/test-utils.spec';
 
 describe('get /api/group/:groupId/member', function() {
-  const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+  const csrfHeaderName = config.auth.csrfTokenName;
   let agent: supertest.SuperTest<supertest.Test>;
   let user: any;
   let csrf: string;

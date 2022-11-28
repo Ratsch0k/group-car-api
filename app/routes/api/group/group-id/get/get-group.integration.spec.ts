@@ -9,7 +9,7 @@ import {Invite, Group, User, Membership} from '../../../../../models';
 import sinon from 'sinon';
 
 describe('get /api/group/:groupId', function() {
-  const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+  const csrfHeaderName = config.auth.csrfTokenName;
 
   let csrf: string;
   let user: any;

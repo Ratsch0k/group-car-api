@@ -14,7 +14,7 @@ import {
   CannotChangeOwnerMembershipError,
 } from '../../../../../../../../errors';
 
-const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+const csrfHeaderName = config.auth.csrfTokenName;
 
 describe('put /api/group/:groupId/member/:userId/admin/grant', function() {
   let agent: supertest.SuperTest<supertest.Test>;

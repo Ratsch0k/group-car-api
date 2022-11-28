@@ -22,7 +22,7 @@ import {
 import {Server} from 'socket.io';
 
 describe('post /api/group/:groupId/car', function() {
-  const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+  const csrfHeaderName = config.auth.csrfTokenName;
   let agent: supertest.SuperTest<supertest.Test>;
   let csrf: string;
   let user: any;
@@ -355,7 +355,7 @@ describe('post /api/group/:groupId/car', function() {
               expect(actualCar.color).to.equal(car.color);
               expect(actualCar.name).to.equal(car.name);
               socket.close();
-              resolve();
+              resolve(null);
             } catch (e) {
               reject(e);
             }

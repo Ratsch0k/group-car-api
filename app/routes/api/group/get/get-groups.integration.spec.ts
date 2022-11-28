@@ -8,7 +8,7 @@ import {Group, User} from '../../../../models';
 import {expect} from 'chai';
 
 describe('get /api/group', function() {
-  const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+  const csrfHeaderName = config.auth.csrfTokenName;
   let agent: supertest.SuperTest<supertest.Test>;
   let csrf: string;
   let user: any;

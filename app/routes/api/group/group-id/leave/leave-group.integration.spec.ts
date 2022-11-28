@@ -7,7 +7,7 @@ import config from '../../../../../config/config';
 import {expect} from 'chai';
 import {Membership} from '../../../../../models';
 
-const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+const csrfHeaderName = config.auth.csrfTokenName;
 
 
 describe('post /api/group/:groupId/leave', function() {

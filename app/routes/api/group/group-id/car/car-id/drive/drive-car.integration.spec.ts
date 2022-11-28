@@ -20,7 +20,7 @@ import {
 import {TestUtils} from '../../../../../../../util/test-utils.spec';
 
 describe('put /api/group/:groupId/car/:carId/drive', function() {
-  const csrfName = config.jwt.securityOptions.tokenName.toLowerCase();
+  const csrfName = config.auth.csrfTokenName;
   let user: any;
   let agent: supertest.SuperTest<supertest.Test>;
   let csrf: string;
@@ -205,7 +205,7 @@ describe('put /api/group/:groupId/car/:carId/drive', function() {
               expect(actualCar.longitude).to.be.null;
               expect(actualCar.driverId).to.equal(user.id);
               socket.close();
-              resolve();
+              resolve(null);
             } catch (e) {
               reject(e);
             }

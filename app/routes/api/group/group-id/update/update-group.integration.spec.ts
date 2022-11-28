@@ -27,7 +27,7 @@ describe('put /api/group/:groupId', function() {
   });
 
   describe('user is logged in:', function() {
-    const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+    const csrfHeaderName = config.auth.csrfTokenName;
 
     let csrf: string;
     let user: any;

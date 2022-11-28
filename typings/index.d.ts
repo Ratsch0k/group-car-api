@@ -1,10 +1,9 @@
 import {PreSession, Session} from '@app/auth/session/session';
 import {ExtendedValidationChain} from '@app/validators';
-import Bluebird from 'bluebird';
 
 export interface Transaction {
-  commit(): Promise<void>;
-  rollback(): Promise<void>;
+  commit(): PromiseLike<void>;
+  rollback(): PromiseLike<void>;
 }
 
 /**

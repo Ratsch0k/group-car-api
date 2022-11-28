@@ -19,7 +19,7 @@ import {
 import {Server} from 'socket.io';
 
 describe('put /api/group/:groupId/car/:carId/park', function() {
-  const csrfName = config.jwt.securityOptions.tokenName.toLowerCase();
+  const csrfName = config.auth.csrfTokenName;
   let user: any;
   let csrf: string;
   let agent: supertest.SuperTest<supertest.Test>;
@@ -305,7 +305,7 @@ describe('put /api/group/:groupId/car/:carId/park', function() {
               expect(actualCar.longitude).to.equal(longitude);
               expect(actualCar.driverId).to.be.null;
               socket.close();
-              resolve();
+              resolve(null);
             } catch (e) {
               reject(e);
             }

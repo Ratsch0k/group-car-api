@@ -29,7 +29,7 @@ export interface TestContext {
   jwtValue: string;
 }
 
-const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+const csrfHeaderName = config.auth.csrfTokenName;
 
 
 /**

@@ -15,7 +15,7 @@ import {
 } from '../../../../../../../errors';
 import {Group, User, Membership} from '../../../../../../../models';
 
-const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+const csrfHeaderName = config.auth.csrfTokenName;
 
 /**
  * Creates the url to be tested based on the parameters.

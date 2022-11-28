@@ -15,7 +15,7 @@ import request from 'supertest';
 import config from '../../../../../config';
 import sinon from 'sinon';
 
-const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+const csrfHeaderName = config.auth.csrfTokenName;
 
 describe('post /api/group/:groupId/invite', function() {
   let agent: request.SuperTest<request.Test>;

@@ -5,7 +5,7 @@ import config from '../../../../../../config';
 import request from 'supertest';
 import {expect} from 'chai';
 
-const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+const csrfHeaderName = config.auth.csrfTokenName;
 
 describe('post /api/user/invite/:groupId/join', function() {
   let agent: request.SuperTest<request.Test>;

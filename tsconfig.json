@@ -80,5 +80,8 @@
     "app/**/*.spec.ts",
     "static/coverage",
     "admin-tool.js"
-  ]
+  ],
+  "ts-node": {
+    "files":true
+  }
 }

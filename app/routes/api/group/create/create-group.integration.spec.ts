@@ -7,7 +7,7 @@ import {expect} from 'chai';
 
 
 describe('post /api/group', function() {
-  const csrfHeaderName = config.jwt.securityOptions.tokenName.toLowerCase();
+  const csrfHeaderName = config.auth.csrfTokenName;
 
   let csrf: string;
   let user: any;

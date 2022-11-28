@@ -30,7 +30,7 @@ describe('deleteCarController', function() {
         email: 'TEST@MAIL.COM',
         id: 11,
         isBetaUser: false,
-      } as Express.User,
+      } as unknown as Express.User,
     };
   });
 

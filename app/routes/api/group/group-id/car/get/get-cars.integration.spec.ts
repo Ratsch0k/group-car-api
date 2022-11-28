@@ -11,7 +11,7 @@ import {Car, CarColor, Group} from '../../../../../../models';
 import {TestUtils} from '../../../../../../util/test-utils.spec';
 
 describe('get /api/group/:groupId/car', function() {
-  const csrfName = config.jwt.securityOptions.tokenName.toLowerCase();
+  const csrfName = config.auth.csrfTokenName;
   let agent: supertest.SuperTest<supertest.Test>;
   let user: any;
   let csrf: string;
@@ -68,7 +68,7 @@ describe('get /api/group/:groupId/car', function() {
         ownerId: user.id,
       });
 
-      const expectedCars = [];
+      const expectedCars: any[] = [];
       // Create cars for the group
       for (let i = 0; i < 4; i++) {
         const car = await Car.create({
